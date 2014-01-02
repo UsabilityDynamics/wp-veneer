@@ -35,7 +35,7 @@ namespace UsabilityDynamics\Veneer {
        * @property text_domain
        * @var string
        */
-      public static $text_domain = 'veneer';
+      public static $text_domain = 'wp-veneer';
 
       /**
        * Singleton Instance Reference.
@@ -58,6 +58,84 @@ namespace UsabilityDynamics\Veneer {
        * @method __construct
        */
       public function __construct() {
+
+        // add_action( 'wp_before_admin_bar_render', array( $this, 'toolbar' ), 10 );
+
+      }
+
+      /**
+       * Add Cluster Toolbar
+       *
+       * @todo Add some sort of vidual for Bootstrap::$version and hostname.
+       *
+       * @method cluster_toolbar
+       * @for Boostrap
+       */
+      public function toolbar() {
+        global $wp_admin_bar;
+
+        $wp_admin_bar->add_menu( array(
+            'id'   => 'cluster',
+            'meta'   => array(
+              'html'     => '<div class="cluster-toolbar-info"></div>',
+              'target'   => '',
+              'onclick'  => '',
+              'title'    => 'Cluster',
+              'tabindex' => 10,
+              'class' => 'cluster-toolbar'
+            ),
+            'title' => 'Cluster',
+            'href' => network_admin_url( 'admin.php?page=cluster' )
+          )
+        );
+
+        $wp_admin_bar->add_menu( array(
+          'parent' => 'cluster',
+          'id'   => 'cluster-cdn',
+          'meta' => array(),
+          'title' => 'Media',
+          'href' => network_admin_url( 'admin.php?page=cluster#panel=cdn' )
+        ));
+
+        $wp_admin_bar->add_menu( array(
+          'parent' => 'cluster',
+          'id'   => 'cluster-search',
+          'meta' => array(),
+          'title' => 'Search',
+          'href' => network_admin_url( 'admin.php?page=cluster#panel=search' )
+        ));
+
+        $wp_admin_bar->add_menu( array(
+          'parent' => 'cluster',
+          'id'   => 'cluster-varnish',
+          'meta' => array(),
+          'title' => 'Speed',
+          'href' => network_admin_url( 'admin.php?page=cluster#panel=varnish' )
+        ));
+
+        $wp_admin_bar->add_menu( array(
+          'parent' => 'cluster',
+          'id'   => 'cluster-api',
+          'meta' => array(),
+          'title' => 'API',
+          'href' => network_admin_url( 'admin.php?page=cluster#panel=api' )
+        ));
+
+        $wp_admin_bar->add_menu( array(
+          'parent' => 'cluster',
+          'id'   => 'cluster-dns',
+          'meta' => array(),
+          'title' => 'DNS',
+          'href' => network_admin_url( 'admin.php?page=cluster#panel=dns' )
+        ));
+
+        $wp_admin_bar->add_menu( array(
+          'parent' => 'cluster',
+          'id'   => 'cluster-support',
+          'meta' => array(),
+          'title' => 'Support',
+          'href' => network_admin_url( 'admin.php?page=cluster#panel=support' )
+        ));
 
       }
 
