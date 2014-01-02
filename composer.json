@@ -15,10 +15,18 @@
       "homepage": "http://usabilitydynamics.com"
     }
   ],
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "http://repository.usabilitydynamics.com"
+    }
+  ],
   "require": {
-    "UsabilityDynamics/settings": "*",
-    "UsabilityDynamics/ui": "*",
-    "UsabilityDynamics/utility": "*"
+    "php": ">=5.3",
+    "usabilitydynamics/lib-wp-xmlrpc": "master",
+    "usabilitydynamics/lib-settings": "master",
+    "usabilitydynamics/lib-ui": "master",
+    "usabilitydynamics/lib-utility": "master"
   },
   "autoload": {
     "classmap": [
