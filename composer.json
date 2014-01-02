@@ -1,0 +1,29 @@
+{
+  "name": "usabilitydynamics/wp-veneer",
+  "version": "0.1.0",
+  "homepage": "https://github.com/UsabilityDynamics/wp-veneer",
+  "keywords": [
+    "wordpress",
+    "multisite",
+    "varnish"
+  ],
+  "license": "MIT",
+  "minimum-stability": "dev",
+  "authors": [
+    {
+      "name": "Andy Potanin",
+      "homepage": "http://usabilitydynamics.com"
+    }
+  ],
+  "require": {
+    "UsabilityDynamics/settings": "*",
+    "UsabilityDynamics/ui": "*",
+    "UsabilityDynamics/utility": "*"
+  },
+  "autoload": {
+    "classmap": [
+      "lib/class-bootstrap.php",
+      "lib/class-log.php"
+    ]
+  }
+}
