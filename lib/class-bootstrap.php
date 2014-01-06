@@ -38,6 +38,60 @@ namespace UsabilityDynamics\Veneer {
       public static $text_domain = 'wp-veneer';
 
       /**
+       * Veneer Cache Instance.
+       *
+       * @public
+       * @property $media
+       * @type {Object}
+       */
+      public $cache;
+
+      /**
+       * Veneer Documents Instance.
+       *
+       * @public
+       * @property $documents
+       * @type {Object}
+       */
+      public $documents;
+
+      /**
+       * Veneer Log Instance.
+       *
+       * @public
+       * @property $log
+       * @type {Object}
+       */
+      public $log;
+
+      /**
+       * Veneer Media Instance
+       *
+       * @public
+       * @property $media
+       * @type {Object}
+       */
+      public $media;
+
+      /**
+       * Veneer Security Instance
+       *
+       * @public
+       * @property $security
+       * @type {Object}
+       */
+      public $security;
+
+      /**
+       * Veneer Varnish Instance.
+       *
+       * @public
+       * @property $varnish
+       * @type {Object}
+       */
+      public $varnish;
+
+      /**
        * Singleton Instance Reference.
        *
        * @public
@@ -58,8 +112,14 @@ namespace UsabilityDynamics\Veneer {
        * @method __construct
        */
       public function __construct() {
+        global $wp_veneer;
 
-        // add_action( 'wp_before_admin_bar_render', array( $this, 'toolbar' ), 10 );
+        // Save context reference.
+        $wp_veneer = self::$instance = &$this;
+
+        $this->media     = new Media();
+
+        add_action( 'wp_before_admin_bar_render', array( $this, 'toolbar' ), 10 );
 
       }
 
@@ -75,66 +135,58 @@ namespace UsabilityDynamics\Veneer {
         global $wp_admin_bar;
 
         $wp_admin_bar->add_menu( array(
-            'id'   => 'cluster',
+            'id'   => 'veneer',
             'meta'   => array(
-              'html'     => '<div class="cluster-toolbar-info"></div>',
+              'html'     => '<div class="veneer-toolbar-info"></div>',
               'target'   => '',
               'onclick'  => '',
-              'title'    => 'Cluster',
+              'title'    => 'Veneer',
               'tabindex' => 10,
-              'class' => 'cluster-toolbar'
+              'class' => 'veneer-toolbar'
             ),
             'title' => 'Cluster',
-            'href' => network_admin_url( 'admin.php?page=cluster' )
+            'href' => network_admin_url( 'admin.php?page=veneer' )
           )
         );
 
         $wp_admin_bar->add_menu( array(
-          'parent' => 'cluster',
-          'id'   => 'cluster-cdn',
+          'parent' => 'veneer',
+          'id'   => 'veneer-cdn',
           'meta' => array(),
           'title' => 'Media',
-          'href' => network_admin_url( 'admin.php?page=cluster#panel=cdn' )
+          'href' => network_admin_url( 'admin.php?page=veneer#panel=cdn' )
         ));
 
         $wp_admin_bar->add_menu( array(
-          'parent' => 'cluster',
-          'id'   => 'cluster-search',
+          'parent' => 'veneer',
+          'id'   => 'veneer-search',
           'meta' => array(),
           'title' => 'Search',
-          'href' => network_admin_url( 'admin.php?page=cluster#panel=search' )
+          'href' => network_admin_url( 'admin.php?page=veneer#panel=search' )
         ));
 
         $wp_admin_bar->add_menu( array(
-          'parent' => 'cluster',
-          'id'   => 'cluster-varnish',
+          'parent' => 'veneer',
+          'id'   => 'veneer-varnish',
           'meta' => array(),
           'title' => 'Speed',
-          'href' => network_admin_url( 'admin.php?page=cluster#panel=varnish' )
+          'href' => network_admin_url( 'admin.php?page=veneer#panel=varnish' )
         ));
 
         $wp_admin_bar->add_menu( array(
-          'parent' => 'cluster',
-          'id'   => 'cluster-api',
+          'parent' => 'veneer',
+          'id'   => 'veneer-api',
           'meta' => array(),
           'title' => 'API',
-          'href' => network_admin_url( 'admin.php?page=cluster#panel=api' )
+          'href' => network_admin_url( 'admin.php?page=veneer#panel=api' )
         ));
 
         $wp_admin_bar->add_menu( array(
-          'parent' => 'cluster',
-          'id'   => 'cluster-dns',
-          'meta' => array(),
-          'title' => 'DNS',
-          'href' => network_admin_url( 'admin.php?page=cluster#panel=dns' )
-        ));
-
-        $wp_admin_bar->add_menu( array(
-          'parent' => 'cluster',
-          'id'   => 'cluster-support',
+          'parent' => 'veneer',
+          'id'   => 'veneer-support',
           'meta' => array(),
           'title' => 'Support',
-          'href' => network_admin_url( 'admin.php?page=cluster#panel=support' )
+          'href' => network_admin_url( 'admin.php?page=veneer#panel=support' )
         ));
 
       }

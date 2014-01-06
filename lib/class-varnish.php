@@ -5,9 +5,9 @@
  * @module Cluster
  * @author potanin@UD
  */
-namespace UsabilityDynamics\Cluster {
+namespace UsabilityDynamics\Veneer {
 
-  if( !class_exists( 'UsabilityDynamics\Cluster\Varnish' ) ) {
+  if( !class_exists( 'UsabilityDynamics\Veneer\Varnish' ) ) {
 
     /**
      * Class Varnish

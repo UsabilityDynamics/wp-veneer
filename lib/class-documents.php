@@ -11,13 +11,13 @@ namespace UsabilityDynamics\Veneer {
   if( !class_exists( 'UsabilityDynamics\Veneer\Documents' ) ) {
 
     /**
-     * Bootstrap Cluster
+     * Veneer Documents
      *
      * @class Bootstrap
      * @author potanin@UD
      * @version 0.0.1
      */
-    class Bootstrap {
+    class Documents {
 
       /**
        * Cluster core version.

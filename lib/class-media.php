@@ -6,9 +6,9 @@
  * @module Cluster
  * @author potanin@UD
  */
-namespace UsabilityDynamics\Cluster {
+namespace UsabilityDynamics\Veneer {
 
-  if( !class_exists( 'UsabilityDynamics\Cluster\Media' ) ) {
+  if( !class_exists( 'UsabilityDynamics\Veneer\Media' ) ) {
 
     /**
      * Class Media
@@ -45,14 +45,14 @@ namespace UsabilityDynamics\Cluster {
        * @for Media
        */
       public function __construct() {
-        global $cluster;
+        global $wp_veneer;
 
         if( !defined( 'UPLOADBLOGSDIR' ) ) {
           wp_die( '<h1>Network Error</h1><p>Unable to instatiate media the UPLOADBLOGSDIR constant is not defined.</p>' );
         }
 
         // @todo Enable to replace media paths with subdomain path.
-        // $cluster->cdn = array( "subdomain" => "media" );
+        // $wp_veneer->cdn = array( "subdomain" => "media" );
 
         // Primary image path/url override.
         add_filter( 'upload_dir', array( &$this, 'upload_dir' ) );
@@ -81,34 +81,32 @@ namespace UsabilityDynamics\Cluster {
        * @param $settings .error
        */
       public static function upload_dir( $settings ) {
-        global $cluster;
-
-        $_instance = Bootstrap::get_instance();
+        global $wp_veneer;
 
         // If Currently on Network Main Site. (Which is unlikely).
         if( is_main_site() ) {
-          $settings[ 'path' ]    = str_replace( '/uploads', '/' . UPLOADBLOGSDIR . '/' . $_instance->domain, $settings[ 'path' ] );
-          $settings[ 'basedir' ] = str_replace( '/uploads', '/' . UPLOADBLOGSDIR . '/' . $_instance->domain, $settings[ 'basedir' ] );
+          $settings[ 'path' ]    = str_replace( '/uploads', '/' . UPLOADBLOGSDIR . '/' . $wp_veneer->domain, $settings[ 'path' ] );
+          $settings[ 'basedir' ] = str_replace( '/uploads', '/' . UPLOADBLOGSDIR . '/' . $wp_veneer->domain, $settings[ 'basedir' ] );
           $settings[ 'baseurl' ] = str_replace( '/uploads', '/media/', $settings[ 'baseurl' ] );
           $settings[ 'url' ]     = str_replace( '/uploads', '/media', $settings[ 'url' ] );
         }
 
         // If On Standard Site.
         if( !is_main_site() ) {
-          $settings[ 'baseurl' ] = ( is_ssl() ? 'https://' : 'http://' ) . untrailingslashit( $_instance->domain ) . '/media';
+          $settings[ 'baseurl' ] = ( is_ssl() ? 'https://' : 'http://' ) . untrailingslashit( $wp_veneer->domain ) . '/media';
           $settings[ 'url' ]     = str_replace( '/files/', '/media/', $settings[ 'url' ] );
         }
 
         // CDN Media Redirection.
-        if( $cluster->get( 'cdn.active' ) ) {
+        if( $wp_veneer->get( 'cdn.active' ) ) {
 
           // Strip Media from Pathname.
           $settings[ 'baseurl' ] = str_replace( '/media', '', $settings[ 'baseurl' ] );
           $settings[ 'url' ] = str_replace( '/media', '', $settings[ 'url' ] );
 
-          // Add media Subdomain. @todo use $cluster->cdn[ 'subdomain' ]
-          $settings[ 'baseurl' ] = str_replace( '://', '://' . $cluster->get( 'cdn.subdomain' ) . '.', $settings[ 'baseurl' ] );
-          $settings[ 'url' ] = str_replace( '://', '://' . $cluster->get( 'cdn.subdomain' ) . '.', $settings[ 'url' ] );
+          // Add media Subdomain. @todo use $wp_veneer->cdn[ 'subdomain' ]
+          $settings[ 'baseurl' ] = str_replace( '://', '://' . $wp_veneer->get( 'cdn.subdomain' ) . '.', $settings[ 'baseurl' ] );
+          $settings[ 'url' ] = str_replace( '://', '://' . $wp_veneer->get( 'cdn.subdomain' ) . '.', $settings[ 'url' ] );
 
         }
 
