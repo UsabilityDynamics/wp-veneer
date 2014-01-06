@@ -73,6 +73,8 @@ namespace UsabilityDynamics\Veneer {
        */
       public $media;
 
+      public $domain;
+
       /**
        * Veneer Security Instance
        *
