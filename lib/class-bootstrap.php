@@ -233,8 +233,6 @@ namespace UsabilityDynamics\Veneer {
       /**
        * Add Cluster Toolbar
        *
-       * @todo Add some sort of vidual for Bootstrap::$version and hostname.
-       *
        * @method cluster_toolbar
        * @for Boostrap
        */
@@ -251,7 +249,7 @@ namespace UsabilityDynamics\Veneer {
               'tabindex' => 10,
               'class'    => 'veneer-toolbar'
             ),
-            'title' => 'Cluster',
+            'title' => 'Veneer',
             'href'  => network_admin_url( 'admin.php?page=veneer' )
           )
         );
@@ -276,9 +274,9 @@ namespace UsabilityDynamics\Veneer {
           'parent' => 'veneer',
           'id'     => 'veneer-varnish',
           'meta'   => array(),
-          'title'  => 'Speed',
+          'title'  => 'Cache',
           'href'   => network_admin_url( 'admin.php?page=veneer#panel=varnish' )
-        ) );
+        ));
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
@@ -286,14 +284,6 @@ namespace UsabilityDynamics\Veneer {
           'meta'   => array(),
           'title'  => 'API',
           'href'   => network_admin_url( 'admin.php?page=veneer#panel=api' )
-        ) );
-
-        $wp_admin_bar->add_menu( array(
-          'parent' => 'veneer',
-          'id'     => 'veneer-support',
-          'meta'   => array(),
-          'title'  => 'Support',
-          'href'   => network_admin_url( 'admin.php?page=veneer#panel=support' )
         ) );
 
       }
