@@ -38,60 +38,88 @@ namespace UsabilityDynamics\Veneer {
       public static $text_domain = 'wp-veneer';
 
       /**
+       * Site Domain
+       *
+       * @public
+       * @property $site
+       * @type {Object}
+       */
+      public $site = null;
+
+      /**
+       * Network Domain
+       *
+       * @public
+       * @property $network
+       * @type {Object}
+       */
+      public $network = null;
+
+      /**
+       * Current Domain
+       *
+       * @public
+       * @property $cluster
+       * @type {Object}
+       */
+      public $cluster = null;
+
+      /**
        * Veneer Cache Instance.
        *
        * @public
-       * @property $media
+       * @property $_cache
        * @type {Object}
        */
-      public $cache;
+      private $_cache;
+
+      /**
+       * Settings Instance.
+       *
+       * @property $_settings
+       * @type {Object}
+       */
+      private $_settings;
 
       /**
        * Veneer Documents Instance.
        *
-       * @public
-       * @property $documents
+       * @property $_documents
        * @type {Object}
        */
-      public $documents;
+      private $_documents;
 
       /**
        * Veneer Log Instance.
        *
-       * @public
-       * @property $log
+       * @property $_log
        * @type {Object}
        */
-      public $log;
+      private $_log;
 
       /**
        * Veneer Media Instance
        *
-       * @public
        * @property $media
        * @type {Object}
        */
-      public $media;
-
-      public $domain;
+      private $_media = null;
 
       /**
        * Veneer Security Instance
        *
-       * @public
-       * @property $security
+       * @property $_security
        * @type {Object}
        */
-      public $security;
+      private $_security = null;
 
       /**
        * Veneer Varnish Instance.
        *
-       * @public
-       * @property $varnish
+       * @property $_varnish
        * @type {Object}
        */
-      public $varnish;
+      private $_varnish = null;
 
       /**
        * Singleton Instance Reference.
@@ -114,14 +142,91 @@ namespace UsabilityDynamics\Veneer {
        * @method __construct
        */
       public function __construct() {
-        global $wp_veneer;
+        global $wpdb, $current_site, $current_blog, $wp_veneer;
 
         // Save context reference.
-        $wp_veneer = self::$instance = &$this;
+        $wp_veneer = self::$instance = & $this;
 
-        $this->media     = new Media();
+        // Set Properties.
+        $this->site    = $wpdb->get_var( "SELECT domain FROM {$wpdb->blogs} WHERE blog_id = '{$wpdb->blogid}' LIMIT 1" );
+        $this->network = $wpdb->get_var( "SELECT domain FROM {$wpdb->site} WHERE id = {$wpdb->siteid}" );
+        $this->cluster = WP_BASE_DOMAIN;
 
-        add_action( 'wp_before_admin_bar_render', array( $this, 'toolbar' ), 10 );
+        // Initialize Settings.
+        $this->_settings();
+
+        // Initialize Components.
+        $this->_components();
+
+        // Initialize Interfaces.
+        $this->_interfaces();
+
+      }
+
+      /**
+       * Initialize Settings.
+       *
+       */
+      private function _settings() {
+
+        // Initialize Settings.
+        $this->_settings = new Settings(array(
+          "store" => "options",
+          "key"   => "ud:veneer",
+        ));
+
+        // ElasticSearch Service Settings.
+        $this->set( 'documents', array(
+          "active" => true,
+          "host"   => "localhost",
+          "port"   => 9200,
+          "token"  => null,
+        ));
+
+        // Varnish Service Settings.
+        $this->set( 'varnish', array(
+          "active" => false,
+          "host"   => "localhost",
+          "key" => null
+        ));
+
+        // CDN Service Settings.
+        $this->set( 'media', array(
+          "subdomain" => "media",
+          "cdn"    => array(
+            "active"    => false,
+            "provider"  => "gcs",
+            "key"       => null
+          )
+        ));
+
+        // Save Settings.
+        $this->_settings->commit();
+
+      }
+
+      /**
+       * Initialize Media, Varnish, etc.
+       *
+       */
+      private function _components() {
+
+        // Enable CDN Media.
+        $this->_media = new Media( $this->get( 'media' ) );
+
+        // Enable Varnish.
+        $this->_varnish = new Varnish($this->get( 'varnish' ));
+
+      }
+
+      /**
+       * Initialize Interface Compnents
+       *
+       */
+      private function _interfaces() {
+
+        // Render Toolbar.
+        add_action( 'wp_before_admin_bar_render', array( &$this, 'toolbar' ), 10 );
 
       }
 
@@ -137,59 +242,59 @@ namespace UsabilityDynamics\Veneer {
         global $wp_admin_bar;
 
         $wp_admin_bar->add_menu( array(
-            'id'   => 'veneer',
-            'meta'   => array(
+            'id'    => 'veneer',
+            'meta'  => array(
               'html'     => '<div class="veneer-toolbar-info"></div>',
               'target'   => '',
               'onclick'  => '',
               'title'    => 'Veneer',
               'tabindex' => 10,
-              'class' => 'veneer-toolbar'
+              'class'    => 'veneer-toolbar'
             ),
             'title' => 'Cluster',
-            'href' => network_admin_url( 'admin.php?page=veneer' )
+            'href'  => network_admin_url( 'admin.php?page=veneer' )
           )
         );
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
-          'id'   => 'veneer-cdn',
-          'meta' => array(),
-          'title' => 'Media',
-          'href' => network_admin_url( 'admin.php?page=veneer#panel=cdn' )
-        ));
+          'id'     => 'veneer-cdn',
+          'meta'   => array(),
+          'title'  => 'Media',
+          'href'   => network_admin_url( 'admin.php?page=veneer#panel=cdn' )
+        ) );
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
-          'id'   => 'veneer-search',
-          'meta' => array(),
-          'title' => 'Search',
-          'href' => network_admin_url( 'admin.php?page=veneer#panel=search' )
-        ));
+          'id'     => 'veneer-search',
+          'meta'   => array(),
+          'title'  => 'Search',
+          'href'   => network_admin_url( 'admin.php?page=veneer#panel=search' )
+        ) );
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
-          'id'   => 'veneer-varnish',
-          'meta' => array(),
-          'title' => 'Speed',
-          'href' => network_admin_url( 'admin.php?page=veneer#panel=varnish' )
-        ));
+          'id'     => 'veneer-varnish',
+          'meta'   => array(),
+          'title'  => 'Speed',
+          'href'   => network_admin_url( 'admin.php?page=veneer#panel=varnish' )
+        ) );
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
-          'id'   => 'veneer-api',
-          'meta' => array(),
-          'title' => 'API',
-          'href' => network_admin_url( 'admin.php?page=veneer#panel=api' )
-        ));
+          'id'     => 'veneer-api',
+          'meta'   => array(),
+          'title'  => 'API',
+          'href'   => network_admin_url( 'admin.php?page=veneer#panel=api' )
+        ) );
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
-          'id'   => 'veneer-support',
-          'meta' => array(),
-          'title' => 'Support',
-          'href' => network_admin_url( 'admin.php?page=veneer#panel=support' )
-        ));
+          'id'     => 'veneer-support',
+          'meta'   => array(),
+          'title'  => 'Support',
+          'href'   => network_admin_url( 'admin.php?page=veneer#panel=support' )
+        ) );
 
       }
 
@@ -206,17 +311,6 @@ namespace UsabilityDynamics\Veneer {
        * @since 0.1.1
        */
       public static function get( $key, $default = null ) {
-
-        // @temp
-        if( $key === 'cdn.subdomain' ) {
-          return 'media';
-        }
-
-        // @temp
-        if( $key === 'cdn.active' ) {
-         return false;
-        }
-
         return self::$instance->_settings ? self::$instance->_settings->get( $key, $default ) : null;
       }
 
