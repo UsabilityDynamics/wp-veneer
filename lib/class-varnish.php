@@ -28,8 +28,10 @@ namespace UsabilityDynamics\Veneer {
 
       public function __construct() {
         add_action( 'init', array( &$this, 'init' ) );
-        //add_action( 'admin_bar_menu', array( $this, 'varnish_links' ), 100 );
-        add_action( 'rightnow_end', array( $this, 'varnish_rightnow' ) );
+
+        // add_action( 'admin_bar_menu', array( $this, 'varnish_links' ), 100 );
+        // add_action( 'rightnow_end', array( $this, 'varnish_rightnow' ) );
+
       }
 
       public function init() {
@@ -57,13 +59,13 @@ namespace UsabilityDynamics\Veneer {
       }
 
       function varnish_rightnow() {
+
         if (current_user_can('activate_plugins')) {
           $url = wp_nonce_url(admin_url('?vhp_flush_all'), 'helf_vhp');
-          $intro = sprintf( __('<a href="%1$s">Varnish HTTP Purge</a> automatically purges your posts when published or updated. Sometimes you need a manual flush. Press the button below to force it to purge your entire cache.', helf_vhp ), 'http://wordpress.org/plugins/varnish-http-purge/' );
           $button = sprintf( __('<p class="button"><a href="%1$s"><strong>Purge Varnish Cache</strong></a></p>', helf_vhp ), $url );
-          $text = $intro . '<br />' . $button;
-          echo "<p class='varnish-rightnow'>$text</p>\n";
+          echo "<p class='varnish-rightnow'>$button</p>\n";
         }
+
       }
 
       // For the not being used at this moment admin bar
