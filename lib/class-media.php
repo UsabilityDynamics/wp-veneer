@@ -30,16 +30,6 @@ namespace UsabilityDynamics\Veneer {
       public $path = null;
 
       /**
-       * Clean domain.
-       *
-       * @public
-       * @static
-       * @property $domain
-       * @type {Object}
-       */
-      public $domain = null;
-
-      /**
        * Custom URL Base for all media.
        *
        * @public
@@ -48,6 +38,26 @@ namespace UsabilityDynamics\Veneer {
        * @type {Object}
        */
       public $url_base = null;
+
+      /**
+       * Instance Domain.
+       *
+       * @public
+       * @static
+       * @property $site
+       * @type {String}
+       */
+      public $site = null;
+
+      /**
+       * Instance Site ID.
+       *
+       * @public
+       * @static
+       * @property $site_id
+       * @type {Integer}
+       */
+      public $site_id = null;
 
       /**
        * Media Active.
@@ -64,7 +74,7 @@ namespace UsabilityDynamics\Veneer {
        * @for Media
        */
       public function __construct( $args ) {
-        global $wp_veneer;
+        global $wp_veneer, $wpdb;
 
         if( !defined( 'UPLOADBLOGSDIR' ) ) {
           wp_die( '<h1>Network Error</h1><p>Unable to instatiate media the UPLOADBLOGSDIR constant is not defined.</p>' );
@@ -72,11 +82,16 @@ namespace UsabilityDynamics\Veneer {
 
         // Extend Arguments with defaults.
         $args = Utility::parse_args( $args, array(
-          "active" => true,
+          "active"    => true,
           "subdomain" => "media",
-          "cdn" => array(),
-          "url_base" => get_option( 'upload_url_path' )
-        ));
+          "cdn"       => array(),
+          "url_base"  => get_option( 'upload_url_path' )
+        ) );
+
+        $this->site    = $wp_veneer->site;
+        $this->site_id = $wp_veneer->site_id;
+        $this->cluster   = WP_BASE_DOMAIN;
+        $this->network   = $wpdb->get_var( "SELECT domain FROM {$wpdb->site} WHERE id = {$wpdb->siteid}" );
 
         if( $args->subdomain ) {
           $this->subdomain = $args->subdomain;
@@ -97,13 +112,31 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'upload_dir', array( &$this, 'upload_dir' ) );
 
         // Get media/upload vales. (wp_upload_dir() will generate directories).
-        $wp_upload_dir    = wp_upload_dir();
+        $wp_upload_dir   = wp_upload_dir();
         $this->directory = BLOGUPLOADDIR;
         $this->path      = $wp_upload_dir[ 'path' ];
         $this->url       = $wp_upload_dir[ 'url' ];
         $this->basedir   = $wp_upload_dir[ 'basedir' ];
         $this->baseurl   = $wp_upload_dir[ 'baseurl' ];
         $this->domain    = defined( 'WP_VENEER_DOMAIN_MEDIA' ) && WP_VENEER_DOMAIN_MEDIA ? null : $wp_upload_dir[ 'baseurl' ];
+
+        //die( '<pre>' . print_r( $this->_debug(), true ) . '</pre>' );
+
+      }
+
+      /**
+       * Return URL Mapping Array
+       *
+       * @return array
+       */
+      private function _debug() {
+        global $wp_veneer;
+
+        return array(
+          'wp_upload_dir' => wp_upload_dir(),
+          'this'          => $this,
+          'wp_veneer'     => $wp_veneer
+        );
 
       }
 
@@ -122,18 +155,28 @@ namespace UsabilityDynamics\Veneer {
       public function upload_dir( $settings ) {
         global $wp_veneer;
 
-        // If Currently on Network Main Site. (Which is unlikely).
+        // $wp_veneer->set( 'media.cdn.active', true );
+
+        // Fix Cluster / Network / Site domains.
+        $settings[ 'url' ]     = $this->url_base ? $this->url_base : str_replace( $wp_veneer->cluster, $this->site, $settings[ 'url' ] );
+        $settings[ 'baseurl' ]     = $this->url_base ? $this->url_base : str_replace( $wp_veneer->cluster, $this->site, $settings[ 'url' ] );
+
+        // If Currently on Network Main Site, e.g. "UsabilityDynamics.com" or "DiscoDonniePresents.com"
         if( is_main_site() ) {
-          $settings[ 'path' ]    = str_replace( '/uploads', '/' . UPLOADBLOGSDIR . '/' . $wp_veneer->site, $settings[ 'path' ] );
-          $settings[ 'basedir' ] = str_replace( '/uploads', '/' . UPLOADBLOGSDIR . '/' . $wp_veneer->site, $settings[ 'basedir' ] );
-          $settings[ 'baseurl' ] = str_replace( '/uploads', '/media/', $settings[ 'baseurl' ] );
-          $settings[ 'url' ]     = str_replace( '/uploads', '/media', $settings[ 'url' ] );
+          $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id, '/' . UPLOADBLOGSDIR . '/' . $wp_veneer->site, $settings[ 'path' ] );
+          $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
+          $settings[ 'subdir' ]  = str_replace( '', '', $settings[ 'subdir' ] );
+          $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id, '/' . UPLOADBLOGSDIR . '/' . $wp_veneer->site, $settings[ 'basedir' ] );
+          $settings[ 'baseurl' ] = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'baseurl' ] );
         }
 
         // If On Standard Site.
         if( !is_main_site() ) {
-          $settings[ 'baseurl' ] = ( is_ssl() ? 'https://' : 'http://' ) . untrailingslashit( $wp_veneer->site ) . '/media';
-          $settings[ 'url' ]     = str_replace( '/files/', '/media/', $settings[ 'url' ] );
+          $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'path' ] );
+          $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
+          $settings[ 'subdir' ]  = str_replace( '', '', $settings[ 'subdir' ] );
+          $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'basedir' ] );
+          $settings[ 'baseurl' ] = $this->url_base ? $this->url_base : ( is_ssl() ? 'https://' : 'http://' ) . untrailingslashit( $wp_veneer->site ) . '/media';
         }
 
         // Custom URL Path explicitly set.
@@ -146,11 +189,11 @@ namespace UsabilityDynamics\Veneer {
 
           // Strip Media from Pathname.
           $settings[ 'baseurl' ] = str_replace( '/media', '', $settings[ 'baseurl' ] );
-          $settings[ 'url' ] = str_replace( '/media', '', $settings[ 'url' ] );
+          $settings[ 'url' ]     = str_replace( '/media', '', $settings[ 'url' ] );
 
           // Add media Subdomain.
           $settings[ 'baseurl' ] = str_replace( '://', '://' . $wp_veneer->get( 'media.subdomain' ) . '.', $settings[ 'baseurl' ] );
-          $settings[ 'url' ] = str_replace( '://', '://' . $wp_veneer->get( 'media.subdomain' ) . '.', $settings[ 'url' ] );
+          $settings[ 'url' ]     = str_replace( '://', '://' . $wp_veneer->get( 'media.subdomain' ) . '.', $settings[ 'url' ] );
 
         }
 

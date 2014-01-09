@@ -47,6 +47,15 @@ namespace UsabilityDynamics\Veneer {
       public $site = null;
 
       /**
+       * Site ID
+       *
+       * @public
+       * @property $site_id
+       * @type {Integer}
+       */
+      public $site_id = null;
+
+      /**
        * Network Domain
        *
        * @public
@@ -151,6 +160,7 @@ namespace UsabilityDynamics\Veneer {
         $this->site    = $wpdb->get_var( "SELECT domain FROM {$wpdb->blogs} WHERE blog_id = '{$wpdb->blogid}' LIMIT 1" );
         $this->network = $wpdb->get_var( "SELECT domain FROM {$wpdb->site} WHERE id = {$wpdb->siteid}" );
         $this->cluster = WP_BASE_DOMAIN;
+        $this->site_id = $wpdb->blogid;
 
         // Initialize Settings.
         $this->_settings();
