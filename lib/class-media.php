@@ -81,12 +81,12 @@ namespace UsabilityDynamics\Veneer {
         }
 
         // Extend Arguments with defaults.
-        $args = Utility::parse_args( $args, array(
+        $args = \UsabilityDynamics\Utility::parse_args( $args, array(
           "active"    => true,
           "subdomain" => "media",
           "cdn"       => array(),
           "url_base"  => get_option( 'upload_url_path' )
-        ) );
+        ));
 
         $this->site    = $wp_veneer->site;
         $this->site_id = $wp_veneer->site_id;

@@ -180,7 +180,7 @@ namespace UsabilityDynamics\Veneer {
       private function _settings() {
 
         // Initialize Settings.
-        $this->_settings = new Settings(array(
+        $this->_settings = new \UsabilityDynamics\Settings(array(
           "store" => "options",
           "key"   => "ud:veneer",
         ));
