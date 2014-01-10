@@ -120,7 +120,7 @@ namespace UsabilityDynamics\Veneer {
         $this->baseurl   = $wp_upload_dir[ 'baseurl' ];
         $this->domain    = defined( 'WP_VENEER_DOMAIN_MEDIA' ) && WP_VENEER_DOMAIN_MEDIA ? null : $wp_upload_dir[ 'baseurl' ];
 
-        //die( '<pre>' . print_r( $this->_debug(), true ) . '</pre>' );
+        // die( '<pre>' . print_r( $this->_debug(), true ) . '</pre>' );
 
       }
 
@@ -141,8 +141,7 @@ namespace UsabilityDynamics\Veneer {
       }
 
       /**
-       *
-       * @todo Add hookin to override media path here to a subdomain.
+       * Media Paths and URLs
        *
        * @param $settings
        * @param $settings .path
@@ -159,24 +158,31 @@ namespace UsabilityDynamics\Veneer {
 
         // Fix Cluster / Network / Site domains.
         $settings[ 'url' ]     = $this->url_base ? $this->url_base : str_replace( $wp_veneer->cluster, $this->site, $settings[ 'url' ] );
-        $settings[ 'baseurl' ]     = $this->url_base ? $this->url_base : str_replace( $wp_veneer->cluster, $this->site, $settings[ 'url' ] );
+        $settings[ 'baseurl' ] = $this->url_base ? $this->url_base : str_replace( $wp_veneer->cluster, $this->site, $settings[ 'url' ] );
+        $settings[ 'path' ]    = str_replace( untrailingslashit( ABSPATH ), untrailingslashit( WP_BASE_DIR ), $settings[ 'path' ] );
+        $settings[ 'basedir' ] = str_replace( untrailingslashit( ABSPATH ), untrailingslashit( WP_BASE_DIR ), $settings[ 'basedir' ] );
+
 
         // If Currently on Network Main Site, e.g. "UsabilityDynamics.com" or "DiscoDonniePresents.com"
         if( is_main_site() ) {
-          $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id, '/' . UPLOADBLOGSDIR . '/' . $wp_veneer->site, $settings[ 'path' ] );
+          //$settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id, '/' . UPLOADBLOGSDIR . '/' . $wp_veneer->site, $settings[ 'path' ] );
+          //$settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id, '/' . UPLOADBLOGSDIR . '/' . $wp_veneer->site, $settings[ 'basedir' ] );
+          $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id , '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
+          $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id , '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
           $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
-          $settings[ 'subdir' ]  = str_replace( '', '', $settings[ 'subdir' ] );
-          $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id, '/' . UPLOADBLOGSDIR . '/' . $wp_veneer->site, $settings[ 'basedir' ] );
           $settings[ 'baseurl' ] = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'baseurl' ] );
+          $settings[ 'subdir' ]  = str_replace( '', '', $settings[ 'subdir' ] );
         }
 
         // If On Standard Site.
         if( !is_main_site() ) {
-          $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'path' ] );
+          //$settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'path' ] );
+          //$settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'basedir' ] );
+          $settings[ 'path' ]    = str_replace( '/sites/' . $this->site_id , '', $settings[ 'path' ] );
+          $settings[ 'basedir' ] = str_replace( '/sites/' . $this->site_id , '', $settings[ 'basedir' ] );
           $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
-          $settings[ 'subdir' ]  = str_replace( '', '', $settings[ 'subdir' ] );
-          $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'basedir' ] );
           $settings[ 'baseurl' ] = $this->url_base ? $this->url_base : ( is_ssl() ? 'https://' : 'http://' ) . untrailingslashit( $wp_veneer->site ) . '/media';
+          $settings[ 'subdir' ]  = str_replace( '', '', $settings[ 'subdir' ] );
         }
 
         // Custom URL Path explicitly set.
