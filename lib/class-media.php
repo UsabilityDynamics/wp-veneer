@@ -120,7 +120,7 @@ namespace UsabilityDynamics\Veneer {
         $this->baseurl   = $wp_upload_dir[ 'baseurl' ];
         $this->domain    = defined( 'WP_VENEER_DOMAIN_MEDIA' ) && WP_VENEER_DOMAIN_MEDIA ? null : $wp_upload_dir[ 'baseurl' ];
 
-        // die( '<pre>' . print_r( $this->_debug(), true ) . '</pre>' );
+        //die( '<pre>' . print_r( $this->_debug(), true ) . '</pre>' );
 
       }
 
@@ -162,25 +162,46 @@ namespace UsabilityDynamics\Veneer {
         $settings[ 'path' ]    = str_replace( untrailingslashit( ABSPATH ), untrailingslashit( WP_BASE_DIR ), $settings[ 'path' ] );
         $settings[ 'basedir' ] = str_replace( untrailingslashit( ABSPATH ), untrailingslashit( WP_BASE_DIR ), $settings[ 'basedir' ] );
 
-
         // If Currently on Network Main Site, e.g. "UsabilityDynamics.com" or "DiscoDonniePresents.com"
         if( is_main_site() ) {
-          //$settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id, '/' . UPLOADBLOGSDIR . '/' . $wp_veneer->site, $settings[ 'path' ] );
-          //$settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id, '/' . UPLOADBLOGSDIR . '/' . $wp_veneer->site, $settings[ 'basedir' ] );
-          $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id , '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
-          $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id , '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
-          $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
-          $settings[ 'baseurl' ] = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'baseurl' ] );
+
+          if( strpos( $settings[ 'path' ], '/uploads/sites' ) ) {
+            $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id , '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
+            $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id , '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
+            $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
+            $settings[ 'baseurl' ] = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'baseurl' ] );
+          }
+
+          if( strpos( $settings[ 'path' ], '/uploads' ) ) {
+            $settings[ 'path' ]    = str_replace( '/uploads', '/static/storage/' . $this->site, $settings[ 'path' ] );
+            $settings[ 'basedir' ] = str_replace( '/uploads', '/static/storage/' . $this->site, $settings[ 'basedir' ] );
+            $settings[ 'url' ]     = str_replace( '/uploads', '/media', $settings[ 'url' ] );
+          }
+
           $settings[ 'subdir' ]  = str_replace( '', '', $settings[ 'subdir' ] );
         }
 
         // If On Standard Site.
         if( !is_main_site() ) {
-          //$settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'path' ] );
-          //$settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'basedir' ] );
-          $settings[ 'path' ]    = str_replace( '/sites/' . $this->site_id , '', $settings[ 'path' ] );
-          $settings[ 'basedir' ] = str_replace( '/sites/' . $this->site_id , '', $settings[ 'basedir' ] );
-          $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
+
+          if( strpos( $settings[ 'path' ], '/uploads/sites' ) ) {
+            $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'path' ] );
+            $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'basedir' ] );
+            $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
+          }
+
+          if( strpos( $settings[ 'path' ], '/sites' ) ) {
+            $settings[ 'path' ]    = str_replace( '/sites/' . $this->site_id , '', $settings[ 'path' ] );
+            $settings[ 'basedir' ] = str_replace( '/sites/' . $this->site_id , '', $settings[ 'basedir' ] );
+            $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
+          }
+
+          if( strpos( $settings[ 'path' ], '/uploads' ) ) {
+            $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'path' ] );
+            $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'basedir' ] );
+            $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
+          }
+
           $settings[ 'baseurl' ] = $this->url_base ? $this->url_base : ( is_ssl() ? 'https://' : 'http://' ) . untrailingslashit( $wp_veneer->site ) . '/media';
           $settings[ 'subdir' ]  = str_replace( '', '', $settings[ 'subdir' ] );
         }
