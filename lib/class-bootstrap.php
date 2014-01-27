@@ -1,17 +1,17 @@
 <?php
 /**
- * UsabilityDynamics\Cluster Bootstrap
+ * UsabilityDynamics\Veneer Bootstrap
  *
  * @verison 0.4.1
  * @author potanin@UD
- * @namespace UsabilityDynamics\Cluster
+ * @namespace UsabilityDynamics\Veneer
  */
 namespace UsabilityDynamics\Veneer {
 
   if( !class_exists( 'UsabilityDynamics\Veneer\Bootstrap' ) ) {
 
     /**
-     * Bootstrap Cluster
+     * Bootstrap Veneer
      *
      * @class Bootstrap
      * @author potanin@UD
@@ -20,7 +20,7 @@ namespace UsabilityDynamics\Veneer {
     class Bootstrap {
 
       /**
-       * Cluster core version.
+       * Veneer core version.
        *
        * @static
        * @property $version
@@ -68,10 +68,10 @@ namespace UsabilityDynamics\Veneer {
        * Current Domain
        *
        * @public
-       * @property $cluster
+       * @property $veneer
        * @type {Object}
        */
-      public $cluster = null;
+      public $veneer = null;
 
       /**
        * Veneer Cache Instance.
@@ -241,9 +241,9 @@ namespace UsabilityDynamics\Veneer {
       }
 
       /**
-       * Add Cluster Toolbar
+       * Add Veneer Toolbar
        *
-       * @method cluster_toolbar
+       * @method toolbar
        * @for Boostrap
        */
       public function toolbar() {
@@ -302,7 +302,7 @@ namespace UsabilityDynamics\Veneer {
        * Get Setting.
        *
        *    // Get Setting
-       *    Cluster::get( 'my_key' )
+       *    Veneer::get( 'my_key' )
        *
        * @method get
        *
@@ -320,7 +320,7 @@ namespace UsabilityDynamics\Veneer {
        * @usage
        *
        *    // Set Setting
-       *    Cluster::set( 'my_key', 'my-value' )
+       *    Veneer::set( 'my_key', 'my-value' )
        *
        * @method get
        * @for Flawless
@@ -333,20 +333,20 @@ namespace UsabilityDynamics\Veneer {
       }
 
       /**
-       * Get the Cluster Singleton
+       * Get the Veneer Singleton
        *
        * Concept based on the CodeIgniter get_instance() concept.
        *
        * @example
        *
-       *      var settings = Cluster::get_instance()->Settings;
-       *      var api = Cluster::$instance()->API;
+       *      var settings = Veneer::get_instance()->Settings;
+       *      var api = Veneer::$instance()->API;
        *
        * @static
        * @return object
        *
        * @method get_instance
-       * @for Cluster
+       * @for Veneer
        */
       public static function &get_instance() {
         return self::$instance;
