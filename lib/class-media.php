@@ -113,7 +113,7 @@ namespace UsabilityDynamics\Veneer {
 
         // Get media/upload vales. (wp_upload_dir() will generate directories).
         $wp_upload_dir   = wp_upload_dir();
-        $this->directory = BLOGUPLOADDIR;
+        $this->directory = defined( 'BLOGUPLOADDIR' ) && BLOGUPLOADDIR ? BLOGUPLOADDIR : '';
         $this->path      = $wp_upload_dir[ 'path' ];
         $this->url       = $wp_upload_dir[ 'url' ];
         $this->basedir   = $wp_upload_dir[ 'basedir' ];
