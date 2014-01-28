@@ -120,7 +120,7 @@ namespace UsabilityDynamics\Veneer {
         $this->baseurl   = $wp_upload_dir[ 'baseurl' ];
         $this->domain    = defined( 'WP_VENEER_DOMAIN_MEDIA' ) && WP_VENEER_DOMAIN_MEDIA ? null : $wp_upload_dir[ 'baseurl' ];
 
-        //die( '<pre>' . print_r( $this->_debug(), true ) . '</pre>' );
+        // die( json_encode( $this->_debug() ) );
 
       }
 
@@ -164,6 +164,14 @@ namespace UsabilityDynamics\Veneer {
 
         // If Currently on Network Main Site, e.g. "UsabilityDynamics.com" or "DiscoDonniePresents.com"
         if( is_main_site() ) {
+
+          if( strpos( $settings[ 'path' ], '/static/storage' ) ) {
+            $settings[ 'path' ]    = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
+            $settings[ 'basedir' ] = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
+            $settings[ 'url' ]     = str_replace( '/static/storage/' . $this->site_id, '/media', $settings[ 'url' ] );
+            $settings[ 'baseurl' ] = str_replace( '/static/storage/' . $this->site_id, '/media', $settings[ 'baseurl' ] );
+
+          }
 
           if( strpos( $settings[ 'path' ], '/uploads/sites' ) ) {
             $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id , '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
