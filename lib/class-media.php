@@ -168,8 +168,8 @@ namespace UsabilityDynamics\Veneer {
           if( strpos( $settings[ 'path' ], '/static/storage' ) ) {
             $settings[ 'path' ]    = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
             $settings[ 'basedir' ] = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'basedir' ] );
-            $settings[ 'url' ]     = str_replace( '/static/storage/' . $this->site_id, '/media', $settings[ 'url' ] );
-            $settings[ 'baseurl' ] = str_replace( '/static/storage/' . $this->site_id, '/media', $settings[ 'baseurl' ] );
+            $settings[ 'url' ]     = str_replace( '/files', '/media', $settings[ 'url' ] );
+            $settings[ 'baseurl' ] = str_replace( '/files', '/media', $settings[ 'baseurl' ] );
           }
 
           if( strpos( $settings[ 'path' ], '/uploads/sites' ) ) {
@@ -186,6 +186,7 @@ namespace UsabilityDynamics\Veneer {
           }
 
           $settings[ 'subdir' ]  = str_replace( '', '', $settings[ 'subdir' ] );
+
         }
 
         // If On Standard Site.
@@ -194,8 +195,8 @@ namespace UsabilityDynamics\Veneer {
           if( strpos( $settings[ 'path' ], '/static/storage' ) ) {
             $settings[ 'path' ]    = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
             $settings[ 'basedir' ] = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'basedir' ] );
-            $settings[ 'url' ]     = str_replace( '/static/storage/' . $this->site_id, '/media', $settings[ 'url' ] );
-            $settings[ 'baseurl' ] = str_replace( '/static/storage/' . $this->site_id, '/media', $settings[ 'baseurl' ] );
+            $settings[ 'url' ]     = str_replace( '/files', '/media', $settings[ 'url' ] );
+            $settings[ 'baseurl' ] = str_replace( '/files', '/media', $settings[ 'baseurl' ] );
           }
 
           if( strpos( $settings[ 'path' ], '/uploads/sites' ) ) {
