@@ -171,6 +171,19 @@ namespace UsabilityDynamics\Veneer {
         // Initialize Interfaces.
         $this->_interfaces();
 
+        // Minify Output.
+        ob_start( 'UsabilityDynamics\Veneer\Cache::minify' );
+
+      }
+
+      /**
+       * Shutdown Request.
+       *
+       * add_action( 'shutdown', array( $this, '_shutdown' ) );
+       *
+       */
+      public function _shutdown() {
+        $headers = getallheaders();
       }
 
       /**

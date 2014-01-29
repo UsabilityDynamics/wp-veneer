@@ -14,7 +14,10 @@ namespace UsabilityDynamics\Veneer {
      *
      * @module Veneer
      */
-    class Utility  extends \UsabilityDynamics\Utility {}
+    class Utility extends \UsabilityDynamics\Utility {
+
+
+    }
 
   }
 
