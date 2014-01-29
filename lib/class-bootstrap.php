@@ -171,9 +171,14 @@ namespace UsabilityDynamics\Veneer {
         // Initialize Interfaces.
         $this->_interfaces();
 
-        // Minify Output.
-        ob_start( 'UsabilityDynamics\Veneer\Cache::minify' );
+        add_action( 'template_redirect', array( $this, 'redirect' ) );
+      }
 
+      /**
+       * Minify Output.
+       */
+      public function redirect() {
+        ob_start( 'UsabilityDynamics\Veneer\Cache::minify' );
       }
 
       /**

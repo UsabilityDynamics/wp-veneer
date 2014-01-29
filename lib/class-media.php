@@ -167,15 +167,14 @@ namespace UsabilityDynamics\Veneer {
 
           if( strpos( $settings[ 'path' ], '/static/storage' ) ) {
             $settings[ 'path' ]    = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
-            $settings[ 'basedir' ] = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
+            $settings[ 'basedir' ] = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'basedir' ] );
             $settings[ 'url' ]     = str_replace( '/static/storage/' . $this->site_id, '/media', $settings[ 'url' ] );
             $settings[ 'baseurl' ] = str_replace( '/static/storage/' . $this->site_id, '/media', $settings[ 'baseurl' ] );
-
           }
 
           if( strpos( $settings[ 'path' ], '/uploads/sites' ) ) {
             $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id , '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
-            $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id , '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
+            $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id , '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'basedir' ] );
             $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
             $settings[ 'baseurl' ] = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'baseurl' ] );
           }
@@ -191,6 +190,13 @@ namespace UsabilityDynamics\Veneer {
 
         // If On Standard Site.
         if( !is_main_site() ) {
+
+          if( strpos( $settings[ 'path' ], '/static/storage' ) ) {
+            $settings[ 'path' ]    = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
+            $settings[ 'basedir' ] = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'basedir' ] );
+            $settings[ 'url' ]     = str_replace( '/static/storage/' . $this->site_id, '/media', $settings[ 'url' ] );
+            $settings[ 'baseurl' ] = str_replace( '/static/storage/' . $this->site_id, '/media', $settings[ 'baseurl' ] );
+          }
 
           if( strpos( $settings[ 'path' ], '/uploads/sites' ) ) {
             $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'path' ] );
