@@ -169,7 +169,8 @@ namespace UsabilityDynamics\Veneer {
             $settings[ 'path' ]    = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
             $settings[ 'basedir' ] = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'basedir' ] );
             $settings[ 'url' ]     = str_replace( '/files', '/media', $settings[ 'url' ] );
-            $settings[ 'baseurl' ] = str_replace( '/files', '/media', $settings[ 'baseurl' ] );
+            $settings[ 'baseurl' ] = str_replace( '/files/2014/01', '/media', $settings[ 'baseurl' ] );
+
           }
 
           if( strpos( $settings[ 'path' ], '/uploads/sites' ) ) {
@@ -188,6 +189,7 @@ namespace UsabilityDynamics\Veneer {
           $settings[ 'subdir' ]  = str_replace( '', '', $settings[ 'subdir' ] );
 
         }
+
 
         // If On Standard Site.
         if( !is_main_site() ) {
