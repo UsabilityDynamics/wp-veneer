@@ -172,7 +172,8 @@ namespace UsabilityDynamics\Veneer {
         $this->_interfaces();
 
         add_action( 'template_redirect', array( $this, 'redirect' ) );
-        add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
       }
 
       /**
@@ -185,9 +186,11 @@ namespace UsabilityDynamics\Veneer {
       /**
        * Minify Output.
        */
-      public function admin_enqueue_scripts() {
+      public function enqueue_scripts() {
 
-        wp_enqueue_style( 'veneer', plugins_url( '/styles/veneer.css', dirname( __DIR__ ) )  );
+        if( is_user_logged_in() ) {
+          wp_enqueue_style( 'veneer', plugins_url( '/styles/veneer.css', dirname( __DIR__ ) ) );
+        };
 
       }
 
