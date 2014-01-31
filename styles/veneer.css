@@ -1,0 +1,5 @@
+#wpadminbar li#wp-admin-bar-localhost.veneer-toolbar-local .ab-item,
+#wpadminbar li#wp-admin-bar-localhost.veneer-toolbar-local .ab-item:focus {
+  background: #333;
+  color: rgb(185, 185, 185);
+}

@@ -172,6 +172,7 @@ namespace UsabilityDynamics\Veneer {
         $this->_interfaces();
 
         add_action( 'template_redirect', array( $this, 'redirect' ) );
+        add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
       }
 
       /**
@@ -179,6 +180,15 @@ namespace UsabilityDynamics\Veneer {
        */
       public function redirect() {
         ob_start( 'UsabilityDynamics\Veneer\Cache::minify' );
+      }
+
+      /**
+       * Minify Output.
+       */
+      public function admin_enqueue_scripts() {
+
+        wp_enqueue_style( 'veneer', plugins_url( '/styles/veneer.css', dirname( __DIR__ ) )  );
+
       }
 
       /**
@@ -256,6 +266,28 @@ namespace UsabilityDynamics\Veneer {
         // Render Toolbar.
         add_action( 'wp_before_admin_bar_render', array( &$this, 'toolbar' ), 10 );
 
+        if( in_array( $_SERVER['REMOTE_ADDR'], array( '127.0.0.1', '10.0.0.1', '0.0.0.0' ) ) ) {
+          add_action( 'wp_before_admin_bar_render', array( &$this, 'toolbar_local' ), 100 );
+        }
+
+      }
+
+      public function toolbar_local() {
+        global $wp_admin_bar;
+
+        $wp_admin_bar->add_menu( array(
+          'id'    => 'localhost',
+          'parent' => 'top-secondary',
+          'meta'  => array(
+            'html'     => '<div class="veneer-toolbar-info"></div>',
+            'target'   => '',
+            'onclick'  => '',
+            'title'    => __( 'Local' ),
+            'class'    => 'veneer-toolbar-local'
+          ),
+          'title' => __( 'Local Environment' ),
+        ));
+
       }
 
       /**
@@ -268,19 +300,18 @@ namespace UsabilityDynamics\Veneer {
         global $wp_admin_bar;
 
         $wp_admin_bar->add_menu( array(
-            'id'    => 'veneer',
-            'meta'  => array(
-              'html'     => '<div class="veneer-toolbar-info"></div>',
-              'target'   => '',
-              'onclick'  => '',
-              'title'    => 'Veneer',
-              'tabindex' => 10,
-              'class'    => 'veneer-toolbar'
-            ),
-            'title' => 'Veneer',
-            'href'  => network_admin_url( 'admin.php?page=veneer' )
-          )
-        );
+          'id'    => 'veneer',
+          'meta'  => array(
+            'html'     => '<div class="veneer-toolbar-info"></div>',
+            'target'   => '',
+            'onclick'  => '',
+            'title'    => 'Veneer',
+            'tabindex' => 10,
+            'class'    => 'veneer-toolbar'
+          ),
+          'title' => 'Veneer',
+          'href'  => network_admin_url( 'admin.php?page=veneer' )
+        ));
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
