@@ -34,10 +34,10 @@ namespace UsabilityDynamics\Veneer {
        *
        * @public
        * @static
-       * @property $url_base
+       * @property $url_rewrite
        * @type {Object}
        */
-      public $url_base = null;
+      public $url_rewrite = null;
 
       /**
        * Instance Domain.
@@ -85,7 +85,7 @@ namespace UsabilityDynamics\Veneer {
           "active"    => true,
           "subdomain" => "media",
           "cdn"       => array(),
-          "url_base"  => get_option( 'upload_url_path' )
+          "url_rewrite"  => get_option( 'upload_url_path' )
         ));
 
         $this->site    = $wp_veneer->site;
@@ -96,8 +96,8 @@ namespace UsabilityDynamics\Veneer {
         if( $args->subdomain ) {
           $this->subdomain = $args->subdomain;
         }
-        if( $args->url_base ) {
-          $this->url_base = $args->url_base;
+        if( $args->url_rewrite ) {
+          $this->url_rewrite = $args->url_rewrite;
         }
 
         if( $args->cdn ) {
@@ -143,6 +143,7 @@ namespace UsabilityDynamics\Veneer {
       /**
        * Media Paths and URLs
        *
+       * @version 2.0.0
        * @param $settings
        * @param $settings .path
        * @param $settings .url
@@ -154,82 +155,26 @@ namespace UsabilityDynamics\Veneer {
       public function upload_dir( $settings ) {
         global $wp_veneer;
 
-        // $wp_veneer->set( 'media.cdn.active', true );
-
-        // Fix Cluster / Network / Site domains.
-        $settings[ 'url' ]     = $this->url_base ? $this->url_base : str_replace( $wp_veneer->cluster, $this->site, $settings[ 'url' ] );
-        $settings[ 'baseurl' ] = $this->url_base ? $this->url_base : str_replace( $wp_veneer->cluster, $this->site, $settings[ 'url' ] );
-        $settings[ 'path' ]    = str_replace( untrailingslashit( ABSPATH ), untrailingslashit( WP_BASE_DIR ), $settings[ 'path' ] );
-        $settings[ 'basedir' ] = str_replace( untrailingslashit( ABSPATH ), untrailingslashit( WP_BASE_DIR ), $settings[ 'basedir' ] );
-
-        // If Currently on Network Main Site, e.g. "UsabilityDynamics.com" or "DiscoDonniePresents.com"
-        if( is_main_site() ) {
-
-          if( strpos( $settings[ 'path' ], '/static/storage' ) ) {
-            $settings[ 'path' ]    = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
-            $settings[ 'basedir' ] = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'basedir' ] );
-            $settings[ 'url' ]     = str_replace( '/files', '/media', $settings[ 'url' ] );
-            $settings[ 'baseurl' ] = str_replace( '/files/2014/01', '/media', $settings[ 'baseurl' ] );
-
+        if( defined( 'WP_VENEER_STORAGE' ) ) {
+          $settings[ 'path' ]    = str_replace( '/blogs.dir/' . $this->site_id . '/files', '/' . WP_VENEER_STORAGE . '/' . $this->site . '/media', $settings[ 'path' ] );
+          $settings[ 'basedir' ] = str_replace( '/blogs.dir/' . $this->site_id . '/files', '/' . WP_VENEER_STORAGE . '/' . $this->site . '/media', $settings[ 'basedir' ] );
+          
+          if( !$this->url_rewrite ) {
+            $settings[ 'url' ] = str_replace( $this->site . '/files', $this->site . '/media', $settings[ 'url' ] );
+            $settings[ 'baseurl' ] = str_replace( $this->site . '/files', $this->site . '/media', $settings[ 'baseurl' ] );
           }
-
-          if( strpos( $settings[ 'path' ], '/uploads/sites' ) ) {
-            $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id , '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
-            $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id , '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'basedir' ] );
-            $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
-            $settings[ 'baseurl' ] = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'baseurl' ] );
+          
+          if( $this->url_rewrite ) {
+            $_rewrite = untrailingslashit( $this->url_rewrite );
+            $settings[ 'url' ] = str_replace( 'http://' . $this->site . '/files', $_rewrite, $settings[ 'url' ] );
+            $settings[ 'baseurl' ] = str_replace( 'http://' . $this->site . '/files', $_rewrite, $settings[ 'baseurl' ] );
+            
           }
-
-          if( strpos( $settings[ 'path' ], '/uploads' ) ) {
-            $settings[ 'path' ]    = str_replace( '/uploads', '/static/storage/' . $this->site, $settings[ 'path' ] );
-            $settings[ 'basedir' ] = str_replace( '/uploads', '/static/storage/' . $this->site, $settings[ 'basedir' ] );
-            $settings[ 'url' ]     = str_replace( '/uploads', '/media', $settings[ 'url' ] );
-          }
-
-          $settings[ 'subdir' ]  = str_replace( '', '', $settings[ 'subdir' ] );
-
+          
         }
-
-
-        // If On Standard Site.
-        if( !is_main_site() ) {
-
-          if( strpos( $settings[ 'path' ], '/static/storage' ) ) {
-            $settings[ 'path' ]    = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'path' ] );
-            $settings[ 'basedir' ] = str_replace( '/static/storage/' . $this->site_id . '/files/', '/' . UPLOADBLOGSDIR . '/' . $this->site, $settings[ 'basedir' ] );
-            $settings[ 'url' ]     = str_replace( '/files', '/media', $settings[ 'url' ] );
-            $settings[ 'baseurl' ] = str_replace( '/files', '/media', $settings[ 'baseurl' ] );
-          }
-
-          if( strpos( $settings[ 'path' ], '/uploads/sites' ) ) {
-            $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'path' ] );
-            $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'basedir' ] );
-            $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
-          }
-
-          if( strpos( $settings[ 'path' ], '/sites' ) ) {
-            $settings[ 'path' ]    = str_replace( '/sites/' . $this->site_id , '', $settings[ 'path' ] );
-            $settings[ 'basedir' ] = str_replace( '/sites/' . $this->site_id , '', $settings[ 'basedir' ] );
-            $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
-          }
-
-          if( strpos( $settings[ 'path' ], '/uploads' ) ) {
-            $settings[ 'path' ]    = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'path' ] );
-            $settings[ 'basedir' ] = str_replace( '/uploads/sites/' . $this->site_id, '/static/storage/' . $this->site, $settings[ 'basedir' ] );
-            $settings[ 'url' ]     = str_replace( '/uploads/sites/' . $this->site_id, '/media', $settings[ 'url' ] );
-          }
-
-          $settings[ 'baseurl' ] = $this->url_base ? $this->url_base : ( is_ssl() ? 'https://' : 'http://' ) . untrailingslashit( $wp_veneer->site ) . '/media';
-          $settings[ 'subdir' ]  = str_replace( '', '', $settings[ 'subdir' ] );
-        }
-
-        // Custom URL Path explicitly set.
-        if( $this->url_base ) {
-          $settings[ 'baseurl' ] = $this->url_base;
-        }
-
+        
         // CDN Media Redirection.
-        if( !$this->url_base && $wp_veneer->get( 'media.cdn.active' ) ) {
+        if( !$this->url_rewrite && $wp_veneer->get( 'media.cdn.active' ) ) {
 
           // Strip Media from Pathname.
           $settings[ 'baseurl' ] = str_replace( '/media', '', $settings[ 'baseurl' ] );
