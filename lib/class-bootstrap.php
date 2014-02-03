@@ -282,13 +282,13 @@ namespace UsabilityDynamics\Veneer {
           'id'    => 'localhost',
           'parent' => 'top-secondary',
           'meta'  => array(
-            'html'     => '<div class="veneer-toolbar-info"></div>',
+            'html'     => '<div class="veneer-toolbar-environment"></div>',
             'target'   => '',
             'onclick'  => '',
             'title'    => __( 'Local' ),
             'class'    => 'veneer-toolbar-local'
           ),
-          'title' => __( 'Local Environment' ),
+          'title' => __( 'Local' ),
         ));
 
       }
