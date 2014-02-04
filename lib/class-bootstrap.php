@@ -26,7 +26,7 @@ namespace UsabilityDynamics\Veneer {
        * @property $version
        * @type {Object}
        */
-      public static $version = '0.1.0';
+      public static $version = '0.2.1';
 
       /**
        * Textdomain String
@@ -171,6 +171,16 @@ namespace UsabilityDynamics\Veneer {
         // Initialize Interfaces.
         $this->_interfaces();
 
+        if( defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE && is_dir( WP_CONTENT_DIR ) ) {
+
+          // Path to static cache directory.
+          if( is_dir( $_path = realpath( trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'static' ) ) ) {
+            $this->set( 'cache.available', true );
+            $this->set( 'cache.path', $_path );
+          }
+
+        }
+
         add_action( 'template_redirect', array( $this, 'redirect' ), 0, 100 );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -180,10 +190,63 @@ namespace UsabilityDynamics\Veneer {
        * Minify Output.
        */
       public function redirect() {
+        ob_start( array( $this, 'cache' ) );
+      }
 
-        if( class_exists( 'UsabilityDynamics\Veneer\Optimize' ) ) {
-          ob_start( 'UsabilityDynamics\Veneer\Optimize::minify' );
+      /**
+       * Handle Caching and Minification
+       *
+       * @todo Add logging.
+       *
+       * @mehod cache
+       * @author potanin@UD
+       */
+      public function cache( $buffer ) {
+        global $post, $wp_query;
+
+        if( is_user_logged_in() ) {
+          return $buffer;
         }
+
+        if( $_GET[ 'doing_wp_cron' ] ) {
+          return $buffer;
+
+        }
+        if( defined( 'DOING_CRON' ) && DOING_CRON ) {
+          return $buffer;
+        }
+
+        if( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+          return $buffer;
+        }
+
+        $buffer = Cache::minify( $buffer );
+
+        if( $this->get( 'cache.available' ) && $this->get( 'cache.path' ) ) {
+          $this->get( 'cache.path' );
+
+          $_info = pathinfo( $_SERVER[ 'REQUEST_URI' ] );
+
+          $_parts = array(
+            untrailingslashit( $this->get( 'cache.path' ) ),
+            trailingslashit( $_info[ 'dirname' ] ),
+            $_info[ 'filename' ] . ( in_array( $_info[ 'extension' ], array( 'html', 'htm' ) ) ? $_info[ 'extension' ] : '' )
+          );
+
+          $_path = implode( '', $_parts );
+
+          if( !wp_mkdir_p( dirname( $_path ) ) ) {
+            return $buffer;
+          }
+
+          // Write Cached Page.
+          file_put_contents( $_path, $buffer );
+
+          return $buffer;
+
+        }
+
+        return $buffer;
 
       }
 
@@ -215,10 +278,10 @@ namespace UsabilityDynamics\Veneer {
       private function _settings() {
 
         // Initialize Settings.
-        $this->_settings = new \UsabilityDynamics\Settings(array(
+        $this->_settings = new \UsabilityDynamics\Settings( array(
           "store" => "options",
           "key"   => "ud:veneer",
-        ));
+        ) );
 
         // ElasticSearch Service Settings.
         $this->set( 'documents', array(
@@ -226,24 +289,24 @@ namespace UsabilityDynamics\Veneer {
           "host"   => "localhost",
           "port"   => 9200,
           "token"  => null,
-        ));
+        ) );
 
         // Varnish Service Settings.
         $this->set( 'varnish', array(
           "active" => false,
           "host"   => "localhost",
-          "key" => null
-        ));
+          "key"    => null
+        ) );
 
         // CDN Service Settings.
         $this->set( 'media', array(
           "subdomain" => "media",
-          "cdn"    => array(
-            "active"    => false,
-            "provider"  => "gcs",
-            "key"       => null
+          "cdn"       => array(
+            "active"   => false,
+            "provider" => "gcs",
+            "key"      => null
           )
-        ));
+        ) );
 
         // Save Settings.
         $this->_settings->commit();
@@ -260,7 +323,7 @@ namespace UsabilityDynamics\Veneer {
         $this->_media = new Media( $this->get( 'media' ) );
 
         // Enable Varnish.
-        $this->_varnish = new Varnish($this->get( 'varnish' ));
+        $this->_varnish = new Varnish( $this->get( 'varnish' ) );
 
       }
 
@@ -273,7 +336,7 @@ namespace UsabilityDynamics\Veneer {
         // Render Toolbar.
         add_action( 'wp_before_admin_bar_render', array( &$this, 'toolbar' ), 10 );
 
-        if( in_array( $_SERVER['REMOTE_ADDR'], array( '127.0.0.1', '10.0.0.1', '0.0.0.0' ) ) ) {
+        if( in_array( $_SERVER[ 'REMOTE_ADDR' ], array( '127.0.0.1', '10.0.0.1', '0.0.0.0' ) ) ) {
           add_action( 'wp_before_admin_bar_render', array( &$this, 'toolbar_local' ), 100 );
         }
 
@@ -283,17 +346,17 @@ namespace UsabilityDynamics\Veneer {
         global $wp_admin_bar;
 
         $wp_admin_bar->add_menu( array(
-          'id'    => 'localhost',
+          'id'     => 'localhost',
           'parent' => 'top-secondary',
-          'meta'  => array(
-            'html'     => '<div class="veneer-toolbar-environment"></div>',
-            'target'   => '',
-            'onclick'  => '',
-            'title'    => __( 'Local' ),
-            'class'    => 'veneer-toolbar-local'
+          'meta'   => array(
+            'html'    => '<div class="veneer-toolbar-environment"></div>',
+            'target'  => '',
+            'onclick' => '',
+            'title'   => __( 'Local' ),
+            'class'   => 'veneer-toolbar-local'
           ),
-          'title' => __( 'Local' ),
-        ));
+          'title'  => __( 'Local' ),
+        ) );
 
       }
 
@@ -318,7 +381,7 @@ namespace UsabilityDynamics\Veneer {
           ),
           'title' => 'Veneer',
           'href'  => network_admin_url( 'admin.php?page=veneer' )
-        ));
+        ) );
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
@@ -342,7 +405,7 @@ namespace UsabilityDynamics\Veneer {
           'meta'   => array(),
           'title'  => 'Cache',
           'href'   => network_admin_url( 'admin.php?page=veneer#panel=varnish' )
-        ));
+        ) );
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
