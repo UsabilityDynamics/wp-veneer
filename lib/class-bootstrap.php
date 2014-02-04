@@ -171,7 +171,7 @@ namespace UsabilityDynamics\Veneer {
         // Initialize Interfaces.
         $this->_interfaces();
 
-        add_action( 'template_redirect', array( $this, 'redirect' ) );
+        add_action( 'template_redirect', array( $this, 'redirect' ), 0, 100 );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
       }
@@ -180,7 +180,11 @@ namespace UsabilityDynamics\Veneer {
        * Minify Output.
        */
       public function redirect() {
-        ob_start( 'UsabilityDynamics\Veneer\Cache::minify' );
+
+        if( class_exists( 'UsabilityDynamics\Veneer\Optimize' ) ) {
+          ob_start( 'UsabilityDynamics\Veneer\Optimize::minify' );
+        }
+
       }
 
       /**
