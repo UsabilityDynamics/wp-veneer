@@ -261,7 +261,8 @@ namespace UsabilityDynamics\Veneer {
           $_parts = array(
             untrailingslashit( $this->get( 'cache.path' ) ),
             trailingslashit( $_info[ 'dirname' ] ),
-            $_info[ 'filename' ] ? $_info[ 'filename' ] : 'index' . ( in_array( $_info[ 'extension' ], array( 'html', 'htm' ) ) ? $_info[ 'extension' ] : '.html' )
+            $_info[ 'filename' ] ? $_info[ 'filename' ] : 'index',
+            in_array( $_info[ 'extension' ], array( 'html', 'htm' ) ) ? $_info[ 'extension' ] : '.html'
           );
 
           $_path = implode( '', $_parts );
