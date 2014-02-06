@@ -26,7 +26,7 @@ namespace UsabilityDynamics\Veneer {
        * @property $version
        * @type {Object}
        */
-      public static $version = '0.2.1';
+      public static $version = '0.2.2';
 
       /**
        * Textdomain String
@@ -239,6 +239,10 @@ namespace UsabilityDynamics\Veneer {
           return $buffer;
         }
 
+        if( is_search() ) {
+          return $buffer;
+        }
+
         if( is_404() ) {
           return $buffer;
         }
@@ -255,7 +259,6 @@ namespace UsabilityDynamics\Veneer {
 
         if( $this->get( 'cache.available' ) && $this->get( 'cache.path' ) ) {
           $this->get( 'cache.path' );
-
 
           $_info = pathinfo( $_SERVER[ 'REQUEST_URI' ] );
 
