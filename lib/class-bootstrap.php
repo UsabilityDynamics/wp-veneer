@@ -200,6 +200,7 @@ namespace UsabilityDynamics\Veneer {
         $etagHeader     = ( isset( $_SERVER[ "HTTP_IF_NONE_MATCH" ] ) ? trim( $_SERVER[ "HTTP_IF_NONE_MATCH" ] ) : false );
 
         $meta = array(
+          'etag' => md5( time() ),
           'x-server' => 'wp-veneer/v' . self::$version,
           'public' => 'true',
           'cache-control' => 'max-age=3600, must-revalidate',
