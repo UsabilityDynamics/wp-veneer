@@ -130,6 +130,8 @@ namespace UsabilityDynamics\Veneer {
        */
       private $_varnish = null;
 
+      private $_search = null;
+
       /**
        * Singleton Instance Reference.
        *
@@ -170,6 +172,9 @@ namespace UsabilityDynamics\Veneer {
 
         // Initialize Interfaces.
         $this->_interfaces();
+
+        // Init Search
+        $this->_search();
 
         if( defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE && is_dir( WP_CONTENT_DIR ) ) {
 
@@ -310,6 +315,47 @@ namespace UsabilityDynamics\Veneer {
        */
       public function _shutdown() {
         $headers = getallheaders();
+      }
+
+      /**
+       *
+       */
+      public function _search() {
+        $this->_search = new Search( array(
+            'host' => '91.240.22.17',
+            'port' => 9200
+        ) );
+
+//        $elasticaIndex = $this->_search->getIndex('twitter');
+//        $elasticaType = $elasticaIndex->getType('tweet');
+//
+//        // The Id of the document
+//        $id = rand(1, 9999999);
+//
+//        // Create a document
+//        $tweet = array(
+//            'id'      => $id,
+//            'user'    => array(
+//                'name'      => 'mewantcookie',
+//                'fullName'  => 'Cookie Monster'
+//            ),
+//            'msg'     => 'Me wish there were expression for cookies like there is for apples. "A cookie a day make the doctor diagnose you with diabetes" not catchy.',
+//            'tstamp'  => time(),
+//            'location'=> '41.12,-71.34',
+//            '_boost'  => 1.0,
+//            'terms' => array(
+//                'f', 'g', 'e'
+//            )
+//        );
+//        // First parameter is the id of document.
+//        $tweetDocument = new \Elastica\Document($id, $tweet);
+//
+//        echo '<pre>';
+//        print_r( $elasticaType->addDocument($tweetDocument) );
+//        echo '</pre>';
+//
+//        // Refresh Index
+//        $elasticaType->getIndex()->refresh();
       }
 
       /**
