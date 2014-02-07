@@ -26,7 +26,8 @@
     "usabilitydynamics/lib-wp-rpc": "master",
     "usabilitydynamics/lib-settings": "master",
     "usabilitydynamics/lib-ui": "master",
-    "usabilitydynamics/lib-utility": "master"
+    "usabilitydynamics/lib-utility": "master",
+    "ruflin/elastica": "master"
   },
   "autoload": {
     "classmap": [ "lib" ]
