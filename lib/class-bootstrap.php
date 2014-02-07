@@ -26,7 +26,7 @@ namespace UsabilityDynamics\Veneer {
        * @property $version
        * @type {Object}
        */
-      public static $version = '0.2.1';
+      public static $version = '0.2.2';
 
       /**
        * Textdomain String
@@ -184,6 +184,33 @@ namespace UsabilityDynamics\Veneer {
         add_action( 'template_redirect', array( $this, 'redirect' ), 0, 100 );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
+      }
+
+      /**
+       * Set Headers
+       *
+       * @todo Etag should be a lot more sophistiacted and take into account actual content changes.
+       *
+       * @author potanin@UD
+       */
+      public function wp_head() {
+
+        $modified_since = ( isset( $_SERVER[ "HTTP_IF_MODIFIED_SINCE" ] ) ? strtotime( $_SERVER[ "HTTP_IF_MODIFIED_SINCE" ] ) : false );
+        $etagHeader     = ( isset( $_SERVER[ "HTTP_IF_NONE_MATCH" ] ) ? trim( $_SERVER[ "HTTP_IF_NONE_MATCH" ] ) : false );
+
+        $meta = array(
+          'etag' => md5( time() ),
+          'x-server' => 'wp-veneer/v' . self::$version,
+          'public' => 'true',
+          'cache-control' => 'max-age=3600, must-revalidate',
+          'last-modified' => gmdate( "D, d M Y H:i:s", time() )." GMT"
+        );
+
+        foreach( (array) $meta as $key => $value ) {
+          printf( '<meta http-equiv="%s" content="%s" />', $key, $value );
+        }
+
       }
 
       /**
@@ -210,8 +237,16 @@ namespace UsabilityDynamics\Veneer {
 
         if( $_GET[ 'doing_wp_cron' ] ) {
           return $buffer;
-
         }
+
+        if( is_search() ) {
+          return $buffer;
+        }
+
+        if( is_404() ) {
+          return $buffer;
+        }
+
         if( defined( 'DOING_CRON' ) && DOING_CRON ) {
           return $buffer;
         }
@@ -230,7 +265,8 @@ namespace UsabilityDynamics\Veneer {
           $_parts = array(
             untrailingslashit( $this->get( 'cache.path' ) ),
             trailingslashit( $_info[ 'dirname' ] ),
-            $_info[ 'filename' ] . ( in_array( $_info[ 'extension' ], array( 'html', 'htm' ) ) ? $_info[ 'extension' ] : '' )
+            $_info[ 'filename' ] ? $_info[ 'filename' ] : 'index',
+            in_array( $_info[ 'extension' ], array( 'html', 'htm' ) ) ? $_info[ 'extension' ] : '.html'
           );
 
           $_path = implode( '', $_parts );
@@ -239,10 +275,15 @@ namespace UsabilityDynamics\Veneer {
             return $buffer;
           }
 
+          // Don't cache blank results.
+          if( !trim( $buffer ) ) {
+            return $buffer;
+          }
+          // @todo Single post object detected.
+          // if( is_single() ) { }
+
           // Write Cached Page.
           file_put_contents( $_path, $buffer );
-
-          return $buffer;
 
         }
 
