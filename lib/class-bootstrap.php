@@ -275,6 +275,10 @@ namespace UsabilityDynamics\Veneer {
             return $buffer;
           }
 
+          // Don't cache blank results.
+          if( !trim( $buffer ) ) {
+            return $buffer;
+          }
           // @todo Single post object detected.
           // if( is_single() ) { }
 
