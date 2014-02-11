@@ -252,6 +252,10 @@ namespace UsabilityDynamics\Veneer {
           return $buffer;
         }
 
+        if( is_attachment() ) {
+          return $buffer;
+        }
+
         if( defined( 'DOING_CRON' ) && DOING_CRON ) {
           return $buffer;
         }
