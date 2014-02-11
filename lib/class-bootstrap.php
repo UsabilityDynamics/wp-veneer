@@ -264,7 +264,7 @@ namespace UsabilityDynamics\Veneer {
           return $buffer;
         }
 
-        $buffer = Cache::minify( $buffer );
+        // $buffer = Cache::minify( $buffer );
 
         if( $this->get( 'cache.available' ) && $this->get( 'cache.path' ) ) {
           $this->get( 'cache.path' );
