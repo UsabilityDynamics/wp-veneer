@@ -213,7 +213,7 @@ namespace UsabilityDynamics\Veneer {
         );
 
         foreach( (array) $meta as $key => $value ) {
-          printf( '<meta http-equiv="%s" content="%s" />', $key, $value );
+          printf( "\n\t" . '<meta http-equiv="%s" content="%s" />', $key, $value );
         }
 
       }
