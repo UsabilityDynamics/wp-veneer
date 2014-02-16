@@ -219,15 +219,17 @@ namespace UsabilityDynamics\Veneer {
       }
 
       /**
-       * Minify Output.
+       * Minify and Cache Output.
+       *
        */
       public function redirect() {
-        ob_start( array( $this, 'cache' ) );
+        // ob_start( array( $this, 'cache' ) );
       }
 
       /**
        * Handle Caching and Minification
        *
+       * @todo Add bypassing of requests with GET variables.
        * @todo Add logging.
        *
        * @mehod cache
@@ -267,7 +269,6 @@ namespace UsabilityDynamics\Veneer {
         // $buffer = Cache::minify( $buffer );
 
         if( $this->get( 'cache.available' ) && $this->get( 'cache.path' ) ) {
-          $this->get( 'cache.path' );
 
           $_info = pathinfo( $_SERVER[ 'REQUEST_URI' ] );
 
