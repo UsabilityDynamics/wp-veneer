@@ -25,4 +25,4 @@
 include_once( __DIR__ . '/lib/class-bootstrap.php' );
 
 // Initialize.
-new UsabilityDynamics\Veneer\Bootstrap();
+new UsawbilityDynamics\Veneer\Bootstrap();
