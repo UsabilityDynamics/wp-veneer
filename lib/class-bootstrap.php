@@ -326,11 +326,14 @@ namespace UsabilityDynamics\Veneer {
        *
        */
       public function _search() {
+        
+      /*
         $this->_search = new Search( array(
             'host' => '91.240.22.17',
             'port' => 9200
         ) );
-
+      //*/
+      
 //        $elasticaIndex = $this->_search->getIndex('twitter');
 //        $elasticaType = $elasticaIndex->getType('tweet');
 //
