@@ -326,14 +326,14 @@ namespace UsabilityDynamics\Veneer {
        *
        */
       public function _search() {
-        
+
       /*
         $this->_search = new Search( array(
             'host' => '91.240.22.17',
             'port' => 9200
         ) );
       //*/
-      
+
 //        $elasticaIndex = $this->_search->getIndex('twitter');
 //        $elasticaType = $elasticaIndex->getType('tweet');
 //
@@ -430,8 +430,7 @@ namespace UsabilityDynamics\Veneer {
 
         // Render Toolbar.
         add_action( 'wp_before_admin_bar_render', array( &$this, 'toolbar' ), 10 );
-
-        if( in_array( $_SERVER[ 'REMOTE_ADDR' ], array( '127.0.0.1', '10.0.0.1', '0.0.0.0' ) ) ) {
+        if( file_exists( WP_BASE_DIR . '/local-debug.php' ) || in_array( $_SERVER[ 'REMOTE_ADDR' ], array( '127.0.0.1', '10.0.0.1', '0.0.0.0' ) ) ) {
           add_action( 'wp_before_admin_bar_render', array( &$this, 'toolbar_local' ), 100 );
         }
 
