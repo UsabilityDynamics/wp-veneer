@@ -198,7 +198,7 @@ namespace UsabilityDynamics\Veneer {
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
 
-        ob_start( array( $this, 'ob_start' ) );
+//        ob_start( array( $this, 'ob_start' ) );
 
       }
 
@@ -238,8 +238,6 @@ namespace UsabilityDynamics\Veneer {
        */
       public function ob_start( &$buffer ) {
         global $post, $wp_query;
-
-
 
         // Remove W3 Total Cache generic text.
         $buffer = str_replace( "Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/", 'Served from', $buffer );
@@ -343,12 +341,12 @@ namespace UsabilityDynamics\Veneer {
        */
       public function _search() {
 
-      /*
-        $this->_search = new Search( array(
-            'host' => '91.240.22.17',
-            'port' => 9200
-        ) );
-      //*/
+        /*
+          $this->_search = new Search( array(
+              'host' => '91.240.22.17',
+              'port' => 9200
+          ) );
+        //*/
 
 //        $elasticaIndex = $this->_search->getIndex('twitter');
 //        $elasticaType = $elasticaIndex->getType('tweet');
