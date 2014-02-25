@@ -186,6 +186,10 @@ namespace UsabilityDynamics\Veneer {
 
         }
 
+        if( defined( 'W3TC' ) && class_exists( 'UsabilityDynamics\Veneer\W3' ) ) {
+          new W3();
+        }
+
         add_action( 'template_redirect', array( $this, 'redirect' ), 0, 100 );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
