@@ -240,12 +240,14 @@ namespace UsabilityDynamics\Veneer {
       public function ob_start( &$buffer ) {
         global $post, $wp_query;
 
+
+
         // Remove W3 Total Cache generic text.
         $buffer = str_replace( "\r\n<!-- Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/\r\n", '<!-- Served from', $buffer );
         $buffer = str_replace( "\r\n Served from:", '', $buffer );
         $buffer = str_replace( 'by W3 Total Cache ', '', $buffer );
 
-        if( is_user_logged_in() ) {
+        if( function_exists( 'is_user_logged_in' ) && is_user_logged_in() ) {
           return $buffer;
         }
 
