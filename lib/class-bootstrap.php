@@ -2,7 +2,11 @@
 /**
  * UsabilityDynamics\Veneer Bootstrap
  *
- * @verison 0.4.1
+ * ### Options
+ * * minification.enabled
+ * * cache.enabled
+ *
+ * @verison 0.5.0
  * @author potanin@UD
  * @namespace UsabilityDynamics\Veneer
  */
@@ -26,7 +30,7 @@ namespace UsabilityDynamics\Veneer {
        * @property $version
        * @type {Object}
        */
-      public static $version = '0.2.2';
+      public static $version = '0.5.0';
 
       /**
        * Textdomain String
@@ -190,10 +194,13 @@ namespace UsabilityDynamics\Veneer {
           new W3();
         }
 
-        add_action( 'template_redirect', array( $this, 'redirect' ), 0, 100 );
+        add_action( 'after_setup_theme', array( $this, 'redirect' ), 0, 100 );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
+
+        ob_start( array( $this, 'ob_start' ) );
+
       }
 
       /**
@@ -223,14 +230,6 @@ namespace UsabilityDynamics\Veneer {
       }
 
       /**
-       * Minify and Cache Output.
-       *
-       */
-      public function redirect() {
-        // ob_start( array( $this, 'cache' ) );
-      }
-
-      /**
        * Handle Caching and Minification
        *
        * @todo Add bypassing of requests with GET variables.
@@ -239,8 +238,13 @@ namespace UsabilityDynamics\Veneer {
        * @mehod cache
        * @author potanin@UD
        */
-      public function cache( $buffer ) {
+      public function ob_start( &$buffer ) {
         global $post, $wp_query;
+
+        // Remove W3 Total Cache generic text.
+        $buffer = str_replace( "\r\n<!-- Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/\r\n", '<!-- Served from', $buffer );
+        $buffer = str_replace( "\r\n Served from:", '', $buffer );
+        $buffer = str_replace( 'by W3 Total Cache ', '', $buffer );
 
         if( is_user_logged_in() ) {
           return $buffer;
@@ -262,6 +266,11 @@ namespace UsabilityDynamics\Veneer {
           return $buffer;
         }
 
+        // Bypass non-get requests.
+        if( $_SERVER[ 'REQUEST_METHOD' ] !== 'GET'  ) {
+          return $buffer;
+        }
+
         if( defined( 'DOING_CRON' ) && DOING_CRON ) {
           return $buffer;
         }
@@ -270,9 +279,11 @@ namespace UsabilityDynamics\Veneer {
           return $buffer;
         }
 
-        // $buffer = Cache::minify( $buffer );
+        if( $this->get( 'minification.enabled' ) ) {
+          $buffer = Cache::minify( $buffer );
+        }
 
-        if( $this->get( 'cache.available' ) && $this->get( 'cache.path' ) ) {
+        if( $this->get( 'cache.enabled' ) && $this->get( 'cache.available' ) && $this->get( 'cache.path' ) ) {
 
           $_info = pathinfo( $_SERVER[ 'REQUEST_URI' ] );
 
