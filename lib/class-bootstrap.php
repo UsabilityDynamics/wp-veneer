@@ -231,7 +231,6 @@ namespace UsabilityDynamics\Veneer {
       /**
        * Handle Caching and Minification
        *
-       * @todo Add bypassing of requests with GET variables.
        * @todo Add logging.
        *
        * @mehod cache
@@ -241,8 +240,8 @@ namespace UsabilityDynamics\Veneer {
         global $post, $wp_query;
 
         // Remove W3 Total Cache generic text.
-        $buffer = str_replace( "\r\n<!-- Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/\r\n", '<!-- Served from', $buffer );
-        $buffer = str_replace( "\r\n Served from:", '', $buffer );
+        $buffer = str_replace( "Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/", 'Served from', $buffer );
+        $buffer = str_replace( "\n\r\n Served from:", '', $buffer );
         $buffer = str_replace( 'by W3 Total Cache ', '', $buffer );
 
         if( is_user_logged_in() ) {
@@ -303,6 +302,7 @@ namespace UsabilityDynamics\Veneer {
           if( !trim( $buffer ) ) {
             return $buffer;
           }
+
           // @todo Single post object detected.
           // if( is_single() ) { }
 
