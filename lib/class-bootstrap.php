@@ -194,7 +194,6 @@ namespace UsabilityDynamics\Veneer {
           new W3();
         }
 
-        add_action( 'after_setup_theme', array( $this, 'redirect' ), 0, 100 );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
