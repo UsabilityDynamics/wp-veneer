@@ -6,7 +6,7 @@
  * * minification.enabled
  * * cache.enabled
  *
- * @verison 0.5.0
+ * @verison 0.5.1
  * @author potanin@UD
  * @namespace UsabilityDynamics\Veneer
  */
@@ -30,7 +30,7 @@ namespace UsabilityDynamics\Veneer {
        * @property $version
        * @type {Object}
        */
-      public static $version = '0.5.0';
+      public static $version = '0.5.1';
 
       /**
        * Textdomain String
@@ -134,6 +134,20 @@ namespace UsabilityDynamics\Veneer {
        */
       private $_varnish = null;
 
+      /**
+       * CloudFront
+       *
+       * @property
+       * @type {Object}
+       */
+      private $_cloud = null;
+
+      /**
+       *
+       *
+       * @property
+       * @type {Object}
+       */
       private $_search = null;
 
       /**
@@ -160,13 +174,21 @@ namespace UsabilityDynamics\Veneer {
         global $wpdb, $current_site, $current_blog, $wp_veneer;
 
         // Save context reference.
-        $wp_veneer = self::$instance = & $this;
+        $wp_veneer = self::$instance = &$this;
+
+//        if( !isset( $wp_cluster ) )  {
+//          _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized until after WP-Cluster.', '0.5.1' );
+//        }
 
         // Set Properties.
         $this->site    = $wpdb->get_var( "SELECT domain FROM {$wpdb->blogs} WHERE blog_id = '{$wpdb->blogid}' LIMIT 1" );
         $this->network = $wpdb->get_var( "SELECT domain FROM {$wpdb->site} WHERE id = {$wpdb->siteid}" );
         $this->cluster = WP_BASE_DOMAIN;
         $this->site_id = $wpdb->blogid;
+
+        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
 
         // Initialize Settings.
         $this->_settings();
@@ -180,23 +202,34 @@ namespace UsabilityDynamics\Veneer {
         // Init Search
         $this->_search();
 
+        // Create Public and Cache directories. Media directory created in Media class.
         if( defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE && is_dir( WP_CONTENT_DIR ) ) {
 
-          // Path to static cache directory.
-          if( is_dir( $_path = realpath( trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'static' ) ) ) {
+          $this->set( 'cache.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'cache' );
+          $this->set( 'assets.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'assets' );
+          $this->set( 'public.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'public' );
+
+          // Path to static cache directory, e.g. /static/storage/my-site.com/cache
+          if( wp_mkdir_p( $this->get( 'cache.path' ) ) ) {
             $this->set( 'cache.available', true );
-            $this->set( 'cache.path', $_path );
+          }
+
+          if( wp_mkdir_p( $this->get( 'assets.path' ) ) ) {
+            $this->set( 'assets.available', true );
+          }
+
+          if( wp_mkdir_p( $this->get( 'public.path' ) ) ) {
+            $this->set( 'public.available', true );
           }
 
         }
 
-        if( defined( 'W3TC' ) && class_exists( 'UsabilityDynamics\Veneer\W3' ) ) {
-          new W3();
-        }
+        // Enable W3 Total Cache if not already instantaited.
 
-        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-        add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
+        $this->set( 'assets.enabled', true );
+        $this->set( 'public.enabled', true );
+        $this->set( 'minification.enabled', false ); // @temp disabled
+        $this->set( 'cache.enabled', false ); // @temp disabled
 
         ob_start( array( $this, 'ob_start' ) );
 
@@ -427,6 +460,8 @@ namespace UsabilityDynamics\Veneer {
        *
        */
       private function _components() {
+
+        $this->_cache = new W3( $this->get( 'cache' ) );
 
         // Enable CDN Media.
         $this->_media = new Media( $this->get( 'media' ) );

@@ -1,6 +1,6 @@
 {
   "name": "usabilitydynamics/wp-veneer",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "homepage": "https://github.com/UsabilityDynamics/wp-veneer",
   "keywords": [
     "wordpress",
@@ -30,6 +30,17 @@
     "ruflin/elastica": "master"
   },
   "autoload": {
-    "classmap": [ "lib" ]
+    "classmap": [ 
+      "lib/class-bootstrap.php",
+      "lib/class-w3.php",
+      "lib/class-cache.php",
+      "lib/class-documents.php",
+      "lib/class-image.php",
+      "lib/class-log.php",
+      "lib/class-media.php",
+      "lib/class-security.php",
+      "lib/class-varnish.php",
+      "lib/class-search.php"  
+     ]
   }
 }

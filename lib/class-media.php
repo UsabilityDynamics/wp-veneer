@@ -76,9 +76,11 @@ namespace UsabilityDynamics\Veneer {
       public function __construct( $args ) {
         global $wp_veneer, $wpdb;
 
-        if( !defined( 'UPLOADBLOGSDIR' ) ) {
-          wp_die( '<h1>Network Error</h1><p>Unable to instatiate media the UPLOADBLOGSDIR constant is not defined.</p>' );
-        }
+        // Enable MS Site Rewriting.
+        add_filter( 'default_site_option_ms_files_rewriting', array( $this, '_ms_files_rewriting' ) );
+        add_filter( 'default_site_option_upload_path', array( $this, '_ms_files_rewriting' ) );
+        add_filter( 'pre_option_upload_path', array( $this, '_upload_path' ) );
+        add_filter( 'pre_option_upload_url_path', array( $this, '_upload_url_path' ) );
 
         // Extend Arguments with defaults.
         $args = \UsabilityDynamics\Utility::parse_args( $args, array(
@@ -108,17 +110,28 @@ namespace UsabilityDynamics\Veneer {
           $this->active = $args->active;
         }
 
+        // Trying to maintain semi-native support.
+        if( !defined( 'UPLOADBLOGSDIR' ) ) {
+          define( 'UPLOADBLOGSDIR', defined( 'WP_VENEER_STORAGE' ) ? WP_VENEER_STORAGE : 'static/storage' );
+        }
+
+        // Uploads path relative to ABSPATH
+        if( !defined( 'BLOGUPLOADDIR' ) ) {
+          define( 'BLOGUPLOADDIR', UPLOADBLOGSDIR . '/media' );
+        }
+
         // Primary image path/url override.
-        add_filter( 'upload_dir', array( &$this, 'upload_dir' ) );
+        add_filter( 'upload_dir', array( $this, 'upload_dir' ) );
 
         // Get media/upload vales. (wp_upload_dir() will generate directories).
         $wp_upload_dir   = wp_upload_dir();
-        $this->directory = defined( 'BLOGUPLOADDIR' ) && BLOGUPLOADDIR ? BLOGUPLOADDIR : '';
         $this->path      = $wp_upload_dir[ 'path' ];
         $this->url       = $wp_upload_dir[ 'url' ];
         $this->basedir   = $wp_upload_dir[ 'basedir' ];
         $this->baseurl   = $wp_upload_dir[ 'baseurl' ];
-        $this->domain    = defined( 'WP_VENEER_DOMAIN_MEDIA' ) && WP_VENEER_DOMAIN_MEDIA ? null : $wp_upload_dir[ 'baseurl' ];
+
+        $this->directory = defined( 'BLOGUPLOADDIR' ) && BLOGUPLOADDIR ? BLOGUPLOADDIR : '';
+        $this->domain    = defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE ? null : $wp_upload_dir[ 'baseurl' ];
 
         // die( json_encode( $this->_debug() ) );
 
@@ -141,6 +154,48 @@ namespace UsabilityDynamics\Veneer {
       }
 
       /**
+       * Do nothing.
+       *
+       * @param $default
+       *
+       * @return mixed
+       */
+      public function _upload_url_path( $default ) {
+        return $default;
+      }
+
+      /**
+       * Returns the base non-site-specific path for file uplods. Final path computed in wp_upload_dir();
+       *
+       * @param $default
+       *
+       * @return string
+       */
+      public function _upload_path( $default ) {
+
+        if( defined( 'WP_BASE_DIR' && defined( 'WP_VENEER_STORAGE' ) ) ) {
+          return WP_BASE_DIR . '/' . WP_VENEER_STORAGE;
+        }
+
+        if( defined( 'WP_BASE_DIR' ) ) {
+          return WP_BASE_DIR . '/static/storage';
+        }
+
+        return WP_CONTENT_DIR . '/static/storage';
+
+      }
+
+      /**
+       *
+       * @param $default
+       *
+       * @return bool
+       */
+      public function _ms_files_rewriting( $default ) {
+        return true;
+      }
+
+      /**
        * Media Paths and URLs
        *
        * @version 2.0.0
@@ -158,17 +213,23 @@ namespace UsabilityDynamics\Veneer {
         if( defined( 'WP_VENEER_STORAGE' ) ) {
           $settings[ 'path' ]    = str_replace( '/blogs.dir/' . $this->site_id . '/files', '/' . WP_VENEER_STORAGE . '/' . $this->site . '/media', $settings[ 'path' ] );
           $settings[ 'basedir' ] = str_replace( '/blogs.dir/' . $this->site_id . '/files', '/' . WP_VENEER_STORAGE . '/' . $this->site . '/media', $settings[ 'basedir' ] );
-          
+
+          $settings[ 'path' ]    = str_replace( '/sites/' . $this->site_id . '', '/' . $this->site . '/media', $settings[ 'path' ] );
+          $settings[ 'basedir' ] = str_replace( '/sites/' . $this->site_id . '', '/' . $this->site . '/media', $settings[ 'basedir' ] );
+
           if( !$this->url_rewrite ) {
-            $settings[ 'url' ] = str_replace( $this->site . '/files', $this->site . '/media', $settings[ 'url' ] );
-            $settings[ 'baseurl' ] = str_replace( $this->site . '/files', $this->site . '/media', $settings[ 'baseurl' ] );
+            $settings[ 'url' ] = home_url( '/media' . $settings[ 'subdir' ] );
+            $settings[ 'baseurl' ] = home_url( '/media' );
           }
           
           if( $this->url_rewrite ) {
             $_rewrite = untrailingslashit( $this->url_rewrite );
             $settings[ 'url' ] = str_replace( 'http://' . $this->site . '/files', $_rewrite, $settings[ 'url' ] );
             $settings[ 'baseurl' ] = str_replace( 'http://' . $this->site . '/files', $_rewrite, $settings[ 'baseurl' ] );
-            
+
+            $settings[ 'url' ] = str_replace( '/sites/' . $this->site_id . '', '/media', $settings[ 'url' ] );
+            $settings[ 'baseurl' ] = str_replace( '/sites/' . $this->site_id . '', '/media', $settings[ 'baseurl' ] );
+
           }
           
         }
