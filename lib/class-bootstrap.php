@@ -6,7 +6,7 @@
  * * minification.enabled
  * * cache.enabled
  *
- * @verison 0.5.0
+ * @verison 0.5.1
  * @author potanin@UD
  * @namespace UsabilityDynamics\Veneer
  */
@@ -30,7 +30,7 @@ namespace UsabilityDynamics\Veneer {
        * @property $version
        * @type {Object}
        */
-      public static $version = '0.5.0';
+      public static $version = '0.5.1';
 
       /**
        * Textdomain String
@@ -182,8 +182,8 @@ namespace UsabilityDynamics\Veneer {
 
         if( defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE && is_dir( WP_CONTENT_DIR ) ) {
 
-          // Path to static cache directory.
-          if( is_dir( $_path = realpath( trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'static' ) ) ) {
+          // Path to static cache directory, e.g. /static/storage/my-site.com/cache
+          if( is_dir( $_path = realpath( trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'cache' ) ) ) {
             $this->set( 'cache.available', true );
             $this->set( 'cache.path', $_path );
           }
@@ -198,7 +198,7 @@ namespace UsabilityDynamics\Veneer {
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
 
-//        ob_start( array( $this, 'ob_start' ) );
+        ob_start( array( $this, 'ob_start' ) );
 
       }
 
