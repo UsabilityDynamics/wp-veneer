@@ -133,19 +133,19 @@ namespace UsabilityDynamics\Veneer {
        * @type {Object}
        */
       private $_varnish = null;
-      
+
       /**
        * CloudFront
        *
-       * @property 
+       * @property
        * @type {Object}
        */
       private $_cloud = null;
-      
+
       /**
-       * 
        *
-       * @property 
+       *
+       * @property
        * @type {Object}
        */
       private $_search = null;
@@ -176,9 +176,9 @@ namespace UsabilityDynamics\Veneer {
         // Save context reference.
         $wp_veneer = self::$instance = &$this;
 
-        if( !isset( $wp_cluster ) )  {
-          _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized until after WP-Cluster.', '0.5.1' );
-        }
+//        if( !isset( $wp_cluster ) )  {
+//          _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized until after WP-Cluster.', '0.5.1' );
+//        }
 
         // Set Properties.
         $this->site    = $wpdb->get_var( "SELECT domain FROM {$wpdb->blogs} WHERE blog_id = '{$wpdb->blogid}' LIMIT 1" );
@@ -225,7 +225,7 @@ namespace UsabilityDynamics\Veneer {
         }
 
         // Enable W3 Total Cache if not already instantaited.
-        
+
         $this->set( 'assets.enabled', true );
         $this->set( 'public.enabled', true );
         $this->set( 'minification.enabled', false ); // @temp disabled
