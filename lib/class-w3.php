@@ -10,17 +10,67 @@ namespace UsabilityDynamics\Veneer {
     class W3 {
 
       /**
+       * W3 Total Cache Instance
+       *
+       * @public
+       * @property $root
+       * @type {Object}
+       */
+      public $root = null;
+      /**
        * Instantiate.
        *
        */
       function __construct() {
 
+        add_action( 'admin_menu', array( $this, 'admin_menu' ), 15 );
+        add_action( 'network_admin_menu', array( $this, 'network_admin_menu' ), 15 );
+
         add_action( 'admin_init', array( $this, 'admin_init' ) );
         add_filter( 'w3tc_extensions', array( $this, 'extension' ), 10, 2 );
         add_action( 'w3tc_extensions_page-veneer', array( $this, 'extension_header' ) );
-
+        
+        // Already Setup somehow.
+        if( !defined( 'W3TC' ) ) {
+        
+          define( 'W3TC_CACHE_CONFIG_DIR', WP_CONTENT_DIR  . '/application/etc/w3/cache' );
+          define( 'W3TC_CONFIG_DIR', WP_CONTENT_DIR . '/application/etc/w3/config' );        
+          define( 'W3TC_CACHE_DIR', WP_CONTENT_DIR . '/static/cache' );
+  
+          define( 'W3TC_CACHE_MINIFY_DIR', W3TC_CACHE_DIR  . '/minify' );
+          define( 'W3TC_CACHE_PAGE_ENHANCED_DIR', W3TC_CACHE_DIR  . '/enhanced' );
+          define( 'W3TC_CACHE_TMP_DIR', W3TC_CACHE_DIR . '/tmp' );
+          define( 'W3TC_CACHE_BLOGMAP_FILENAME', W3TC_CACHE_DIR . '/blogs.php' );
+  
+          define( 'W3TC_ADDIN_FILE_ADVANCED_CACHE', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/advanced-cache.php');
+          define( 'W3TC_ADDIN_FILE_OBJECT_CACHE', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/object-cache.php');
+          define( 'W3TC_ADDIN_FILE_DB', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/db.php');
+  
+          // define('W3TC_FILE_DB_CLUSTER_CONFIG', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/db-cluster-config.php');
+          // define( 'W3TC_PLUGINS_DIR', WP_CONTENT_DIR . '/static/etc' );
+          // define( 'W3TC_INSTALL_DIR', W3TC_DIR . '/static/etc' );
+          // define( 'W3TC_INSTALL_MINIFY_DIR', W3TC_CACHE_DIR . '/min');
+          // define('W3TC_INSTALL_FILE_ADVANCED_CACHE', W3TC_INSTALL_DIR . '/advanced-cache.php');
+          // define('W3TC_INSTALL_FILE_DB', W3TC_INSTALL_DIR . '/db.php');
+          // define('W3TC_INSTALL_FILE_OBJECT_CACHE', W3TC_INSTALL_DIR . '/object-cache.php');        
+          // define( 'W3TC_EXTENSION_DIR', W3TC_DIR . '/static/etc' );
+      
+          // Load W3 Total Cache and Initialize.      
+          if( file_exists( WP_PLUGIN_DIR . '/w3-total-cache/inc/define.php' ) ) {
+            @include_once WP_PLUGIN_DIR . '/w3-total-cache/inc/define.php';
+      
+            $this->root = w3_instance( 'W3_Root' );
+            $this->root->run();
+              
+          }
+            
+          // Forces W3 to not load natively.
+          define( 'W3TC_IN_MINIFY', true );                     
+          
+        }
+      
       }
-
+      
       /**
        * Display if caching or not.
        */
@@ -44,10 +94,34 @@ namespace UsabilityDynamics\Veneer {
       }
 
       /**
+       * Rmove Unnecessary Menus
+       *
+       */
+      function admin_menu() {        
+        remove_submenu_page( 'w3tc_dashboard', 'w3tc_support' );
+        remove_submenu_page( 'w3tc_dashboard', 'w3tc_about' );
+      }
+
+      /**
+       * Rmove Unnecessary Menus
+       *
+       */
+      function network_admin_menu() {        
+        remove_submenu_page( 'w3tc_dashboard', 'w3tc_support' );
+        remove_submenu_page( 'w3tc_dashboard', 'w3tc_dashboard' );
+        remove_submenu_page( 'w3tc_dashboard', 'w3tc_about' );
+        remove_submenu_page( 'w3tc_dashboard', 'w3tc_install' );
+        remove_submenu_page( 'w3tc_dashboard', 'w3tc_faq' );
+        remove_submenu_page( 'w3tc_dashboard', 'w3tc_install' );              
+      }
+      
+      /**
        * Setups sections
        */
       function admin_init() {
+      
         w3_require_once( W3TC_INC_FUNCTIONS_DIR . '/extensions.php' );
+        
         // Register our settings field group
         w3tc_add_settings_section(
           'header', // Unique identifier for the settings section
@@ -106,39 +180,10 @@ namespace UsabilityDynamics\Veneer {
        * @param $args
        */
       function print_setting( $setting, $args ) {
-        w3_require_once( W3TC_INC_FUNCTIONS_DIR . '/extensions.php' );
-        list( $name, $id ) = w3tc_get_name_and_id( 'veneer', $setting );
-        if( $args[ 'type' ] != 'custom' )
-          w3_ui_element( $args[ 'type' ], $setting, $name, w3tc_get_extension_config( 'veneer', $setting ), w3_extension_is_sealed( 'veneer' ) );
-        else {
-          if( $setting == 'fragment_reject_roles' ):
-            $saved_roles = w3tc_get_extension_config( 'veneer', $setting );
-            if( !is_array( $saved_roles ) )
-              $saved_roles = array();
-            ?>
-            <div id="<?php echo esc_attr( $id ) ?>">
-                <input type="hidden" name="<?php echo esc_attr( $name ) ?>" value=""/>
-              <?php foreach( get_editable_roles() as $role_name => $role_data ) : ?>
-                <input <?php disabled( w3_extension_is_sealed( 'veneer' ) ) ?> type="checkbox" name="<?php echo esc_attr( $name ) ?>[]" value="<?php echo $role_name ?>" <?php checked( in_array( $role_name, $saved_roles ) ) ?> id="role_<?php echo $role_name ?>"/>
-                <label for="role_<?php echo $role_name ?>"><?php echo $role_data[ 'name' ] ?></label>
-              <?php endforeach; ?>
-                </div>
-          <?php
-          else:
-            $saved_hooks = w3tc_get_extension_config( 'veneer', $setting );
-            if( !is_array( $saved_hooks ) )
-              $saved_hooks = array();
-            $hooks = array( 'genesis_header' => 'Header', 'genesis_footer' => 'Footer', 'genesis_sidebar' => 'Sidebar', 'genesis_loop' => 'The Loop', 'wp_head' => 'wp_head', 'wp_footer' => 'wp_footer', 'genesis_comments' => 'Comments', 'genesis_pings' => 'Pings', 'genesis_do_nav' => 'Primary navigation', 'genesis_do_subnav' => 'Secondary navigation' );?>
-            <div id="<?php echo esc_attr( $id ) ?>">
-                    <input <?php disabled( w3_extension_is_sealed( 'veneer' ) ) ?> type="hidden" name="<?php echo esc_attr( $name ) ?>" value=""/>
-              <?php foreach( $hooks as $hook => $hook_label ) : ?>
-                <input <?php disabled( w3_extension_is_sealed( 'veneer' ) ) ?> type="checkbox" name="<?php echo esc_attr( $name ) ?>[]" value="<?php echo $hook ?>" <?php checked( in_array( $hook, $saved_hooks ) ) ?> id="role_<?php echo $hook ?>"/>
-                <label for="role_<?php echo $hook ?>"><?php echo $hook_label ?></label><br/>
-              <?php endforeach; ?>
-                </div>
-          <?php
-          endif;
-        }
+        // w3_require_once( W3TC_INC_FUNCTIONS_DIR . '/extensions.php' );        
+        // $saved_roles = w3tc_get_extension_config( 'veneer', $setting );
+        // w3tc_get_name_and_id( 'veneer', $setting );
+        echo 'wp-veneer settings';
       }
 
       /**
@@ -307,6 +352,8 @@ namespace UsabilityDynamics\Veneer {
           );
       }
     }
+    
   }
+  
 }
 

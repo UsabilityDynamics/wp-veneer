@@ -133,7 +133,21 @@ namespace UsabilityDynamics\Veneer {
        * @type {Object}
        */
       private $_varnish = null;
-
+      
+      /**
+       * CloudFront
+       *
+       * @property 
+       * @type {Object}
+       */
+      private $_cloud = null;
+      
+      /**
+       * 
+       *
+       * @property 
+       * @type {Object}
+       */
       private $_search = null;
 
       /**
@@ -163,7 +177,7 @@ namespace UsabilityDynamics\Veneer {
         $wp_veneer = self::$instance = &$this;
 
         if( !isset( $wp_cluster ) )  {
-          _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized until after WP-Cluster.' );
+          _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized until after WP-Cluster.', '0.5.1' );
         }
 
         // Set Properties.
@@ -210,10 +224,8 @@ namespace UsabilityDynamics\Veneer {
 
         }
 
-        if( defined( 'W3TC' ) && class_exists( 'UsabilityDynamics\Veneer\W3' ) ) {
-          new W3();
-        }
-
+        // Enable W3 Total Cache if not already instantaited.
+        
         $this->set( 'assets.enabled', true );
         $this->set( 'public.enabled', true );
         $this->set( 'minification.enabled', false ); // @temp disabled
@@ -448,6 +460,8 @@ namespace UsabilityDynamics\Veneer {
        *
        */
       private function _components() {
+
+        $this->_cache = new W3( $this->get( 'cache' ) );
 
         // Enable CDN Media.
         $this->_media = new Media( $this->get( 'media' ) );
