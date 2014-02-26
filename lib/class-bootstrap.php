@@ -360,16 +360,6 @@ namespace UsabilityDynamics\Veneer {
       }
 
       /**
-       * Shutdown Request.
-       *
-       * add_action( 'shutdown', array( $this, '_shutdown' ) );
-       *
-       */
-      public function _shutdown() {
-        $headers = getallheaders();
-      }
-
-      /**
        *
        */
       public function _search() {
