@@ -160,13 +160,21 @@ namespace UsabilityDynamics\Veneer {
         global $wpdb, $current_site, $current_blog, $wp_veneer;
 
         // Save context reference.
-        $wp_veneer = self::$instance = & $this;
+        $wp_veneer = self::$instance = &$this;
+
+        if( !isset( $wp_cluster ) )  {
+          _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized until after WP-Cluster.' );
+        }
 
         // Set Properties.
         $this->site    = $wpdb->get_var( "SELECT domain FROM {$wpdb->blogs} WHERE blog_id = '{$wpdb->blogid}' LIMIT 1" );
         $this->network = $wpdb->get_var( "SELECT domain FROM {$wpdb->site} WHERE id = {$wpdb->siteid}" );
         $this->cluster = WP_BASE_DOMAIN;
         $this->site_id = $wpdb->blogid;
+
+        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
 
         // Initialize Settings.
         $this->_settings();
@@ -180,12 +188,24 @@ namespace UsabilityDynamics\Veneer {
         // Init Search
         $this->_search();
 
+        // Create Public and Cache directories. Media directory created in Media class.
         if( defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE && is_dir( WP_CONTENT_DIR ) ) {
 
+          $this->set( 'cache.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'cache' );
+          $this->set( 'assets.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'assets' );
+          $this->set( 'public.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'public' );
+
           // Path to static cache directory, e.g. /static/storage/my-site.com/cache
-          if( is_dir( $_path = realpath( trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'cache' ) ) ) {
+          if( wp_mkdir_p( $this->get( 'cache.path' ) ) ) {
             $this->set( 'cache.available', true );
-            $this->set( 'cache.path', $_path );
+          }
+
+          if( wp_mkdir_p( $this->get( 'assets.path' ) ) ) {
+            $this->set( 'assets.available', true );
+          }
+
+          if( wp_mkdir_p( $this->get( 'public.path' ) ) ) {
+            $this->set( 'public.available', true );
           }
 
         }
@@ -194,9 +214,10 @@ namespace UsabilityDynamics\Veneer {
           new W3();
         }
 
-        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-        add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
+        $this->set( 'assets.enabled', true );
+        $this->set( 'public.enabled', true );
+        $this->set( 'minification.enabled', false ); // @temp disabled
+        $this->set( 'cache.enabled', false ); // @temp disabled
 
         ob_start( array( $this, 'ob_start' ) );
 
