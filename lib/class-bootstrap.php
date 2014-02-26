@@ -244,7 +244,7 @@ namespace UsabilityDynamics\Veneer {
         $buffer = str_replace( "\n\r\n Served from:", '', $buffer );
         $buffer = str_replace( 'by W3 Total Cache ', '', $buffer );
 
-        if( is_user_logged_in() ) {
+        if( function_exists( 'is_user_logged_in' ) && is_user_logged_in() ) {
           return $buffer;
         }
 
@@ -341,12 +341,12 @@ namespace UsabilityDynamics\Veneer {
        */
       public function _search() {
 
-      /*
-        $this->_search = new Search( array(
-            'host' => '91.240.22.17',
-            'port' => 9200
-        ) );
-      //*/
+        /*
+          $this->_search = new Search( array(
+              'host' => '91.240.22.17',
+              'port' => 9200
+          ) );
+        //*/
 
 //        $elasticaIndex = $this->_search->getIndex('twitter');
 //        $elasticaType = $elasticaIndex->getType('tweet');
