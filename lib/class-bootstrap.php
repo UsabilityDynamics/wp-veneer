@@ -190,7 +190,6 @@ namespace UsabilityDynamics\Veneer {
 
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-        add_action( 'get_header', array( $this, 'get_header' ) );
         add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
 
         // Initialize Settings.
