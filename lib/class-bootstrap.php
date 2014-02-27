@@ -451,13 +451,20 @@ namespace UsabilityDynamics\Veneer {
        */
       private function _components() {
 
-        $this->_cache = new W3( $this->get( 'cache' ) );
+        // Initialize W3 Total Cachen Handlers.
+        if( class_exists( 'UsabilityDynamics\Veneer\W3' ) ) {
+          $this->_cache = new W3( $this->get( 'cache' ) );
+        }
 
         // Enable CDN Media.
+        if( class_exists( 'UsabilityDynamics\Veneer\Media' ) ) {
         $this->_media = new Media( $this->get( 'media' ) );
+        }
 
         // Enable Varnish.
-        $this->_varnish = new Varnish( $this->get( 'varnish' ) );
+        if( class_exists( 'UsabilityDynamics\Veneer\Varnish' ) ) {
+          $this->_varnish = new Varnish( $this->get( 'varnish' ) );
+        }
 
       }
 
