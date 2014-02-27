@@ -27,7 +27,10 @@
     "usabilitydynamics/lib-settings": "master",
     "usabilitydynamics/lib-ui": "master",
     "usabilitydynamics/lib-utility": "master",
-    "ruflin/elastica": "master"
+    "ruflin/elastica": "master",
+    "electrolinux/phpquery": "0.9.6",
+    "matthiasmullie/minify": "1.2.0",
+    "mrclay/minify": "master"
   },
   "autoload": {
     "classmap": [ 

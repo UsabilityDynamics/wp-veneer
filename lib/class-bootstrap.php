@@ -5,6 +5,8 @@
  * ### Options
  * * minification.enabled
  * * cache.enabled
+ * * offload.scripts
+ *
  *
  * @verison 0.5.1
  * @author potanin@UD
@@ -188,6 +190,7 @@ namespace UsabilityDynamics\Veneer {
 
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+        add_action( 'get_header', array( $this, 'get_header' ) );
         add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
 
         // Initialize Settings.
@@ -224,12 +227,11 @@ namespace UsabilityDynamics\Veneer {
 
         }
 
-        // Enable W3 Total Cache if not already instantaited.
-
         $this->set( 'assets.enabled', true );
         $this->set( 'public.enabled', true );
         $this->set( 'minification.enabled', false ); // @temp disabled
         $this->set( 'cache.enabled', false ); // @temp disabled
+        $this->set( 'offload.scripts', false ); // @temp disabled
 
         ob_start( array( $this, 'ob_start' ) );
 
@@ -271,6 +273,27 @@ namespace UsabilityDynamics\Veneer {
        */
       public function ob_start( &$buffer ) {
         global $post, $wp_query;
+
+        // Will extract all JavaScript from page. 
+        if( $this->get( 'offload.scripts' ) && class_exists( 'phpQuery' ) ) {
+
+          $doc = \phpQuery::newDocumentHTML( $buffer );
+          $scripts = pq( 'script:not([pagespeed_no_defer])' );
+
+          $_output = array();
+
+          foreach( $scripts as $script ) {
+            $_output[] = $script;
+            // @todo Write extracted Scripts to an /asset file to be served.
+          }
+
+          // Remove all found <script> tags.
+          $scripts->remove();
+
+          // Return HTML without tags.
+          return $doc->document->saveHTML();
+
+        }
 
         // Remove W3 Total Cache generic text.
         $buffer = str_replace( "Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/", 'Served from', $buffer );
