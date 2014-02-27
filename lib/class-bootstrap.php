@@ -256,6 +256,7 @@ namespace UsabilityDynamics\Veneer {
        */
       public function _outline( $buffer = null, $type = 'script' ) {
 
+        
         // Will extract all JavaScript from page.
         if( class_exists( 'phpQuery' ) ) {
 
@@ -324,12 +325,6 @@ namespace UsabilityDynamics\Veneer {
           return $buffer;
         }
 
-        if( $this->get( 'outline.scripts' ) ) {
-          if( $_response = $this->_outline( $buffer, 'scripts' ) ) {
-            return $_response;
-          }
-        }
-
         // Remove W3 Total Cache generic text.
         $buffer = str_replace( "Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/", 'Served from', $buffer );
         $buffer = str_replace( "\n\r\n Served from:", '', $buffer );
@@ -366,6 +361,12 @@ namespace UsabilityDynamics\Veneer {
 
         if( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
           return $buffer;
+        }
+
+        if( $this->get( 'outline.scripts' ) ) {
+          if( $_response = $this->_outline( $buffer, 'scripts' ) ) {
+            return $_response;
+          }
         }
 
         if( $this->get( 'minification.enabled' ) ) {
