@@ -274,7 +274,7 @@ namespace UsabilityDynamics\Veneer {
       public function ob_start( &$buffer ) {
         global $post, $wp_query;
 
-        // Will extract all JavaScript from page. 
+        // Will extract all JavaScript from page.
         if( $this->get( 'offload.scripts' ) && class_exists( 'phpQuery' ) ) {
 
           $doc = \phpQuery::newDocumentHTML( $buffer );
@@ -289,6 +289,10 @@ namespace UsabilityDynamics\Veneer {
 
           // Remove all found <script> tags.
           $scripts->remove();
+
+          if( function_exists( 'is_user_logged_in' ) && !is_user_logged_in() ) {
+            // @todo Write generated app.config.js file to to static /assets cache.
+          }
 
           // Return HTML without tags.
           return $doc->document->saveHTML();
