@@ -5,7 +5,7 @@
  * ### Options
  * * minification.enabled
  * * cache.enabled
- * * offload.scripts
+ * * outline.scripts
  *
  *
  * @verison 0.5.1
@@ -178,9 +178,9 @@ namespace UsabilityDynamics\Veneer {
         // Save context reference.
         $wp_veneer = self::$instance = &$this;
 
-//        if( !isset( $wp_cluster ) )  {
-//          _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized until after WP-Cluster.', '0.5.1' );
-//        }
+        if( !isset( $wp_cluster ) )  {
+          _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized until after WP-Cluster.', '0.5.1' );
+        }
 
         // Set Properties.
         $this->site    = $wpdb->get_var( "SELECT domain FROM {$wpdb->blogs} WHERE blog_id = '{$wpdb->blogid}' LIMIT 1" );
@@ -204,6 +204,8 @@ namespace UsabilityDynamics\Veneer {
 
         // Init Search
         $this->_search();
+
+        ob_start( array( $this, 'ob_start' ) );
 
         // Create Public and Cache directories. Media directory created in Media class.
         if( defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE && is_dir( WP_CONTENT_DIR ) ) {
@@ -231,9 +233,53 @@ namespace UsabilityDynamics\Veneer {
         $this->set( 'public.enabled', true );
         $this->set( 'minification.enabled', false ); // @temp disabled
         $this->set( 'cache.enabled', false ); // @temp disabled
-        $this->set( 'offload.scripts', false ); // @temp disabled
+        $this->set( 'outline.scripts', false ); // @temp disabled
 
-        ob_start( array( $this, 'ob_start' ) );
+        // @temp
+        if( $wp_veneer->site === 'umesouthpadre.com' ) {
+          $this->set( 'cache.enabled', true );
+          $this->set( 'minification.enabled', true );
+          $this->set( 'outline.scripts', true );
+        }
+
+      }
+
+      /**
+       * Outline Scripts and Styles.
+       *
+       * https://developers.google.com/speed/pagespeed/module/filter-js-outline
+       *
+       * @param null   $buffer
+       * @param string $type
+       *
+       * @return string
+       */
+      public function _outline( $buffer = null, $type = 'script' ) {
+
+        // Will extract all JavaScript from page.
+        if( class_exists( 'phpQuery' ) ) {
+
+          $doc = \phpQuery::newDocumentHTML( $buffer );
+          $scripts = pq( 'script:not([data-main])' );
+
+          $_output = array();
+
+          // @todo Write extracted Scripts to an /asset file to be served.
+          foreach( $scripts as $script ) {
+            $_output[] = $script;
+          }
+
+          // Remove all found <script> tags.
+          $scripts->remove();
+
+          if( function_exists( 'is_user_logged_in' ) && !is_user_logged_in() ) {
+            // @todo Write generated app.config.js file to to static /assets cache.
+          }
+
+          // Return HTML without tags.
+          return $doc->document->saveHTML();
+
+        }
 
       }
 
@@ -274,29 +320,14 @@ namespace UsabilityDynamics\Veneer {
       public function ob_start( &$buffer ) {
         global $post, $wp_query;
 
-        // Will extract all JavaScript from page.
-        if( $this->get( 'offload.scripts' ) && class_exists( 'phpQuery' ) ) {
+        if( is_admin() ) {
+          return $buffer;
+        }
 
-          $doc = \phpQuery::newDocumentHTML( $buffer );
-          $scripts = pq( 'script:not([pagespeed_no_defer])' );
-
-          $_output = array();
-
-          foreach( $scripts as $script ) {
-            $_output[] = $script;
-            // @todo Write extracted Scripts to an /asset file to be served.
+        if( $this->get( 'outline.scripts' ) ) {
+          if( $_response = $this->_outline( $buffer, 'scripts' ) ) {
+            return $_response;
           }
-
-          // Remove all found <script> tags.
-          $scripts->remove();
-
-          if( function_exists( 'is_user_logged_in' ) && !is_user_logged_in() ) {
-            // @todo Write generated app.config.js file to to static /assets cache.
-          }
-
-          // Return HTML without tags.
-          return $doc->document->saveHTML();
-
         }
 
         // Remove W3 Total Cache generic text.
