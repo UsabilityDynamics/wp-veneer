@@ -173,7 +173,7 @@ namespace UsabilityDynamics\Veneer {
        * @method __construct
        */
       public function __construct() {
-        global $wpdb, $current_site, $current_blog, $wp_veneer;
+        global $wpdb, $current_site, $current_blog, $wp_veneer, $wp_cluster;
 
         // Save context reference.
         $wp_veneer = self::$instance = &$this;
@@ -324,12 +324,6 @@ namespace UsabilityDynamics\Veneer {
           return $buffer;
         }
 
-        if( $this->get( 'outline.scripts' ) ) {
-          if( $_response = $this->_outline( $buffer, 'scripts' ) ) {
-            return $_response;
-          }
-        }
-
         // Remove W3 Total Cache generic text.
         $buffer = str_replace( "Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/", 'Served from', $buffer );
         $buffer = str_replace( "\n\r\n Served from:", '', $buffer );
@@ -366,6 +360,12 @@ namespace UsabilityDynamics\Veneer {
 
         if( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
           return $buffer;
+        }
+
+        if( $this->get( 'outline.scripts' ) ) {
+          if( $_response = $this->_outline( $buffer, 'scripts' ) ) {
+            return $_response;
+          }
         }
 
         if( $this->get( 'minification.enabled' ) ) {
