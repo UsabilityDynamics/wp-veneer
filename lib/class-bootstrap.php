@@ -3,7 +3,7 @@
  * UsabilityDynamics\Veneer Bootstrap
  *
  * ### Options
- * * minification.enabled
+ * * asset.minification.enabled
  * * cache.enabled
  * * outline.scripts
  *
@@ -211,7 +211,8 @@ namespace UsabilityDynamics\Veneer {
 
           $this->set( 'cache.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'cache' );
           $this->set( 'assets.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'assets' );
-          $this->set( 'public.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'public' );
+          $this->set( 'static.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'static' );
+          $this->set( 'cdn.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'cdn' );
 
           // Path to static cache directory, e.g. /static/storage/my-site.com/cache
           if( wp_mkdir_p( $this->get( 'cache.path' ) ) ) {
@@ -222,23 +223,14 @@ namespace UsabilityDynamics\Veneer {
             $this->set( 'assets.available', true );
           }
 
-          if( wp_mkdir_p( $this->get( 'public.path' ) ) ) {
-            $this->set( 'public.available', true );
+          if( wp_mkdir_p( $this->get( 'static.path' ) ) ) {
+            $this->set( 'static.available', true );
           }
 
-        }
+          if( wp_mkdir_p( $this->get( 'cdn.path' ) ) ) {
+            $this->set( 'cdn.available', true );
+          }
 
-        $this->set( 'assets.enabled', true );
-        $this->set( 'public.enabled', true );
-        $this->set( 'minification.enabled', false ); // @temp disabled
-        $this->set( 'cache.enabled', false ); // @temp disabled
-        $this->set( 'outline.scripts', false ); // @temp disabled
-
-        // @temp
-        if( $wp_veneer->site === 'umesouthpadre.com' ) {
-          $this->set( 'cache.enabled', true );
-          $this->set( 'minification.enabled', true );
-          $this->set( 'outline.scripts', true );
         }
 
       }
@@ -368,7 +360,7 @@ namespace UsabilityDynamics\Veneer {
           }
         }
 
-        if( $this->get( 'minification.enabled' ) ) {
+        if( $this->get( 'asset.minification.enabled' ) ) {
           $buffer = Cache::minify( $buffer );
         }
 
@@ -486,17 +478,27 @@ namespace UsabilityDynamics\Veneer {
           "active" => false,
           "host"   => "localhost",
           "key"    => null
-        ) );
+        ));
 
         // CDN Service Settings.
         $this->set( 'media', array(
+          "relative"  => true,
           "subdomain" => "media",
           "cdn"       => array(
             "active"   => false,
-            "provider" => "gcs",
-            "key"      => null
+            "provider" => "cf",
+            "key"      => null,
+            "secret"   => null,
+            "bucket"   => null
           )
-        ) );
+        ));
+
+        $this->set( 'assets.enabled', true );
+        $this->set( 'static.enabled', true );
+        $this->set( 'assets.minification.enabled', true );
+        $this->set( 'cdn.enabled', true );
+        $this->set( 'cache.enabled', true );
+        $this->set( 'outline.scripts', true );
 
         // Save Settings.
         $this->_settings->commit();
@@ -628,7 +630,7 @@ namespace UsabilityDynamics\Veneer {
        * @author potanin@UD
        * @since 0.1.1
        */
-      public static function get( $key, $default = null ) {
+      public static function get( $key = null, $default = null ) {
         return self::$instance->_settings ? self::$instance->_settings->get( $key, $default ) : null;
       }
 

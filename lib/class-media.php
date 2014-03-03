@@ -229,7 +229,6 @@ namespace UsabilityDynamics\Veneer {
 
             $settings[ 'url' ] = str_replace( '/sites/' . $this->site_id . '', '/media', $settings[ 'url' ] );
             $settings[ 'baseurl' ] = str_replace( '/sites/' . $this->site_id . '', '/media', $settings[ 'baseurl' ] );
-
           }
           
         }
@@ -238,12 +237,12 @@ namespace UsabilityDynamics\Veneer {
         if( !$this->url_rewrite && $wp_veneer->get( 'media.cdn.active' ) ) {
 
           // Strip Media from Pathname.
-          $settings[ 'baseurl' ] = str_replace( '/media', '', $settings[ 'baseurl' ] );
-          $settings[ 'url' ]     = str_replace( '/media', '', $settings[ 'url' ] );
+          // $settings[ 'baseurl' ] = str_replace( '/media', '', $settings[ 'baseurl' ] );
+          // $settings[ 'url' ]     = str_replace( '/media', '', $settings[ 'url' ] );
 
           // Add media Subdomain.
-          $settings[ 'baseurl' ] = str_replace( '://', '://' . $wp_veneer->get( 'media.subdomain' ) . '.', $settings[ 'baseurl' ] );
-          $settings[ 'url' ]     = str_replace( '://', '://' . $wp_veneer->get( 'media.subdomain' ) . '.', $settings[ 'url' ] );
+          // $settings[ 'baseurl' ] = str_replace( '://', '://' . $wp_veneer->get( 'media.subdomain' ) . '.', $settings[ 'baseurl' ] );
+          // $settings[ 'url' ]     = str_replace( '://', '://' . $wp_veneer->get( 'media.subdomain' ) . '.', $settings[ 'url' ] );
 
         }
 

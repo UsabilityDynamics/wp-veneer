@@ -77,7 +77,7 @@ namespace UsabilityDynamics\Veneer {
 
           // @todo Use to modify settings.
           if( is_callable( 'w3_instance' ) ) {
-            $this->config = w3_instance( 'W3_Config' );
+            $this->instance = w3_instance( 'W3_Config' );
           }
 
         }
