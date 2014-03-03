@@ -53,6 +53,17 @@ namespace UsabilityDynamics\Veneer {
       public $site = null;
 
       /**
+       * Site Root Domain
+       *
+       * Used as basis for media, assets, cdn subdomains.
+       *
+       * @public
+       * @property $apex
+       * @type {Object}
+       */
+      public $apex = null;
+
+      /**
        * Site ID
        *
        * @public
@@ -187,6 +198,7 @@ namespace UsabilityDynamics\Veneer {
         $this->network = $wpdb->get_var( "SELECT domain FROM {$wpdb->site} WHERE id = {$wpdb->siteid}" );
         $this->cluster = WP_BASE_DOMAIN;
         $this->site_id = $wpdb->blogid;
+        $this->apex    = isset( $current_blog->apex ) ? $current_blog->apex : $apex = str_replace( "www.", '', $this->site );
 
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -316,11 +328,9 @@ namespace UsabilityDynamics\Veneer {
           return $buffer;
         }
 
-        $apex = str_replace( "www.", '', $this->site );
-
         // @temp
-        $buffer = str_replace( "//{$this->site}/media/",  "//media.{$apex}/",   $buffer );
-        $buffer = str_replace( "//{$this->site}/assets/", "//assets.{$apex}/",  $buffer );
+        $buffer = str_replace( "//{$this->site}/media/",  "//media.{$this->apex}/",   $buffer );
+        $buffer = str_replace( "//{$this->site}/assets/", "//assets.{$this->apex}/",  $buffer );
 
 
         // Remove W3 Total Cache generic text.
