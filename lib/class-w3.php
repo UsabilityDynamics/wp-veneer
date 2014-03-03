@@ -50,13 +50,13 @@ namespace UsabilityDynamics\Veneer {
           define( 'W3TC_ADDIN_FILE_OBJECT_CACHE', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/object-cache.php');
           define( 'W3TC_ADDIN_FILE_DB', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/db.php');
 
-          // define('W3TC_FILE_DB_CLUSTER_CONFIG', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/db-cluster-config.php');
+          // define( 'W3TC_FILE_DB_CLUSTER_CONFIG', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/db-cluster-config.php');
           // define( 'W3TC_PLUGINS_DIR', WP_CONTENT_DIR . '/static/etc' );
           // define( 'W3TC_INSTALL_DIR', W3TC_DIR . '/static/etc' );
           // define( 'W3TC_INSTALL_MINIFY_DIR', W3TC_CACHE_DIR . '/min');
-          // define('W3TC_INSTALL_FILE_ADVANCED_CACHE', W3TC_INSTALL_DIR . '/advanced-cache.php');
-          // define('W3TC_INSTALL_FILE_DB', W3TC_INSTALL_DIR . '/db.php');
-          // define('W3TC_INSTALL_FILE_OBJECT_CACHE', W3TC_INSTALL_DIR . '/object-cache.php');
+          // define( 'W3TC_INSTALL_FILE_ADVANCED_CACHE', W3TC_INSTALL_DIR . '/advanced-cache.php');
+          // define( 'W3TC_INSTALL_FILE_DB', W3TC_INSTALL_DIR . '/db.php');
+          // define( 'W3TC_INSTALL_FILE_OBJECT_CACHE', W3TC_INSTALL_DIR . '/object-cache.php');
           // define( 'W3TC_EXTENSION_DIR', W3TC_DIR . '/static/etc' );
 
           // Load W3 Total Cache and Initialize.
