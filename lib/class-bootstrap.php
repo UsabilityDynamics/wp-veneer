@@ -3,7 +3,7 @@
  * UsabilityDynamics\Veneer Bootstrap
  *
  * ### Options
- * * asset.minification.enabled
+ * * assets.minification.enabled
  * * cache.enabled
  * * outline.scripts
  *
@@ -377,7 +377,7 @@ namespace UsabilityDynamics\Veneer {
           }
         }
 
-        if( $this->get( 'asset.minification.enabled' ) ) {
+        if( $this->get( 'assets.minification.enabled' ) ) {
           $buffer = Cache::minify( $buffer );
         }
 
@@ -512,9 +512,9 @@ namespace UsabilityDynamics\Veneer {
 
         $this->set( 'assets.enabled', true );
         $this->set( 'static.enabled', true );
-        $this->set( 'assets.minification.enabled', true );
+        $this->set( 'assets.minification.enabled', false );
         $this->set( 'cdn.enabled', true );
-        $this->set( 'cache.enabled', true );
+        $this->set( 'cache.enabled', false );
         $this->set( 'outline.scripts', true );
 
         // Save Settings.
