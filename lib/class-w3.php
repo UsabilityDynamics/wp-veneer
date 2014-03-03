@@ -37,6 +37,12 @@ namespace UsabilityDynamics\Veneer {
         // Already Setup somehow.
         if( !defined( 'W3TC' ) ) {
 
+          // Enable Database Clustering.
+          define( 'W3TC_ENTERPRISE', true );
+
+          // Disable Upgrade Nag.
+          define( 'W3TC_PRO', true );
+
           define( 'W3TC_CACHE_CONFIG_DIR', WP_CONTENT_DIR  . '/application/etc/w3/cache' );
           define( 'W3TC_CONFIG_DIR', WP_CONTENT_DIR . '/application/etc/w3/config' );
           define( 'W3TC_CACHE_DIR', WP_CONTENT_DIR . '/static/cache' );
@@ -49,6 +55,7 @@ namespace UsabilityDynamics\Veneer {
           define( 'W3TC_ADDIN_FILE_ADVANCED_CACHE', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/advanced-cache.php');
           define( 'W3TC_ADDIN_FILE_OBJECT_CACHE', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/object-cache.php');
           define( 'W3TC_ADDIN_FILE_DB', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/db.php');
+          define( 'W3TC_WP_LOADER', ( defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : WP_CONTENT_DIR . '/plugins' ) . '/w3tc-wp-loader.php' );
 
           // define( 'W3TC_FILE_DB_CLUSTER_CONFIG', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/db-cluster-config.php');
           // define( 'W3TC_PLUGINS_DIR', WP_CONTENT_DIR . '/static/etc' );
@@ -67,6 +74,11 @@ namespace UsabilityDynamics\Veneer {
 
           // Forces W3 to not load natively.
           define( 'W3TC_IN_MINIFY', true );
+
+          // @todo Use to modify settings.
+          if( is_callable( 'w3_instance' ) ) {
+            $this->config = w3_instance( 'W3_Config' );
+          }
 
         }
 
@@ -99,8 +111,17 @@ namespace UsabilityDynamics\Veneer {
        *
        */
       function admin_menu() {
+
+        if( !current_user_can( 'manage_network' ) ) {
+          return remove_menu_page( 'w3tc_dashboard' );
+        }
+
+        remove_submenu_page( 'w3tc_dashboard', 'w3tc_dashboard' );
         remove_submenu_page( 'w3tc_dashboard', 'w3tc_support' );
+        remove_submenu_page( 'w3tc_dashboard', 'w3tc_faq' );
+        remove_submenu_page( 'w3tc_dashboard', 'w3tc_install' );
         remove_submenu_page( 'w3tc_dashboard', 'w3tc_about' );
+
       }
 
       /**
@@ -108,12 +129,17 @@ namespace UsabilityDynamics\Veneer {
        *
        */
       function network_admin_menu() {
+
+        if( !current_user_can( 'manage_network' ) ) {
+          return remove_menu_page( 'w3tc_dashboard' );
+        }
+
         remove_submenu_page( 'w3tc_dashboard', 'w3tc_support' );
         remove_submenu_page( 'w3tc_dashboard', 'w3tc_dashboard' );
         remove_submenu_page( 'w3tc_dashboard', 'w3tc_about' );
-        remove_submenu_page( 'w3tc_dashboard', 'w3tc_install' );
         remove_submenu_page( 'w3tc_dashboard', 'w3tc_faq' );
         remove_submenu_page( 'w3tc_dashboard', 'w3tc_install' );
+
       }
 
       /**
@@ -130,6 +156,7 @@ namespace UsabilityDynamics\Veneer {
           '__return_false', // Section callback (we don't want anything)
           'veneer' // extension id, used to uniquely identify the extension;
         );
+
         w3tc_add_settings_section(
           'content',
           'Content',
