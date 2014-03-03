@@ -316,6 +316,13 @@ namespace UsabilityDynamics\Veneer {
           return $buffer;
         }
 
+        $apex = str_replace( "www.", '', $this->site );
+
+        // @temp
+        $buffer = str_replace( "//{$this->site}/media/",  "//media.{$apex}/",   $buffer );
+        $buffer = str_replace( "//{$this->site}/assets/", "//assets.{$apex}/",  $buffer );
+
+
         // Remove W3 Total Cache generic text.
         $buffer = str_replace( "Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/", 'Served from', $buffer );
         $buffer = str_replace( "\n\r\n Served from:", '', $buffer );
