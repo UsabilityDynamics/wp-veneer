@@ -28,6 +28,8 @@ namespace UsabilityDynamics\Veneer {
        */
       static function minify( $buffer ) {
 
+        return self::minify_html( $buffer );
+
         // Strip Linebreaks.
         $buffer = str_replace( array( "\n","\r","\t" ), '', $buffer );
 
@@ -35,8 +37,6 @@ namespace UsabilityDynamics\Veneer {
         $buffer = preg_replace( '/<!--(.*)-->/Uis', '', $buffer );
 
         //preg_replace('/<!--(.*)-->/Uis', '', $html)
-
-        $buffer = str_replace( 'W3 Total Cache', 'sdfsdf', $buffer );
 
         // Strip whitespace.
         $buffer = preg_replace( '/\s+/', ' ', $buffer );

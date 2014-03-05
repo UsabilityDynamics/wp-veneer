@@ -3,9 +3,18 @@
  * UsabilityDynamics\Veneer Bootstrap
  *
  * ### Options
- * * assets.minification.enabled
  * * cache.enabled
- * * outline.scripts
+ * * scripts.outline.enabled
+ *
+ * * media.shard.enabled
+ * * media.path.public
+ * * media.shard.subdomain
+ *
+ * * assets.shard.enabled
+ * * assets.shard.subdomain
+ * * scripts.path.public
+ * * html.minify.enabled
+ * *
  *
  *
  * @verison 0.5.1
@@ -196,6 +205,8 @@ namespace UsabilityDynamics\Veneer {
         // Set Properties.
         $this->site    = $wpdb->get_var( "SELECT domain FROM {$wpdb->blogs} WHERE blog_id = '{$wpdb->blogid}' LIMIT 1" );
         $this->network = $wpdb->get_var( "SELECT domain FROM {$wpdb->site} WHERE id = {$wpdb->siteid}" );
+
+        // @todo Should not use WP_BASE_DOMAIN constant.
         $this->cluster = WP_BASE_DOMAIN;
         $this->site_id = $wpdb->blogid;
         $this->apex    = isset( $current_blog->apex ) ? $current_blog->apex : $apex = str_replace( "www.", '', $this->site );
@@ -221,26 +232,28 @@ namespace UsabilityDynamics\Veneer {
         // Create Public and Cache directories. Media directory created in Media class.
         if( defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE && is_dir( WP_CONTENT_DIR ) ) {
 
-          $this->set( 'cache.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'cache' );
-          $this->set( 'assets.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'assets' );
-          $this->set( 'static.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'static' );
-          $this->set( 'cdn.path',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'cdn' );
+          $this->set( 'media.path.disk',    trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'cache' );
+          $this->set( 'cache.path.disk',    trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'cache' );
+          $this->set( 'scripts.path.disk',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'assets/scripts' );
+          $this->set( 'styles.path.disk',   trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'assets/styles' );
+          $this->set( 'static.path.disk',   trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'static' );
+          $this->set( 'cdn.path.disk',      trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'cdn' );
 
           // Path to static cache directory, e.g. /static/storage/my-site.com/cache
-          if( wp_mkdir_p( $this->get( 'cache.path' ) ) ) {
-            $this->set( 'cache.available', true );
+          if( !wp_mkdir_p( $this->get( 'cache.path.disk' ) ) ) {
+            $this->set( 'cache.available', false );
           }
 
-          if( wp_mkdir_p( $this->get( 'assets.path' ) ) ) {
-            $this->set( 'assets.available', true );
+          if( !wp_mkdir_p( $this->get( 'assets.path.disk' ) ) ) {
+            $this->set( 'assets.available', false );
           }
 
-          if( wp_mkdir_p( $this->get( 'static.path' ) ) ) {
-            $this->set( 'static.available', true );
+          if( !wp_mkdir_p( $this->get( 'static.path.disk' ) ) ) {
+            $this->set( 'static.available', false );
           }
 
-          if( wp_mkdir_p( $this->get( 'cdn.path' ) ) ) {
-            $this->set( 'cdn.available', true );
+          if( !wp_mkdir_p( $this->get( 'cdn.path.disk' ) ) ) {
+            $this->set( 'cdn.available', false );
           }
 
         }
@@ -328,32 +341,33 @@ namespace UsabilityDynamics\Veneer {
           return $buffer;
         }
 
-        // @temp
-        $buffer = str_replace( "//{$this->site}/media/",  "//media.{$this->apex}/",   $buffer );
-        $buffer = str_replace( "//{$this->site}/assets/", "//assets.{$this->apex}/",  $buffer );
-
 
         // Remove W3 Total Cache generic text.
         $buffer = str_replace( "Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/", 'Served from', $buffer );
         $buffer = str_replace( "\n\r\n Served from:", '', $buffer );
         $buffer = str_replace( 'by W3 Total Cache ', '', $buffer );
 
+        // Never cached logged in users.
         if( function_exists( 'is_user_logged_in' ) && is_user_logged_in() ) {
           return $buffer;
         }
 
-        if( $_GET[ 'doing_wp_cron' ] ) {
+        // Ignore CRON requests.
+        if( isset( $_GET[ 'doing_wp_cron' ] ) && $_GET[ 'doing_wp_cron' ] ) {
           return $buffer;
         }
 
+        // Do not cache search results.
         if( is_search() ) {
           return $buffer;
         }
 
+        // Ignore 404 pages.
         if( is_404() ) {
           return $buffer;
         }
 
+        // Bail on Media and Assets.
         if( is_attachment() ) {
           return $buffer;
         }
@@ -363,30 +377,38 @@ namespace UsabilityDynamics\Veneer {
           return $buffer;
         }
 
-        if( defined( 'DOING_CRON' ) && DOING_CRON ) {
+        // Always bypass AJAX and CRON Requests.
+        if( ( defined( 'DOING_CRON' ) && DOING_CRON ) && ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
           return $buffer;
         }
 
-        if( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-          return $buffer;
+        // Media Domain Sharding.
+        if( $this->get( 'media.shard.enabled' ) ) {
+          $buffer = str_replace( "//{$this->site}/" . $this->get( 'media.path.public' ) . "/",  "//" . $this->get( 'media.shard.subdomain' ) . ".{$this->apex}/", $buffer );
         }
 
-        if( $this->get( 'outline.scripts' ) ) {
-          if( $_response = $this->_outline( $buffer, 'scripts' ) ) {
-            return $_response;
-          }
+        // Asset Domain Sharding.
+        if( $this->get( 'assets.shard.enabled' ) ) {
+          $buffer = str_replace( "//{$this->site}/" . $this->get( 'scripts.path.public' ) . "/", "//" . $this->get( 'assets.shard.subdomain' ) . ".{$this->apex}/", $buffer );
         }
 
-        if( $this->get( 'assets.minification.enabled' ) ) {
-          $buffer = Cache::minify( $buffer );
+        // Outline and AMD JavaScript Assets.
+        if( $this->get( 'scripts.outline.enabled' ) && $_response = $this->_outline( $buffer, 'scripts' ) ) {
+          $buffer = $_response;
         }
 
-        if( $this->get( 'cache.enabled' ) && $this->get( 'cache.available' ) && $this->get( 'cache.path' ) ) {
+        // Minify HTML Output.
+        if( $this->get( 'html.minify.enabled' ) ) {
+          $buffer = Cache::minify_html( $buffer );
+        }
+
+        // Save static HTML cache.
+        if( $this->get( 'cache.enabled' ) && $this->get( 'cache.available' ) && $this->get( 'cache.path.disk' ) ) {
 
           $_info = pathinfo( $_SERVER[ 'REQUEST_URI' ] );
 
           $_parts = array(
-            untrailingslashit( $this->get( 'cache.path' ) ),
+            untrailingslashit( $this->get( 'cache.path.disk' ) ),
             trailingslashit( $_info[ 'dirname' ] ),
             $_info[ 'filename' ] ? $_info[ 'filename' ] : 'index',
             in_array( $_info[ 'extension' ], array( 'html', 'htm' ) ) ? $_info[ 'extension' ] : '.html'
@@ -482,6 +504,8 @@ namespace UsabilityDynamics\Veneer {
           "key"   => "ud:veneer",
         ) );
 
+        // $this->_settings->flush();
+
         // ElasticSearch Service Settings.
         $this->set( 'documents', array(
           "active" => true,
@@ -499,9 +523,12 @@ namespace UsabilityDynamics\Veneer {
 
         // CDN Service Settings.
         $this->set( 'media', array(
-          "relative"  => true,
-          "subdomain" => "media",
-          "cdn"       => array(
+          "relative"  => true
+        ));
+
+        // CDN Service Settings.
+        $this->set( 'cdn', array(
+          "provider"  => array(
             "active"   => false,
             "provider" => "cf",
             "key"      => null,
@@ -510,12 +537,27 @@ namespace UsabilityDynamics\Veneer {
           )
         ));
 
-        $this->set( 'assets.enabled', true );
         $this->set( 'static.enabled', true );
-        $this->set( 'assets.minification.enabled', false );
         $this->set( 'cdn.enabled', true );
-        $this->set( 'cache.enabled', false );
-        $this->set( 'outline.scripts', true );
+        $this->set( 'cache.enabled', true );
+
+        $this->set( 'media.shard.enabled', true );
+        $this->set( 'scripts.shard.enabled', true );
+        $this->set( 'styles.shard.enabled', true );
+
+        $this->set( 'media.shard.subdomain', 'media' );
+        $this->set( 'scripts.shard.subdomain', 'assets' );
+        $this->set( 'styles.shard.subdomain', 'assets' );
+
+        $this->set( 'media.path.public', '/media' );
+        $this->set( 'scripts.path.public', '/assets/scripts' );
+        $this->set( 'styles.path.public', '/assets/styles' );
+
+        $this->set( 'html.minify.enabled', false );
+
+        $this->set( 'scripts.outline.enabled', false );
+
+        // die( '<pre>' . print_r( $this->get(), true ) . '</pre>' );
 
         // Save Settings.
         $this->_settings->commit();
