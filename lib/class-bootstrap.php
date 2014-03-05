@@ -211,6 +211,7 @@ namespace UsabilityDynamics\Veneer {
         $this->site_id = $wpdb->blogid;
         $this->apex    = isset( $current_blog->apex ) ? $current_blog->apex : $apex = str_replace( "www.", '', $this->site );
 
+        add_action( 'init', array( $this, 'init' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
@@ -258,8 +259,63 @@ namespace UsabilityDynamics\Veneer {
 
         }
 
+
       }
 
+      public function _admin_menu() {
+        global $menu, $submenu;
+
+//        die( '<pre>' . print_r( $menu, true ) . '</pre>' );
+
+        // Site Only.
+        if( current_filter() === 'admin_menu' ) {
+
+          // Remove Native Site Sections.
+          // remove_submenu_page( 'index.php', 'my-sites.php' );
+
+          // Add Network Administration.
+          add_options_page( __( 'Services', self::$text_domain ), __( 'Services', self::$text_domain ), 'manage_network', 'network-policy', array( $this, 'site_settings' ) );
+          add_options_page( __( 'CDN', self::$text_domain ), __( 'CDN', self::$text_domain ), 'manage_network', 'network-policy', array( $this, 'site_settings' ) );
+
+        }
+
+        // Network Only.
+        if( current_filter() === 'network_admin_menu' ) {
+
+          // Remove Native Network Settings.
+          // remove_menu_page( 'sites.php' );
+
+        }
+
+        // Add Network Administration to Network and Site.
+        add_submenu_page( 'settings.php', __( 'API Settings', self::$text_domain ), __( 'API Settings', self::$text_domain ), 'manage_network', 'network-dns', array( $this, 'network_settings' ) );
+        add_submenu_page( 'index.php', __( 'Reports', self::$text_domain ), __( 'Reports', self::$text_domain ), 'manage_network', 'network-policy', array( $this, 'network_settings' ) );
+
+      }
+
+      /**
+       * Site Settings
+       *
+       */
+      public function site_settings() {
+
+        if( file_exists( dirname( __DIR__ ) . '/views/settings-site.php' ) ) {
+          include( dirname( __DIR__ ) . '/views/settings-site.php' );
+        }
+
+      }
+
+      /**
+       * Network Settings
+       *
+       */
+      public function network_settings() {
+
+        if( file_exists( dirname( __DIR__ ) . '/views/settings-network.php' ) ) {
+          include( dirname( __DIR__ ) . '/views/settings-network.php' );
+        }
+
+      }
       /**
        * Outline Scripts and Styles.
        *
@@ -434,6 +490,17 @@ namespace UsabilityDynamics\Veneer {
         }
 
         return $buffer;
+
+      }
+
+      public function init() {
+
+        // Only admin can see W3TC notices and errors
+        // add_action('admin_notices', array( $this, 'admin_notices' ));
+        // add_action('network_admin_notices', array( $this, 'admin_notices' ));
+
+        add_action( 'admin_menu', array( $this, '_admin_menu' ), 8 );
+        add_action( 'network_admin_menu', array( $this, '_admin_menu' ), 8 );
 
       }
 
@@ -629,17 +696,21 @@ namespace UsabilityDynamics\Veneer {
       public function toolbar() {
         global $wp_admin_bar;
 
+        if( !$this->get( 'toolbar.menu.enabled' ) ) {
+          return;
+        }
+
         $wp_admin_bar->add_menu( array(
           'id'    => 'veneer',
           'meta'  => array(
             'html'     => '<div class="veneer-toolbar-info"></div>',
             'target'   => '',
             'onclick'  => '',
-            'title'    => 'Veneer',
+            'title'    => 'Services',
             'tabindex' => 10,
             'class'    => 'veneer-toolbar'
           ),
-          'title' => 'Veneer',
+          'title' => 'Services',
           'href'  => network_admin_url( 'admin.php?page=veneer' )
         ) );
 
