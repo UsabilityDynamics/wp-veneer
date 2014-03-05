@@ -328,7 +328,7 @@ namespace UsabilityDynamics\Veneer {
        */
       public function _outline( $buffer = null, $type = 'script' ) {
 
-        
+
         // Will extract all JavaScript from page.
         if( class_exists( 'phpQuery' ) ) {
 
@@ -608,9 +608,9 @@ namespace UsabilityDynamics\Veneer {
         $this->set( 'cdn.enabled', true );
         $this->set( 'cache.enabled', true );
 
-        $this->set( 'media.shard.enabled', true );
-        $this->set( 'scripts.shard.enabled', true );
-        $this->set( 'styles.shard.enabled', true );
+        $this->set( 'media.shard.enabled', false );
+        $this->set( 'scripts.shard.enabled', false );
+        $this->set( 'styles.shard.enabled', false );
 
         $this->set( 'media.shard.subdomain', 'media' );
         $this->set( 'scripts.shard.subdomain', 'assets' );
