@@ -221,7 +221,7 @@ namespace UsabilityDynamics\Veneer {
             $settings[ 'url' ] = home_url( '/media' . $settings[ 'subdir' ] );
             $settings[ 'baseurl' ] = home_url( '/media' );
           }
-          
+
           if( $this->url_rewrite ) {
             $_rewrite = untrailingslashit( $this->url_rewrite );
             $settings[ 'url' ] = str_replace( 'http://' . $this->site . '/files', $_rewrite, $settings[ 'url' ] );
@@ -230,9 +230,9 @@ namespace UsabilityDynamics\Veneer {
             $settings[ 'url' ] = str_replace( '/sites/' . $this->site_id . '', '/media', $settings[ 'url' ] );
             $settings[ 'baseurl' ] = str_replace( '/sites/' . $this->site_id . '', '/media', $settings[ 'baseurl' ] );
           }
-          
+
         }
-        
+
         // CDN Media Redirection.
         if( !$this->url_rewrite && $wp_veneer->get( 'media.cdn.active' ) ) {
 
