@@ -28,8 +28,6 @@
     "usabilitydynamics/lib-ui": "master",
     "usabilitydynamics/lib-utility": "master",
     "aws/aws-sdk-php": "2.5.*@dev",
-    "ruflin/elastica": "master",
-    "electrolinux/phpquery": "0.9.6",
     "matthiasmullie/minify": "1.2.0",
     "mrclay/minify": "master"
   },
