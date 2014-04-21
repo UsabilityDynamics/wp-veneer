@@ -17,7 +17,7 @@
  * *
  *
  *
- * @verison 0.5.1
+ * @verison 0.6.0
  * @author potanin@UD
  * @namespace UsabilityDynamics\Veneer
  */
@@ -41,7 +41,7 @@ namespace UsabilityDynamics\Veneer {
        * @property $version
        * @type {Object}
        */
-      public static $version = '0.5.1';
+      public static $version = '0.6.0';
 
       /**
        * Textdomain String
@@ -89,15 +89,6 @@ namespace UsabilityDynamics\Veneer {
        * @type {Object}
        */
       public $network = null;
-
-      /**
-       * Current Domain
-       *
-       * @public
-       * @property $veneer
-       * @type {Object}
-       */
-      public $veneer = null;
 
       /**
        * Veneer Cache Instance.
@@ -165,12 +156,13 @@ namespace UsabilityDynamics\Veneer {
       private $_cloud = null;
 
       /**
+       * URL Rewrites
        *
-       *
-       * @property
+       * @public
+       * @property $_rewrites
        * @type {Object}
        */
-      private $_search = null;
+      public $_rewrites = null;
 
       /**
        * Singleton Instance Reference.
@@ -198,16 +190,20 @@ namespace UsabilityDynamics\Veneer {
         // Save context reference.
         $wp_veneer = self::$instance = &$this;
 
-        if( !isset( $wp_cluster ) )  {
-          _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized until after WP-Cluster.', '0.5.1' );
+        if( did_action( 'init' ) ) {
+          _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized before "init" filter.', '0.6.0' );
         }
 
-        // Set Properties.
-        $this->site    = $wpdb->get_var( "SELECT domain FROM {$wpdb->blogs} WHERE blog_id = '{$wpdb->blogid}' LIMIT 1" );
-        $this->network = $wpdb->get_var( "SELECT domain FROM {$wpdb->site} WHERE id = {$wpdb->siteid}" );
+        // Requires $this->site to be defined, therefore being ignored on single-site installs.
+        if( defined( 'MULTISITE' ) && MULTISITE ) {
+          $this->site     = $wpdb->get_var( "SELECT domain FROM {$wpdb->blogs} WHERE blog_id = '{$wpdb->blogid}' LIMIT 1" );
+          $this->network  = $wpdb->get_var( "SELECT domain FROM {$wpdb->site} WHERE id = {$wpdb->siteid}" );
+        } else {
+          $this->site     = str_replace( array( 'http://', 'https://' ), '', get_bloginfo( 'url' ) );
+          $this->network  = str_replace( array( 'http://', 'https://' ), '', get_bloginfo( 'url' ) );
+          $this->apex     = str_replace( array( 'http://', 'https://' ), '', get_bloginfo( 'url' ) );
+        }
 
-        // @todo Should not use WP_BASE_DOMAIN constant.
-        $this->cluster = WP_BASE_DOMAIN;
         $this->site_id = $wpdb->blogid;
         $this->apex    = isset( $current_blog->apex ) ? $current_blog->apex : $apex = str_replace( "www.", '', $this->site );
 
@@ -225,9 +221,6 @@ namespace UsabilityDynamics\Veneer {
         // Initialize Interfaces.
         $this->_interfaces();
 
-        // Init Search
-        $this->_search();
-
         ob_start( array( $this, 'ob_start' ) );
 
         // Create Public and Cache directories. Media directory created in Media class.
@@ -235,11 +228,11 @@ namespace UsabilityDynamics\Veneer {
 
           $this->set( 'media.path.disk',    trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'media' );
           $this->set( 'cache.path.disk',    trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'cache' );
-          //$this->set( 'scripts.path.disk',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'assets/scripts' );
-          //$this->set( 'styles.path.disk',   trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'assets/styles' );
           $this->set( 'assets.path.disk',   trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'assets' );
           $this->set( 'static.path.disk',   trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'static' );
           $this->set( 'cdn.path.disk',      trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'cdn' );
+          $this->set( 'scripts.path.disk',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'assets/scripts' );
+          $this->set( 'styles.path.disk',   trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'assets/styles' );
 
           if( !wp_mkdir_p( $this->get( 'media.path.disk' ) ) ) {
             $this->set( 'media.available', false );
@@ -266,10 +259,11 @@ namespace UsabilityDynamics\Veneer {
 
       }
 
+      /**
+       *
+       */
       public function _admin_menu() {
         global $menu, $submenu;
-
-//        die( '<pre>' . print_r( $menu, true ) . '</pre>' );
 
         // Site Only.
         if( current_filter() === 'admin_menu' ) {
@@ -285,10 +279,8 @@ namespace UsabilityDynamics\Veneer {
 
         // Network Only.
         if( current_filter() === 'network_admin_menu' ) {
-
           // Remove Native Network Settings.
           // remove_menu_page( 'sites.php' );
-
         }
 
         // Add Network Administration to Network and Site.
@@ -332,12 +324,14 @@ namespace UsabilityDynamics\Veneer {
        */
       public function _outline( $buffer = null, $type = 'script' ) {
 
-
         // Will extract all JavaScript from page.
         if( class_exists( 'phpQuery' ) ) {
 
           $doc = \phpQuery::newDocumentHTML( $buffer );
-          $scripts = pq( 'script:not([data-main])' );
+
+          if( function_exists( 'pq' ) ) {
+            $scripts = pq( 'script:not([data-main])' );
+          }
 
           $_output = array();
 
@@ -520,50 +514,6 @@ namespace UsabilityDynamics\Veneer {
       }
 
       /**
-       *
-       */
-      public function _search() {
-
-        /*
-          $this->_search = new Search( array(
-              'host' => '91.240.22.17',
-              'port' => 9200
-          ) );
-        //*/
-
-//        $elasticaIndex = $this->_search->getIndex('twitter');
-//        $elasticaType = $elasticaIndex->getType('tweet');
-//
-//        // The Id of the document
-//        $id = rand(1, 9999999);
-//
-//        // Create a document
-//        $tweet = array(
-//            'id'      => $id,
-//            'user'    => array(
-//                'name'      => 'mewantcookie',
-//                'fullName'  => 'Cookie Monster'
-//            ),
-//            'msg'     => 'Me wish there were expression for cookies like there is for apples. "A cookie a day make the doctor diagnose you with diabetes" not catchy.',
-//            'tstamp'  => time(),
-//            'location'=> '41.12,-71.34',
-//            '_boost'  => 1.0,
-//            'terms' => array(
-//                'f', 'g', 'e'
-//            )
-//        );
-//        // First parameter is the id of document.
-//        $tweetDocument = new \Elastica\Document($id, $tweet);
-//
-//        echo '<pre>';
-//        print_r( $elasticaType->addDocument($tweetDocument) );
-//        echo '</pre>';
-//
-//        // Refresh Index
-//        $elasticaType->getIndex()->refresh();
-      }
-
-      /**
        * Initialize Settings.
        *
        */
@@ -643,17 +593,22 @@ namespace UsabilityDynamics\Veneer {
 
         // Initialize W3 Total Cachen Handlers.
         if( class_exists( 'UsabilityDynamics\Veneer\W3' ) ) {
-          $this->_cache = new W3( $this->get( 'cache' ) );
+          $this->_cache =     new W3( $this->get( 'cache' ) );
         }
 
         // Enable CDN Media.
         if( class_exists( 'UsabilityDynamics\Veneer\Media' ) ) {
-        $this->_media = new Media( $this->get( 'media' ) );
+          $this->_media =     new Media( $this->get( 'media' ) );
         }
 
         // Enable Varnish.
         if( class_exists( 'UsabilityDynamics\Veneer\Varnish' ) ) {
-          $this->_varnish = new Varnish( $this->get( 'varnish' ) );
+          $this->_varnish =   new Varnish( $this->get( 'varnish' ) );
+        }
+
+        // Enable URL Rewrites.
+        if( class_exists( 'UsabilityDynamics\Veneer\Rewrites' ) ) {
+          $this->_rewrites =  new Rewrites( $this->get( 'rewrites' ) );
         }
 
       }

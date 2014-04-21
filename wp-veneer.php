@@ -3,7 +3,7 @@
  * Plugin Name: WP-Veneer
  * Plugin URI: http://usabilitydynamics.com/
  * Description: Veneer.io Helper.
- * Version: 0.2.2
+ * Version: 0.6.0
  * Author: Usability Dynamics
  * Author URI: http://usabilitydynamics.com/
  * License: GPLv2 or later
@@ -25,4 +25,4 @@
 include_once( __DIR__ . '/lib/class-bootstrap.php' );
 
 // Initialize.
-new UsawbilityDynamics\Veneer\Bootstrap();
+new UsabilityDynamics\Veneer\Bootstrap();
