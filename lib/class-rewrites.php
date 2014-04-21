@@ -116,6 +116,7 @@ namespace UsabilityDynamics\Veneer {
         self::$self_admin_url    = self_admin_url();
         self::$user_admin_url    = user_admin_url();
 
+        // die( '<pre>' . print_r( $this->_debug(), true ) . '</pre>' );
       }
 
       /**

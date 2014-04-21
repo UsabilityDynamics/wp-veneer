@@ -392,9 +392,9 @@ namespace UsabilityDynamics\Veneer {
         global $post, $wp_query;
 
         if( is_admin() ) {
+          $buffer = str_replace( '/wp-admin', '/manage', $buffer );
           return $buffer;
         }
-
 
         // Remove W3 Total Cache generic text.
         $buffer = str_replace( "Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/", 'Served from', $buffer );
@@ -620,14 +620,18 @@ namespace UsabilityDynamics\Veneer {
       private function _interfaces() {
 
         // Render Toolbar.
-        add_action( 'wp_before_admin_bar_render', array( &$this, 'toolbar' ), 10 );
+        add_action( 'wp_before_admin_bar_render', array( $this, 'toolbar' ), 10 );
 
         if( file_exists( WP_BASE_DIR . '/local-debug.php' ) || in_array( $_SERVER[ 'REMOTE_ADDR' ], array( '127.0.0.1', '10.0.0.1', '0.0.0.0' ) ) ) {
-          add_action( 'wp_before_admin_bar_render', array( &$this, 'toolbar_local' ), 100 );
+          add_action( 'wp_before_admin_bar_render', array( $this, 'toolbar_local' ), 100 );
         }
 
       }
 
+      /**
+       * Administrative Toolbar.
+       *
+       */
       public function toolbar_local() {
         global $wp_admin_bar;
 
