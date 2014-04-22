@@ -229,33 +229,40 @@ namespace UsabilityDynamics\Veneer {
           $this->set( 'media.path.disk',    trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'media' );
           $this->set( 'cache.path.disk',    trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'cache' );
           $this->set( 'assets.path.disk',   trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'assets' );
-          $this->set( 'static.path.disk',   trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'static' );
-          $this->set( 'cdn.path.disk',      trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'cdn' );
           $this->set( 'scripts.path.disk',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'assets/scripts' );
           $this->set( 'styles.path.disk',   trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'assets/styles' );
+          // $this->set( 'static.path.disk',   trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'static' );
+          // $this->set( 'cdn.path.disk',      trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'cdn' );
 
-          if( !wp_mkdir_p( $this->get( 'media.path.disk' ) ) ) {
+          if( $this->get( 'media.path.disk' ) && !wp_mkdir_p( $this->get( 'media.path.disk' ) ) ) {
             $this->set( 'media.available', false );
           }
 
-          if( !wp_mkdir_p( $this->get( 'cache.path.disk' ) ) ) {
+          if( $this->get( 'cache.path.disk' ) && !wp_mkdir_p( $this->get( 'cache.path.disk' ) ) ) {
             $this->set( 'cache.available', false );
           }
 
-          if( !wp_mkdir_p( $this->get( 'assets.path.disk' ) ) ) {
+          if( $this->get( 'assets.path.disk' ) && !wp_mkdir_p( $this->get( 'assets.path.disk' ) ) ) {
             $this->set( 'assets.available', false );
           }
 
-          if( !wp_mkdir_p( $this->get( 'static.path.disk' ) ) ) {
+          if( $this->get( 'static.path.disk' ) && !wp_mkdir_p( $this->get( 'static.path.disk' ) ) ) {
             $this->set( 'static.available', false );
           }
 
-          if( !wp_mkdir_p( $this->get( 'cdn.path.disk' ) ) ) {
+          if( $this->get( 'cdn.path.disk' ) && !wp_mkdir_p( $this->get( 'cdn.path.disk' ) ) ) {
             $this->set( 'cdn.available', false );
           }
 
-        }
+          if( $this->get( 'scripts.path.disk' ) && !wp_mkdir_p( $this->get( 'scripts.path.disk' ) ) ) {
+            $this->set( 'scripts.available', false );
+          }
 
+          if( $this->get( 'styles.path.disk' ) && !wp_mkdir_p( $this->get( 'styles.path.disk' ) ) ) {
+            $this->set( 'styles.available', false );
+          }
+
+        }
 
       }
 

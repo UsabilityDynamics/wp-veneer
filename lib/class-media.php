@@ -172,13 +172,10 @@ namespace UsabilityDynamics\Veneer {
        * @return string
        */
       public function _upload_path( $default ) {
+        global $wp_veneer;
 
-        if( defined( 'WP_BASE_DIR' && defined( 'WP_VENEER_STORAGE' ) ) ) {
-          return WP_BASE_DIR . '/' . WP_VENEER_STORAGE;
-        }
-
-        if( defined( 'WP_BASE_DIR' ) ) {
-          return WP_BASE_DIR . '/static/storage';
+        if( defined( 'WP_BASE_DIR' ) && defined( 'WP_VENEER_STORAGE' ) ) {
+          return WP_BASE_DIR . '/' . WP_VENEER_STORAGE . '/sites/' . $wp_veneer->site . '/media' ;
         }
 
         return WP_CONTENT_DIR . '/static/storage';

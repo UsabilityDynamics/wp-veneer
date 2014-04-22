@@ -33,6 +33,7 @@
   },
   "autoload": {
     "classmap": [ 
+      "lib/class-api.php",
       "lib/class-bootstrap.php",
       "lib/class-w3.php",
       "lib/class-cache.php",
