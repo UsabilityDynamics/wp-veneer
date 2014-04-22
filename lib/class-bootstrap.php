@@ -392,7 +392,8 @@ namespace UsabilityDynamics\Veneer {
         global $post, $wp_query;
 
         if( is_admin() ) {
-          $buffer = str_replace( '/wp-admin', '/manage', $buffer );
+          $buffer = str_replace( '/wp-admin/load-styles.php',   '/manage/load-styles.php',  $buffer );
+          $buffer = str_replace( '/wp-admin/load-scripts.php',  '/manage/load-scripts.php', $buffer );
           return $buffer;
         }
 
@@ -506,6 +507,7 @@ namespace UsabilityDynamics\Veneer {
        * Minify Output.
        */
       public function enqueue_scripts() {
+        global $wp_veneer;
 
         if( is_user_logged_in() ) {
           wp_enqueue_style( 'veneer', plugins_url( '/styles/veneer.css', dirname( __DIR__ ) ) );

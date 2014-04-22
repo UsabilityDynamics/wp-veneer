@@ -1,8 +1,6 @@
 <?php
 /**
- * Domain Rewrites
- *
- * @todo It may be better to direct get_stylesheet_directory_uri and get_template_directory_uri directly to /assets
+ * URL Rewrites
  *
  * @version 0.1.6
  * @module Veneer
@@ -13,49 +11,22 @@ namespace UsabilityDynamics\Veneer {
   if( !class_exists( 'UsabilityDynamics\Veneer\Rewrites' ) ) {
 
     /**
-     * Class Locale
+     * Class Rewrites
      *
+     * @property mixed home_url
+     * @property mixed site_url
+     * @property mixed admin_url
+     * @property mixed includes_url
+     * @property mixed content_url
+     * @property mixed network_site_url
+     * @property mixed plugins_url
+     * @property mixed network_home_url
+     * @property mixed network_admin_url
+     * @property mixed self_admin_url
+     * @property mixed user_admin_url
      * @module Veneer
      */
     class Rewrites {
-
-      /**
-       * Current site (blog)
-       *
-       * @public
-       * @static
-       * @property $site_id
-       * @type {Object}
-       */
-      static public $site_url = null;
-
-      /**
-       * Current site's public home URL
-       *
-       * @public
-       * @static
-       * @property $home_url
-       * @type {Object}
-       */
-      static public $home_url = null;
-
-      /**
-       * Current site's administration URL
-       *
-       * @public
-       * @static
-       * @property $admin_url
-       * @type {Object}
-       */
-      static public $admin_url = null;
-      static public $includes_url = null;
-      static public $content_url = null;
-      static public $plugins_url = null;
-      static public $network_site_url = null;
-      static public $network_home_url = null;
-      static public $network_admin_url = null;
-      static public $self_admin_url = null;
-      static public $user_admin_url = null;
 
       /**
        * Initialize Locale
@@ -104,19 +75,20 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'template_directory_uri', array( $this, 'template_directory_uri' ), 100, 3 );
 
         // URLs
-        self::$home_url          = get_home_url();
-        self::$site_url          = get_site_url();
-        self::$admin_url         = get_admin_url();
-        self::$includes_url      = includes_url();
-        self::$content_url       = content_url();
-        self::$plugins_url       = plugins_url();
-        self::$network_site_url  = network_site_url();
-        self::$network_home_url  = network_home_url();
-        self::$network_admin_url = network_admin_url();
-        self::$self_admin_url    = self_admin_url();
-        self::$user_admin_url    = user_admin_url();
+        $this->home_url     = get_home_url();
+        $this->site_url     = get_site_url();
+        $this->admin_url    = get_admin_url();
+        $this->includes_url = includes_url();
+        $this->content_url  = content_url();
+        $this->plugins_url  = plugins_url();
+        $this->network_site_url  = network_site_url();
+        $this->network_home_url  = network_home_url();
+        $this->network_admin_url  = network_admin_url();
+        $this->self_admin_url  = self_admin_url();
+        $this->user_admin_url  = user_admin_url();
 
-        // die( '<pre>' . print_r( $this->_debug(), true ) . '</pre>' );
+        // die( '<pre>' . print_r( $this, true ) . '</pre>' );
+
       }
 
       /**
@@ -273,7 +245,7 @@ namespace UsabilityDynamics\Veneer {
       public static function includes_url( $url ) {
         global $wp_veneer;
 
-        $url = str_replace( $wp_veneer->cluster_domain, $wp_veneer->site, $url );
+        $url = str_replace( $wp_veneer->network, $wp_veneer->site, $url );
 
         $url = str_replace( 'wp-includes/js',   'assets/scripts', $url );
         $url = str_replace( 'wp-includes/css',  'assets/styles',  $url );
@@ -294,7 +266,7 @@ namespace UsabilityDynamics\Veneer {
       public static function content_url( $url ) {
         global $wp_veneer;
 
-        $url = str_replace( $wp_veneer->cluster_domain, $wp_veneer->site, $url );
+        $url = str_replace( $wp_veneer->network, $wp_veneer->site, $url );
         return $url;
 
       }
@@ -424,7 +396,6 @@ namespace UsabilityDynamics\Veneer {
        */
       public static function replace_network_url( $url ) {
         global $wp_veneer;
-        $url = str_replace( $wp_veneer->cluster_domain, $wp_veneer->network, $url );
         return str_replace( $wp_veneer->network, $wp_veneer->site, $url );
       }
 
@@ -439,7 +410,6 @@ namespace UsabilityDynamics\Veneer {
        */
       public static function plugins_url( $url, $path, $plugin ) {
         global $wp_veneer;
-
         if( strpos( $plugin, '/vendor' ) ) {
 
           // Strip filename and get just the path.
@@ -461,7 +431,7 @@ namespace UsabilityDynamics\Veneer {
 
         }
 
-        $url = str_replace( array( $wp_veneer->cluster_domain ), array( $wp_veneer->site ), $url );
+        $url = str_replace( array( $wp_veneer->network ), array( $wp_veneer->site ), $url );
 
         /**
          * Replace any thing that has the modules directory followed by the full path to the web root for custom MU plugins
