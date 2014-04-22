@@ -226,32 +226,17 @@ namespace UsabilityDynamics\Veneer {
         // Create Public and Cache directories. Media directory created in Media class.
         if( defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE && is_dir( WP_CONTENT_DIR ) ) {
 
-          $this->set( 'media.path.disk',    trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'media' );
-          $this->set( 'cache.path.disk',    trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'cache' );
-          $this->set( 'assets.path.disk',   trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'assets' );
-          $this->set( 'scripts.path.disk',  trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'assets/scripts' );
-          $this->set( 'styles.path.disk',   trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'assets/styles' );
-          // $this->set( 'static.path.disk',   trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'static' );
-          // $this->set( 'cdn.path.disk',      trailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . 'sites/' . trailingslashit( $this->site ) . 'cdn' );
+          $this->set( 'media.path.disk',    untrailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'media' );
+          $this->set( 'assets.path.disk',   untrailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'assets' );
+          $this->set( 'scripts.path.disk',  untrailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'assets/scripts' );
+          $this->set( 'styles.path.disk',   untrailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'assets/styles' );
 
           if( $this->get( 'media.path.disk' ) && !wp_mkdir_p( $this->get( 'media.path.disk' ) ) ) {
             $this->set( 'media.available', false );
           }
 
-          if( $this->get( 'cache.path.disk' ) && !wp_mkdir_p( $this->get( 'cache.path.disk' ) ) ) {
-            $this->set( 'cache.available', false );
-          }
-
           if( $this->get( 'assets.path.disk' ) && !wp_mkdir_p( $this->get( 'assets.path.disk' ) ) ) {
             $this->set( 'assets.available', false );
-          }
-
-          if( $this->get( 'static.path.disk' ) && !wp_mkdir_p( $this->get( 'static.path.disk' ) ) ) {
-            $this->set( 'static.available', false );
-          }
-
-          if( $this->get( 'cdn.path.disk' ) && !wp_mkdir_p( $this->get( 'cdn.path.disk' ) ) ) {
-            $this->set( 'cdn.available', false );
           }
 
           if( $this->get( 'scripts.path.disk' ) && !wp_mkdir_p( $this->get( 'scripts.path.disk' ) ) ) {

@@ -229,7 +229,7 @@ namespace UsabilityDynamics\Veneer {
        */
       public static function home_url( $url, $path, $orig_scheme, $blog_id ) {
 
-        $url = str_replace( '/vendor/wordpress/core', '', $url );
+        $url = str_replace( '/vendor/automattic/wordpress', '', $url );
 
         //die($url);
         return $url;
@@ -410,6 +410,7 @@ namespace UsabilityDynamics\Veneer {
        */
       public static function plugins_url( $url, $path, $plugin ) {
         global $wp_veneer;
+
         if( strpos( $plugin, '/vendor' ) ) {
 
           // Strip filename and get just the path.
@@ -430,6 +431,7 @@ namespace UsabilityDynamics\Veneer {
           $url = site_url( $_annex . $path );
 
         }
+
 
         $url = str_replace( array( $wp_veneer->network ), array( $wp_veneer->site ), $url );
 

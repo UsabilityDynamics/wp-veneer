@@ -175,7 +175,7 @@ namespace UsabilityDynamics\Veneer {
         global $wp_veneer;
 
         if( defined( 'WP_BASE_DIR' ) && defined( 'WP_VENEER_STORAGE' ) ) {
-          return WP_BASE_DIR . '/' . WP_VENEER_STORAGE . '/sites/' . $wp_veneer->site . '/media' ;
+          return untrailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE  ) . untrailingslashit( $wp_veneer->site ) . '/media';
         }
 
         return WP_CONTENT_DIR . '/static/storage';
