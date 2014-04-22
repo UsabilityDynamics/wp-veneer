@@ -392,8 +392,11 @@ namespace UsabilityDynamics\Veneer {
         global $post, $wp_query;
 
         if( is_admin() ) {
-          $buffer = str_replace( '/wp-admin/load-styles.php',   '/manage/load-styles.php',  $buffer );
-          $buffer = str_replace( '/wp-admin/load-scripts.php',  '/manage/load-scripts.php', $buffer );
+          // @note This is hackish...
+          $buffer = str_replace( '/vendor/automattic/wordpress/wp-admin/load-styles.php',   '/manage/load-styles.php',  $buffer );
+          $buffer = str_replace( '/vendor/automattic/wordpress/wp-admin/load-scripts.php',  '/manage/load-scripts.php', $buffer );
+          $buffer = str_replace( '/vendor/automattic/wordpress/manage/load-styles.php',     '/manage/load-styles.php',  $buffer );
+          $buffer = str_replace( '/vendor/automattic/wordpress/manage/load-scripts.php',    '/manage/load-scripts.php', $buffer );
           return $buffer;
         }
 
