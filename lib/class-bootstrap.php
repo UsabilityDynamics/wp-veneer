@@ -17,7 +17,7 @@
  * *
  *
  *
- * @verison 0.6.0
+ * @verison 0.6.1
  * @author potanin@UD
  * @namespace UsabilityDynamics\Veneer
  */
@@ -41,7 +41,7 @@ namespace UsabilityDynamics\Veneer {
        * @property $version
        * @type {Object}
        */
-      public static $version = '0.6.0';
+      public static $version = '0.6.1';
 
       /**
        * Textdomain String
@@ -191,7 +191,7 @@ namespace UsabilityDynamics\Veneer {
         $wp_veneer = self::$instance = &$this;
 
         if( did_action( 'init' ) ) {
-          _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized before "init" filter.', '0.6.0' );
+          _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized before "init" filter.', '0.6.1' );
         }
 
         // Requires $this->site to be defined, therefore being ignored on single-site installs.
