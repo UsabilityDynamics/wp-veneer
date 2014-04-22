@@ -531,8 +531,6 @@ namespace UsabilityDynamics\Veneer {
           "key"   => "ud:veneer",
         ) );
 
-        // $this->_settings->flush();
-
         // ElasticSearch Service Settings.
         $this->set( 'documents', array(
           "active" => true,
@@ -583,8 +581,6 @@ namespace UsabilityDynamics\Veneer {
         $this->set( 'html.minify.enabled', false );
 
         $this->set( 'scripts.outline.enabled', false );
-
-        // die( '<pre>' . print_r( $this->get(), true ) . '</pre>' );
 
         // Save Settings.
         $this->_settings->commit();
@@ -657,7 +653,7 @@ namespace UsabilityDynamics\Veneer {
       }
 
       /**
-       * Add Veneer Toolbar
+       * Shows Veneer Status (in dev)
        *
        * @method toolbar
        * @for Boostrap
@@ -666,54 +662,47 @@ namespace UsabilityDynamics\Veneer {
         global $wp_admin_bar;
 
         if( !$this->get( 'toolbar.menu.enabled' ) ) {
-          return;
+          // return;
         }
 
         $wp_admin_bar->add_menu( array(
           'id'    => 'veneer',
+          'parent'    => 'top-secondary',
           'meta'  => array(
             'html'     => '<div class="veneer-toolbar-info"></div>',
             'target'   => '',
             'onclick'  => '',
-            'title'    => 'Services',
+            'title'    => 'Veneer',
             'tabindex' => 10,
             'class'    => 'veneer-toolbar'
           ),
-          'title' => 'Services',
+          'title' => 'Veneer',
           'href'  => network_admin_url( 'admin.php?page=veneer' )
-        ) );
+        ));
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
-          'id'     => 'veneer-cdn',
+          'id'     => 'veneer-pagespeed',
           'meta'   => array(),
-          'title'  => 'Media',
+          'title'  => 'PageSpeed',
           'href'   => network_admin_url( 'admin.php?page=veneer#panel=cdn' )
-        ) );
+        ));
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
-          'id'     => 'veneer-search',
+          'id'     => 'veneer-cloudfront',
           'meta'   => array(),
-          'title'  => 'Search',
-          'href'   => network_admin_url( 'admin.php?page=veneer#panel=search' )
-        ) );
+          'title'  => 'CloudFront',
+          'href'   => network_admin_url( 'admin.php?page=veneer#panel=cdn' )
+        ));
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
           'id'     => 'veneer-varnish',
           'meta'   => array(),
-          'title'  => 'Cache',
-          'href'   => network_admin_url( 'admin.php?page=veneer#panel=varnish' )
-        ) );
-
-        $wp_admin_bar->add_menu( array(
-          'parent' => 'veneer',
-          'id'     => 'veneer-api',
-          'meta'   => array(),
-          'title'  => 'API',
-          'href'   => network_admin_url( 'admin.php?page=veneer#panel=api' )
-        ) );
+          'title'  => 'Varnish',
+          'href'   => network_admin_url( 'admin.php?page=veneer#panel=cdn' )
+        ));
 
       }
 
