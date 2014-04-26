@@ -27,6 +27,12 @@ namespace UsabilityDynamics\Veneer {
           return;
         }
 
+        if( !defined( 'WP_CACHE' ) || !WP_CACHE ) {
+          return;
+        }
+
+        return;
+
         add_action( 'admin_menu', array( $this, 'admin_menu' ), 15 );
         add_action( 'network_admin_menu', array( $this, 'network_admin_menu' ), 15 );
 
@@ -43,19 +49,19 @@ namespace UsabilityDynamics\Veneer {
           // Disable Upgrade Nag.
           define( 'W3TC_PRO', true );
 
-          define( 'W3TC_CACHE_CONFIG_DIR', WP_CONTENT_DIR  . '/application/etc/w3/cache' );
-          define( 'W3TC_CONFIG_DIR', WP_CONTENT_DIR . '/application/etc/w3/config' );
-          define( 'W3TC_CACHE_DIR', WP_CONTENT_DIR . '/static/cache' );
+          define( 'W3TC_CACHE_CONFIG_DIR', WP_CONTENT_DIR  . '/application/static/etc/w3/cache' );
+          define( 'W3TC_CONFIG_DIR', WP_CONTENT_DIR . '/application/static/etc/w3/config' );
+          define( 'W3TC_CACHE_DIR', WP_CONTENT_DIR . '/storage/static/cache' );
 
           define( 'W3TC_CACHE_MINIFY_DIR', W3TC_CACHE_DIR  . '/minify' );
           define( 'W3TC_CACHE_PAGE_ENHANCED_DIR', W3TC_CACHE_DIR  . '/enhanced' );
           define( 'W3TC_CACHE_TMP_DIR', W3TC_CACHE_DIR . '/tmp' );
           define( 'W3TC_CACHE_BLOGMAP_FILENAME', W3TC_CACHE_DIR . '/blogs.php' );
-
-          define( 'W3TC_ADDIN_FILE_ADVANCED_CACHE', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/advanced-cache.php');
-          define( 'W3TC_ADDIN_FILE_OBJECT_CACHE', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/object-cache.php');
-          define( 'W3TC_ADDIN_FILE_DB', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/db.php');
           define( 'W3TC_WP_LOADER', ( defined( 'WP_PLUGIN_DIR' ) ? WP_PLUGIN_DIR : WP_CONTENT_DIR . '/plugins' ) . '/w3tc-wp-loader.php' );
+
+          // define( 'W3TC_ADDIN_FILE_ADVANCED_CACHE', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/advanced-cache.php');
+          // define( 'W3TC_ADDIN_FILE_OBJECT_CACHE', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/object-cache.php');
+          // define( 'W3TC_ADDIN_FILE_DB', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/db.php');
 
           // define( 'W3TC_FILE_DB_CLUSTER_CONFIG', WP_VENDOR_PATH . '/usabilitydynamics/wp-cluster/lib/local/db-cluster-config.php');
           // define( 'W3TC_PLUGINS_DIR', WP_CONTENT_DIR . '/static/etc' );
