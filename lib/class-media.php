@@ -78,9 +78,8 @@ namespace UsabilityDynamics\Veneer {
 
         // Enable MS Site Rewriting.
         add_filter( 'default_site_option_ms_files_rewriting', array( $this, '_ms_files_rewriting' ) );
-        add_filter( 'default_site_option_upload_path', array( $this, '_ms_files_rewriting' ) );
-        add_filter( 'pre_option_upload_path', array( $this, '_upload_path' ) );
-        add_filter( 'pre_option_upload_url_path', array( $this, '_upload_url_path' ) );
+        add_filter( 'pre_option_upload_path', array( $this, '_media_path' ) );
+        add_filter( 'pre_option_upload_url_path', array( $this, '_media_url_path' ) );
 
         // Extend Arguments with defaults.
         $args = \UsabilityDynamics\Utility::parse_args( $args, array(
@@ -112,12 +111,12 @@ namespace UsabilityDynamics\Veneer {
 
         // Trying to maintain semi-native support.
         if( !defined( 'UPLOADBLOGSDIR' ) ) {
-          define( 'UPLOADBLOGSDIR', defined( 'WP_VENEER_STORAGE' ) ? WP_VENEER_STORAGE : 'static/storage' );
+          // define( 'UPLOADBLOGSDIR', defined( 'WP_VENEER_STORAGE' ) ? WP_VENEER_STORAGE : 'static/storage' );
         }
 
         // Uploads path relative to ABSPATH
         if( !defined( 'BLOGUPLOADDIR' ) ) {
-          define( 'BLOGUPLOADDIR', UPLOADBLOGSDIR . '/media' );
+          // define( 'BLOGUPLOADDIR', UPLOADBLOGSDIR . '/media' );
         }
 
         // Primary image path/url override.
@@ -130,8 +129,8 @@ namespace UsabilityDynamics\Veneer {
         $this->basedir   = $wp_upload_dir[ 'basedir' ];
         $this->baseurl   = $wp_upload_dir[ 'baseurl' ];
 
-        $this->directory = defined( 'BLOGUPLOADDIR' ) && BLOGUPLOADDIR ? BLOGUPLOADDIR : '';
-        $this->domain    = defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE ? null : $wp_upload_dir[ 'baseurl' ];
+        //$this->directory = defined( 'BLOGUPLOADDIR' ) && BLOGUPLOADDIR ? BLOGUPLOADDIR : '';
+        //$this->domain    = defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE ? null : $wp_upload_dir[ 'baseurl' ];
 
         // die( json_encode( $this->_debug() ) );
 
@@ -160,7 +159,7 @@ namespace UsabilityDynamics\Veneer {
        *
        * @return mixed
        */
-      public function _upload_url_path( $default ) {
+      public function _media_url_path( $default ) {
         return $default;
       }
 
@@ -171,14 +170,23 @@ namespace UsabilityDynamics\Veneer {
        *
        * @return string
        */
-      public function _upload_path( $default ) {
+      public function _media_path( $default ) {
         global $wp_veneer;
 
-        if( defined( 'WP_BASE_DIR' ) && defined( 'WP_VENEER_STORAGE' ) ) {
-          return untrailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE  ) . untrailingslashit( $wp_veneer->site ) . '/media';
+        if( defined( 'WP_VENEER_PUBLIC' ) && WP_VENEER_PUBLIC ) {
+          $_public_path = trailingslashit( WP_VENEER_PUBLIC );
+        } elseif( defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE ) {
+          $_public_path = trailingslashit( WP_VENEER_STORAGE );
+        } else {
+          $_public_path = trailingslashit( WP_CONTENT_DIR );
         }
 
-        return WP_CONTENT_DIR . '/static/storage';
+        // Append the apex domain to storage path.
+        if( defined( 'MULTISITE' ) && MULTISITE && ( WP_VENEER_PUBLIC || WP_VENEER_STORAGE ) ) {
+          $_public_path = $_public_path . trailingslashit( $this->site );
+        }
+
+        return $_public_path . 'media';
 
       }
 

@@ -224,12 +224,24 @@ namespace UsabilityDynamics\Veneer {
         ob_start( array( $this, 'ob_start' ) );
 
         // Create Public and Cache directories. Media directory created in Media class.
-        if( defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE && is_dir( WP_CONTENT_DIR ) ) {
+        if( defined( 'WP_VENEER_STORAGE' ) && is_dir( WP_VENEER_STORAGE ) ) {
 
-          $this->set( 'media.path.disk',    untrailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'media' );
-          $this->set( 'assets.path.disk',   untrailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'assets' );
-          $this->set( 'scripts.path.disk',  untrailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'assets/scripts' );
-          $this->set( 'styles.path.disk',   untrailingslashit( WP_CONTENT_DIR ) . trailingslashit( WP_VENEER_STORAGE ) . trailingslashit( $this->site ) . 'assets/styles' );
+          // Use public directory if explicitly defined.
+          if( defined( 'WP_VENEER_PUBLIC' ) && WP_VENEER_PUBLIC ) {
+            $_public_path = trailingslashit( WP_VENEER_PUBLIC );
+          } else {
+            $_public_path = trailingslashit( WP_VENEER_STORAGE );
+          }
+
+          // Append the apex domain to storage path.
+          if( defined( 'MULTISITE' ) && MULTISITE ) {
+            $_public_path = $_public_path . trailingslashit( $this->site );
+          }
+
+          $this->set( 'media.path.disk',    $_public_path . 'media' );
+          $this->set( 'assets.path.disk',   $_public_path . 'assets' );
+          $this->set( 'scripts.path.disk',  $_public_path . 'assets/scripts' );
+          $this->set( 'styles.path.disk',   $_public_path . 'assets/styles' );
 
           if( $this->get( 'media.path.disk' ) && !wp_mkdir_p( $this->get( 'media.path.disk' ) ) ) {
             $this->set( 'media.available', false );
@@ -389,13 +401,13 @@ namespace UsabilityDynamics\Veneer {
             $buffer = str_replace( '/wp-admin/load-styles.php',   '/manage/load-styles.php',  $buffer );
             $buffer = str_replace( '/wp-admin/load-scripts.php',  '/manage/load-scripts.php', $buffer );
           } else {
-            $buffer = str_replace( '/vendor/automattic/wordpress/wp-admin/load-styles.php',   '/manage/load-styles.php',  $buffer );
-            $buffer = str_replace( '/vendor/automattic/wordpress/wp-admin/load-scripts.php',  '/manage/load-scripts.php', $buffer );
-            $buffer = str_replace( '/vendor/automattic/wordpress/manage/load-styles.php',     '/manage/load-styles.php',  $buffer );
-            $buffer = str_replace( '/vendor/automattic/wordpress/manage/load-scripts.php',    '/manage/load-scripts.php', $buffer );
+            $buffer = str_replace( '/vendor/libraries/automattic/wordpress/wp-admin/load-styles.php',   '/manage/load-styles.php',  $buffer );
+            $buffer = str_replace( '/vendor/libraries/automattic/wordpress/wp-admin/load-scripts.php',  '/manage/load-scripts.php', $buffer );
+            $buffer = str_replace( '/vendor/libraries/automattic/wordpress/manage/load-styles.php',     '/manage/load-styles.php',  $buffer );
+            $buffer = str_replace( '/vendor/libraries/automattic/wordpress/manage/load-scripts.php',    '/manage/load-scripts.php', $buffer );
           }
 
-          $buffer = str_replace( '/vendor/automattic/wordpress/manage/', '/manage/',  $buffer );
+          $buffer = str_replace( '/vendor/libraries/automattic/wordpress/manage/', '/manage/',  $buffer );
 
           return $buffer;
 

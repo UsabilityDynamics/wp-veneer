@@ -7,7 +7,7 @@
  * Author: Usability Dynamics
  * Author URI: http://usabilitydynamics.com/
  * License: GPLv2 or later
- * Veneer: True
+ * Network: False
  *
  * The Loder class is self-initializing.
  *

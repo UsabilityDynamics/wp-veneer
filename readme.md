@@ -1,9 +1,14 @@
-### Manages
+## Manages
 * Varnish Purging
 * URL Rewrites
 * vElasic Search
 
-### Instance Properties
+## Constants
+
+* WP_VENEER_STORAGE - Absolute path to storage directory.
+* WP_VENEER_PUBLIC  - Absolute path to "public" directory. If multisite is enabled, assets should be organized by apex domains.
+
+## Instance Properties
 Properties set by Bootstrap class to the global $wp_veneer object.
 
 * site      - Current site's domain.
@@ -11,7 +16,7 @@ Properties set by Bootstrap class to the global $wp_veneer object.
 * network   - Network's (if applicable) apex domain.
 * site_id   - Current site's blog ID.
 
-### W3 Total Cache Issues & Notes
+## W3 Total Cache Issues & Notes
 * Verified for seperate Networks: Plugin Activation,
 * Ideally "cache" should be located in static/storage/{domain}/cache
 * Only single hostname is allowed in settings - stereolivehouston.com images go to direct.nightculture.com
@@ -23,3 +28,7 @@ Properties set by Bootstrap class to the global $wp_veneer object.
 * minified cache broken because URLs go to http://direct.nightculture.com/cache/minify/... while uploads go to /system/minify/... (could be fixed w/ "static" hostname)
 * supports_full_page_mirroring is disabled on FTP... why?
 
+## Changelog
+
+### 0.7.1
+* Added WP_VENEER_PUBLIC constant to allow explicit setting of directory to be used for uploads.

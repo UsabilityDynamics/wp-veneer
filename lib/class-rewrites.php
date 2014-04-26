@@ -63,7 +63,7 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'lostpassword_url', array( $this, 'lostpassword_url' ), 100, 3 );
         add_filter( 'admin_url', array( $this, 'admin_url' ), 100, 3 );
         add_filter( 'includes_url', array( $this, 'includes_url' ), 100, 3 );
-        add_filter( 'home_url', array( $this, 'home_url' ), 100, 4 );
+        //add_filter( 'home_url', array( $this, 'home_url' ), 100, 4 );
         add_filter( 'login_url', array( $this, 'login_url' ), 100, 2 );
         add_filter( 'logout_url', array( $this, 'logout_url' ), 50, 2 );
 
@@ -75,19 +75,21 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'template_directory_uri', array( $this, 'template_directory_uri' ), 100, 3 );
 
         // URLs
-        $this->home_url     = get_home_url();
-        $this->site_url     = get_site_url();
-        $this->admin_url    = get_admin_url();
-        $this->includes_url = includes_url();
-        $this->content_url  = content_url();
-        $this->plugins_url  = plugins_url();
-        $this->network_site_url  = network_site_url();
-        $this->network_home_url  = network_home_url();
+        $this->home_url           = home_url();
+        $this->media_url          = home_url( '/media' );
+        $this->assets_url         = home_url( '/assets' );
+        $this->site_url           = site_url();
+        $this->admin_url          = get_admin_url();
+        $this->includes_url       = includes_url();
+        $this->content_url        = content_url();
+        $this->plugins_url        = plugins_url();
+        $this->network_site_url   = network_site_url();
+        $this->network_home_url   = network_home_url();
         $this->network_admin_url  = network_admin_url();
-        $this->self_admin_url  = self_admin_url();
-        $this->user_admin_url  = user_admin_url();
+        $this->self_admin_url     = self_admin_url();
+        $this->user_admin_url     = user_admin_url();
 
-        // die( '<pre>' . print_r( $this, true ) . '</pre>' );
+        // add_action( 'template_redirect', function() { global $wp_veneer; wp_send_json_success( $wp_veneer->_rewrites ); });
 
       }
 
@@ -96,12 +98,13 @@ namespace UsabilityDynamics\Veneer {
        *
        * Hooks into get_option( 'home' )
        *
+       * @todo Apparently at some point ->site gets unset on non-ms.
        * @param $default
        * @return string
        */
       public function _option_home( $default ) {
         global $wp_veneer;
-        return 'http://' . $wp_veneer->site;
+        return $wp_veneer->site ? 'http://' . $wp_veneer->site : $default;
       }
 
       /**
@@ -229,7 +232,7 @@ namespace UsabilityDynamics\Veneer {
        */
       public static function home_url( $url, $path, $orig_scheme, $blog_id ) {
 
-        $url = str_replace( '/vendor/automattic/wordpress', '', $url );
+        $url = str_replace( '/vendor/libraries/automattic/wordpress', '', $url );
 
         //die($url);
         return $url;
@@ -287,8 +290,8 @@ namespace UsabilityDynamics\Veneer {
       public static function masked_url_fixes( $url ) {
 
         // Conceal WordPress Location. (new)
-        if( strpos( $url, '/vendor/automattic/wordpress' ) ) {
-          $url = str_replace( '/vendor/automattic/wordpress', '', $url );
+        if( strpos( $url, '/vendor/libraries/automattic/wordpress' ) ) {
+          $url = str_replace( '/vendor/libraries/automattic/wordpress', '', $url );
         }
 
         // Conceal WordPress location. (legacy)
@@ -431,7 +434,6 @@ namespace UsabilityDynamics\Veneer {
           $url = site_url( $_annex . $path );
 
         }
-
 
         $url = str_replace( array( $wp_veneer->network ), array( $wp_veneer->site ), $url );
 
