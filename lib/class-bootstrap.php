@@ -411,6 +411,15 @@ namespace UsabilityDynamics\Veneer {
 
           return $buffer;
 
+        } else {
+
+          $buffer = str_replace( '/manage\/admin-ajax.php',     '/api', $buffer );
+          $buffer = str_replace( '/vendor/themes',              '/themes', $buffer );
+          $buffer = str_replace( '/vendor/modules',             '/modules', $buffer );
+          $buffer = str_replace( '/wp-includes/js',             '/assets/scripts', $buffer );
+          $buffer = str_replace( '/wp-includes/css',            '/assets/styles', $buffer );
+          $buffer = str_replace( '/wp-includes',                '/assets', $buffer );
+
         }
 
         // Remove W3 Total Cache generic text.

@@ -241,6 +241,8 @@ namespace UsabilityDynamics\Veneer {
       /**
        * Includes URL
        *
+       * @todo Does not seem to be working..
+       *
        * http://sugarsociety.com/wp-includes -> http://sugarsociety.com/includes
        * @param $url
        * @return mixed
@@ -249,10 +251,6 @@ namespace UsabilityDynamics\Veneer {
         global $wp_veneer;
 
         $url = str_replace( $wp_veneer->network, $wp_veneer->site, $url );
-
-        $url = str_replace( 'wp-includes/js',   'assets/scripts', $url );
-        $url = str_replace( 'wp-includes/css',  'assets/styles',  $url );
-        $url = str_replace( 'wp-includes',      'assets',         $url );
 
         return $url;
       }
@@ -326,7 +324,12 @@ namespace UsabilityDynamics\Veneer {
        */
       public static function admin_url( $url, $path, $blog_id ) {
 
-        $url = str_replace( '/wp-admin/', '/manage/', $url );
+        $url = str_replace( '/vendor/libraries/automattic/wordpress/manage', '/manage', $url );
+
+        // $url = str_replace( '/wp-admin/', '/manage/', $url );
+
+        // @note Got to be careful here since admin cookies only apply to /manage. if( defined( 'ADMIN_COOKIE_PATH' ) && ADMIN_COOKIE_PATH ) {}
+        // $url = str_replace( '/admin-ajax.php', '/api', $url );
 
         // @todo replace with api.site.com
         // $url = str_replace( 'wp-ajax.php', '/manage/', $url );
