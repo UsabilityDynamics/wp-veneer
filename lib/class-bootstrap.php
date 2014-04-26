@@ -195,7 +195,7 @@ namespace UsabilityDynamics\Veneer {
         }
 
         // Requires $this->site to be defined, therefore being ignored on single-site installs.
-        if( defined( 'MULTISITE' ) && MULTISITE ) {
+        if( defined( 'MULTISITE' ) && MULTISITE && $wpdb->site ) {
           $this->site     = $wpdb->get_var( "SELECT domain FROM {$wpdb->blogs} WHERE blog_id = '{$wpdb->blogid}' LIMIT 1" );
           $this->network  = $wpdb->get_var( "SELECT domain FROM {$wpdb->site} WHERE id = {$wpdb->siteid}" );
         } else {
