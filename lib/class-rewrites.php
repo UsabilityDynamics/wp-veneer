@@ -24,6 +24,7 @@ namespace UsabilityDynamics\Veneer {
      * @property mixed network_admin_url
      * @property mixed self_admin_url
      * @property mixed user_admin_url
+     * @property mixed theme_root_uri
      * @module Veneer
      */
     class Rewrites {
@@ -63,7 +64,7 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'lostpassword_url', array( $this, 'lostpassword_url' ), 100, 3 );
         add_filter( 'admin_url', array( $this, 'admin_url' ), 100, 3 );
         add_filter( 'includes_url', array( $this, 'includes_url' ), 100, 3 );
-        //add_filter( 'home_url', array( $this, 'home_url' ), 100, 4 );
+        add_filter( 'home_url', array( $this, 'home_url' ), 100, 4 );
         add_filter( 'login_url', array( $this, 'login_url' ), 100, 2 );
         add_filter( 'logout_url', array( $this, 'logout_url' ), 50, 2 );
 
@@ -73,12 +74,14 @@ namespace UsabilityDynamics\Veneer {
 
         add_filter( 'stylesheet_directory_uri', array( $this, 'stylesheet_directory_uri' ), 100, 3 );
         add_filter( 'template_directory_uri', array( $this, 'template_directory_uri' ), 100, 3 );
+        add_filter( 'theme_root_uri', array( $this, 'theme_root_uri' ), 100, 3 );
+
+        // Carrington Build
+        add_filter( 'cfct-build-module-urls', array( $this, 'cfct_build_module_urls' ), 100, 3 );
 
         // URLs
-        $this->home_url           = home_url();
-        $this->media_url          = home_url( '/media' );
-        $this->assets_url         = home_url( '/assets' );
-        $this->site_url           = site_url();
+        $this->home_url           = get_home_url();
+        $this->site_url           = get_site_url();
         $this->admin_url          = get_admin_url();
         $this->includes_url       = includes_url();
         $this->content_url        = content_url();
@@ -98,13 +101,12 @@ namespace UsabilityDynamics\Veneer {
        *
        * Hooks into get_option( 'home' )
        *
-       * @todo Apparently at some point ->site gets unset on non-ms.
        * @param $default
        * @return string
        */
       public function _option_home( $default ) {
         global $wp_veneer;
-        return $wp_veneer->site ? 'http://' . $wp_veneer->site : $default;
+        return 'http://' . $wp_veneer->site;
       }
 
       /**
@@ -121,6 +123,40 @@ namespace UsabilityDynamics\Veneer {
         }
 
         return untrailingslashit( get_home_url() ) . '/' . $template_dir_uri;
+      }
+
+      /**
+       * Fixing issue where theme resides outside any known directories
+       */
+      public function theme_root_uri( $uri, $siteurl, $tofind ){
+        /** If we don't have the custom location defined, bail */
+        if( !defined( 'WP_THEME_STORAGE_DIR' ) ){
+          return $uri;
+        }
+        /** If the URI is actually a valid URL, bail */
+        if( filter_var( $uri, FILTER_VALIDATE_URL ) === true ){
+          return $uri;
+        }
+        /** If the current URI is the same as what we have defined */
+        if( $uri == WP_THEME_STORAGE_DIR ){
+          if( is_dir( WP_THEME_STORAGE_DIR . '/' . $tofind ) ){
+            $uri = rtrim( $siteurl, '/' ) . '/' . trim( str_ireplace( WP_BASE_DIR, '', $uri ), '/' );
+          }
+        }
+        /** Return default */
+        return $uri;
+      }
+
+      /**
+       * Fix carrington build stuff
+       */
+      function cfct_build_module_urls( $urls ){
+        foreach( $urls as &$url ){
+          if( stripos( $url, WP_BASE_DIR ) === 0 ){
+            $url = str_ireplace( WP_BASE_DIR, WP_BASE_URL, $url );
+          }
+        }
+        return $urls;
       }
 
       /**
@@ -231,17 +267,12 @@ namespace UsabilityDynamics\Veneer {
        * @return mixed
        */
       public static function home_url( $url, $path, $orig_scheme, $blog_id ) {
-
         $url = str_replace( '/vendor/libraries/automattic/wordpress', '', $url );
-
-        //die($url);
         return $url;
       }
 
       /**
        * Includes URL
-       *
-       * @todo Does not seem to be working..
        *
        * http://sugarsociety.com/wp-includes -> http://sugarsociety.com/includes
        * @param $url
@@ -250,7 +281,13 @@ namespace UsabilityDynamics\Veneer {
       public static function includes_url( $url ) {
         global $wp_veneer;
 
+        /** Make sure we're on the current site */
         $url = str_replace( $wp_veneer->network, $wp_veneer->site, $url );
+
+        /** Now, do our includes replacements */
+        $url = str_ireplace( 'wp-includes/js', 'assets/scripts', $url );
+        $url = str_ireplace( 'wp-includes/css', 'assets/styles', $url );
+        $url = str_ireplace( 'wp-includes/images', 'assets/images', $url );
 
         return $url;
       }
@@ -324,7 +361,8 @@ namespace UsabilityDynamics\Veneer {
        */
       public static function admin_url( $url, $path, $blog_id ) {
 
-        $url = str_replace( '/vendor/libraries/automattic/wordpress/manage', '/manage', $url );
+        $url = str_replace( '/vendor/libraries/automattic/wordpress/manage/', '/manage/', $url );
+        $url = str_replace( '/wp-admin/', '/manage/', $url );
 
         // $url = str_replace( '/wp-admin/', '/manage/', $url );
 
