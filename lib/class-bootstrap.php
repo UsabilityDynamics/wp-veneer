@@ -396,7 +396,10 @@ namespace UsabilityDynamics\Veneer {
         global $post, $wp_query;
 
         $buffer = str_replace( '/wordpress-seojs',      '/wordpress-seo/js', $buffer );
+        $buffer = str_replace( '/wordpress-seocss',     '/wordpress-seo/css', $buffer );
         $buffer = str_replace( '/wordpress-seoimages',  '/wordpress-seo/images', $buffer );
+        $buffer = str_replace( '/debug-barjs',          '/debug-bar/js', $buffer );
+        $buffer = str_replace( '/debug-barcss',         '/debug-bar/css', $buffer );
         $buffer = str_replace( '/wp-admin/js',          '/manage/js', $buffer );
 
         if( is_admin() ) {

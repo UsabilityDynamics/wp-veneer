@@ -50,7 +50,6 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'content_url', array( $this, 'replace_network_url' ), 10, 2 );
         add_filter( 'user_admin_url', array( $this, 'replace_network_url' ), 10, 2 );
         add_filter( 'site_url', array( $this, 'replace_network_url' ), 10, 2 );
-        add_filter( 'cfct-build-module-url', array( $this, 'replace_network_url' ), 10, 3 );
 
         // Support Vendor paths. Disabled because references get_blogaddress_by_id() too early.
         add_filter( 'update_attached_file', array( $this, 'update_attached_file' ), 50, 2 );
@@ -78,6 +77,7 @@ namespace UsabilityDynamics\Veneer {
 
         // Carrington Build
         add_filter( 'cfct-build-module-urls', array( $this, 'cfct_build_module_urls' ), 100, 3 );
+        add_filter( 'cfct-build-module-url', array( $this, 'replace_network_url' ), 10, 3 );
 
         // URLs
         $this->home_url           = get_home_url();
@@ -106,7 +106,7 @@ namespace UsabilityDynamics\Veneer {
        */
       public function _option_home( $default ) {
         global $wp_veneer;
-        return 'http://' . $wp_veneer->site;
+        return ( $wp_veneer->site ? 'http://' . $wp_veneer->site : $default );
       }
 
       /**
@@ -435,12 +435,11 @@ namespace UsabilityDynamics\Veneer {
        * Network URL
        *
        * @param $url
-       *
        * @return mixed
        */
       public static function replace_network_url( $url ) {
         global $wp_veneer;
-        return str_replace( $wp_veneer->network, $wp_veneer->site, $url );
+        return $wp_veneer->network && $wp_veneer->site ? str_replace( $wp_veneer->network, $wp_veneer->site, $url ) : $url;
       }
 
       /**
