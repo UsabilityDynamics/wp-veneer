@@ -395,43 +395,8 @@ namespace UsabilityDynamics\Veneer {
       public function ob_start( &$buffer ) {
         global $post, $wp_query;
 
-        $buffer = apply_filters( 'veneer::ob_start', $buffer, $this );
-        
-        /**
-        $buffer = str_replace( '/wordpress-seojs',      '/wordpress-seo/js', $buffer );
-        $buffer = str_replace( '/wordpress-seocss',     '/wordpress-seo/css', $buffer );
-        $buffer = str_replace( '/wordpress-seoimages',  '/wordpress-seo/images', $buffer );
-        $buffer = str_replace( '/debug-barjs',          '/debug-bar/js', $buffer );
-        $buffer = str_replace( '/debug-barcss',         '/debug-bar/css', $buffer );
-        $buffer = str_replace( '/wp-admin/js',          '/manage/js', $buffer );
+        apply_filters( 'wp-veneer:ob_start', $buffer, $this );
 
-        if( is_admin() ) {
-
-          if( $this->_rewrites ) {
-            $buffer = str_replace( '/wp-admin/load-styles.php',   '/manage/load-styles.php',  $buffer );
-            $buffer = str_replace( '/wp-admin/load-scripts.php',  '/manage/load-scripts.php', $buffer );
-          } else {
-            $buffer = str_replace( '/vendor/libraries/automattic/wordpress/wp-admin/load-styles.php',   '/manage/load-styles.php',  $buffer );
-            $buffer = str_replace( '/vendor/libraries/automattic/wordpress/wp-admin/load-scripts.php',  '/manage/load-scripts.php', $buffer );
-            $buffer = str_replace( '/vendor/libraries/automattic/wordpress/manage/load-styles.php',     '/manage/load-styles.php',  $buffer );
-            $buffer = str_replace( '/vendor/libraries/automattic/wordpress/manage/load-scripts.php',    '/manage/load-scripts.php', $buffer );
-          }
-
-          $buffer = str_replace( '/vendor/libraries/automattic/wordpress/manage/', '/manage/',  $buffer );
-
-          return $buffer;
-
-        } else {
-
-          $buffer = str_replace( '/manage\/admin-ajax.php',     '/api', $buffer );
-          $buffer = str_replace( '/vendor/themes',              '/themes', $buffer );
-          $buffer = str_replace( '/vendor/modules',             '/modules', $buffer );
-          $buffer = str_replace( '/wp-includes/js',             '/assets/scripts', $buffer );
-          $buffer = str_replace( '/wp-includes/css',            '/assets/styles', $buffer );
-          $buffer = str_replace( '/wp-includes',                '/assets', $buffer );
-
-        }
-            */
         // Remove W3 Total Cache generic text.
         $buffer = str_replace( "Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/", 'Served from', $buffer );
         $buffer = str_replace( "\n\r\n Served from:", '', $buffer );
