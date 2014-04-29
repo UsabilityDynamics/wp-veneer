@@ -13,18 +13,7 @@ namespace UsabilityDynamics\Veneer {
     /**
      * Class Rewrites
      *
-     * @property mixed home_url
-     * @property mixed site_url
-     * @property mixed admin_url
-     * @property mixed includes_url
-     * @property mixed content_url
-     * @property mixed network_site_url
-     * @property mixed plugins_url
-     * @property mixed network_home_url
-     * @property mixed network_admin_url
-     * @property mixed self_admin_url
-     * @property mixed user_admin_url
-     * @property mixed theme_root_uri
+     * @property array $urls Holds the debug info for all of our URLs
      * @module Veneer
      */
     class Rewrites {
@@ -79,21 +68,35 @@ namespace UsabilityDynamics\Veneer {
         // Carrington Build
         add_filter( 'cfct-build-module-urls', array( $this, 'cfct_build_module_urls' ), 100, 3 );
 
-        // URLs
-        $this->home_url           = get_home_url();
-        $this->site_url           = get_site_url();
-        $this->admin_url          = get_admin_url();
-        $this->includes_url       = includes_url();
-        $this->content_url        = content_url();
-        $this->plugins_url        = plugins_url();
-        $this->network_site_url   = network_site_url();
-        $this->network_home_url   = network_home_url();
-        $this->network_admin_url  = network_admin_url();
-        $this->self_admin_url     = self_admin_url();
-        $this->user_admin_url     = user_admin_url();
+
+
+        //print_r( $this->_debug() ); die();
 
         // add_action( 'template_redirect', function() { global $wp_veneer; wp_send_json_success( $wp_veneer->_rewrites ); });
 
+      }
+
+      /**
+       * Refreshes our URLs
+       */
+      public function _refresh_urls(){
+        /** Setup our array */
+        $this->urls = array(
+          'home_url' => get_home_url(),
+          'login_url' => wp_login_url(),
+          'site_url' => get_site_url(),
+          'admin_url' => get_admin_url(),
+          'includes_url' => includes_url(),
+          'content_url' => content_url(),
+          'plugins_url' => plugins_url(),
+          'network_site_url' => network_site_url(),
+          'network_home_url' => network_home_url(),
+          'network_admin_url' => network_admin_url(),
+          'self_admin_url' => self_admin_url(),
+          'user_admin_url' => user_admin_url(),
+          'get_stylesheet_directory_uri' => get_stylesheet_directory_uri(),
+          'get_template_directory_uri' => get_template_directory_uri()
+        );
       }
 
       /**
@@ -183,24 +186,9 @@ namespace UsabilityDynamics\Veneer {
        * @return array
        */
       private function _debug() {
-
-        return array(
-          'wp_login_url' => wp_login_url(),
-          'get_home_url' => get_home_url(),
-          'get_site_url' => get_site_url(),
-          'get_admin_url' => get_admin_url(),
-          'includes_url' => includes_url(),
-          'content_url' => content_url(),
-          'plugins_url' => plugins_url(),
-          'network_site_url' => network_site_url(),
-          'network_home_url' => network_home_url(),
-          'network_admin_url' => network_admin_url(),
-          'self_admin_url' => self_admin_url(),
-          'user_admin_url' => user_admin_url(),
-          'get_stylesheet_directory_uri' => get_stylesheet_directory_uri(),
-          'get_template_directory_uri' => get_template_directory_uri()
-        );
-
+        /** Refresh our URLs, first */
+        $this->_refresh_urls();
+        return $this->urls;
       }
 
       /**
@@ -279,16 +267,10 @@ namespace UsabilityDynamics\Veneer {
        * @return mixed
        */
       public static function includes_url( $url ) {
-        global $wp_veneer;
-
-        /** Make sure we're on the current site */
-        $url = str_replace( $wp_veneer->network, $wp_veneer->site, $url );
-
-        /** Now, do our includes replacements */
         $url = str_ireplace( 'wp-includes/js', 'assets/scripts', $url );
         $url = str_ireplace( 'wp-includes/css', 'assets/styles', $url );
         $url = str_ireplace( 'wp-includes/images', 'assets/images', $url );
-
+        $url = str_ireplace( 'wp-includes/', 'assets/', $url );
         return $url;
       }
 
@@ -446,44 +428,45 @@ namespace UsabilityDynamics\Veneer {
       /**
        * Fix Vendor Plugin Paths
        *
+       * Docs from WP Codex:
+       * Retrieves the absolute URL to the plugins directory (without the trailing slash) or, when using the $path
+       * argument, to a specific file under that directory. You can either specify the $path argument as a hardcoded
+       * path relative to the plugins directory, or conveniently pass __FILE__ as the second argument to make the $path
+       * relative to the parent directory of the current PHP script file.
+       *
        * @param {String} $url Computed URL, likely wrong for vendor directories.
-       * @param $path
-       * @param {String} $plugin Path to plugin file that called the plugins_url() method.
+       * @param {String} $path Path to the plugin file of which URL you want to retrieve, relative to the plugins directory or to $plugin if specified.
+       * @param {String} $plugin Path under the plugins directory of which parent directory you want the $path to be relative to.
        *
        * @return mixed
        */
       public static function plugins_url( $url, $path, $plugin ) {
         global $wp_veneer;
 
-        if( strpos( $plugin, '/vendor' ) ) {
+        
 
-          // Strip filename and get just the path.
-          if( strpos( $plugin, '.php' ) ) {
-            $plugin = dirname( $plugin );
-          }
-
-          if( defined( 'WP_BASE_DIR' ) ) {
-            $_base = defined( 'WP_BASE_DIR' ) ? WP_BASE_DIR : ABSPATH;
-          }
-
-          $_path = str_replace( '\\', '/', ( $plugin ? $plugin : $url ) );
-          $_base = str_replace( '\\', '/', $_base );
-
-          $_annex = untrailingslashit( str_replace( $_base, '', $_path ) );
-
-          // Not sure if should use site_url or home_url..
-          $url = site_url( $_annex . $path );
-
-        }
+//        if( strpos( $plugin, '/vendor' ) ) {
+//
+//          // Strip filename and get just the path.
+//          if( strpos( $plugin, '.php' ) ) {
+//            $plugin = dirname( $plugin );
+//          }
+//
+//          if( defined( 'WP_BASE_DIR' ) ) {
+//            $_base = defined( 'WP_BASE_DIR' ) ? WP_BASE_DIR : ABSPATH;
+//          }
+//
+//          $_path = str_replace( '\\', '/', ( $plugin ? $plugin : $url ) );
+//          $_base = str_replace( '\\', '/', $_base );
+//
+//          $_annex = untrailingslashit( str_replace( $_base, '', $_path ) );
+//
+//          // Not sure if should use site_url or home_url..
+//          $url = site_url( $_annex . $path );
+//
+//        }
 
         $url = str_replace( array( $wp_veneer->network ), array( $wp_veneer->site ), $url );
-
-        /**
-         * Replace any thing that has the modules directory followed by the full path to the web root for custom MU plugins
-         * http://baldrichfalcons.com/{static/storage/baldrichfalcons.com/modules}/sites/cluster-uds-io/modules/akismet/2.6.0
-         */
-        $modules_relative = str_ireplace( WP_BASE_DIR, '', WP_PLUGIN_DIR );
-        $url = str_ireplace( trim( $modules_relative, '/' ) . '/' . trim( WP_BASE_DIR, '/' ) . '/', '', $url );
 
         return $url;
 
