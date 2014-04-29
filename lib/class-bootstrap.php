@@ -395,6 +395,9 @@ namespace UsabilityDynamics\Veneer {
       public function ob_start( &$buffer ) {
         global $post, $wp_query;
 
+        $buffer = apply_filters( 'veneer::ob_start', $buffer, $this );
+        
+        /**
         $buffer = str_replace( '/wordpress-seojs',      '/wordpress-seo/js', $buffer );
         $buffer = str_replace( '/wordpress-seocss',     '/wordpress-seo/css', $buffer );
         $buffer = str_replace( '/wordpress-seoimages',  '/wordpress-seo/images', $buffer );
@@ -428,7 +431,7 @@ namespace UsabilityDynamics\Veneer {
           $buffer = str_replace( '/wp-includes',                '/assets', $buffer );
 
         }
-
+            */
         // Remove W3 Total Cache generic text.
         $buffer = str_replace( "Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/", 'Served from', $buffer );
         $buffer = str_replace( "\n\r\n Served from:", '', $buffer );

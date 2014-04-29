@@ -68,10 +68,7 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'cfct-build-module-urls', array( $this, 'cfct_build_module_urls' ), 100, 3 );
         add_filter( 'cfct-build-module-url', array( $this, 'replace_network_url' ), 10, 3 );
 
-
-
-        //print_r( $this->_debug() ); die();
-
+        // print_r( $this->_debug() ); die();
         // add_action( 'template_redirect', function() { global $wp_veneer; wp_send_json_success( $wp_veneer->_rewrites ); });
 
       }
@@ -140,11 +137,9 @@ namespace UsabilityDynamics\Veneer {
         if( filter_var( $uri, FILTER_VALIDATE_URL ) === true ){
           return $uri;
         }
-        /** If the current URI is the same as what we have defined */
-        if( $uri == WP_THEME_STORAGE_DIR ){
-          if( is_dir( WP_THEME_STORAGE_DIR . '/' . $tofind ) ){
-            $uri = rtrim( $siteurl, '/' ) . '/' . trim( str_ireplace( WP_BASE_DIR, '', $uri ), '/' );
-          }
+        /** If the URL has the base directory */
+        if( stripos( $uri, WP_BASE_DIR ) !== false ){
+          $uri = rtrim( $siteurl, '/' ) . '/' . trim( str_ireplace( WP_BASE_DIR, '', $uri ), '/' );
         }
         /** Return default */
         return $uri;
@@ -441,32 +436,30 @@ namespace UsabilityDynamics\Veneer {
        */
       public static function plugins_url( $url, $path, $plugin ) {
         global $wp_veneer;
-
-        
-
-//        if( strpos( $plugin, '/vendor' ) ) {
-//
-//          // Strip filename and get just the path.
-//          if( strpos( $plugin, '.php' ) ) {
-//            $plugin = dirname( $plugin );
-//          }
-//
-//          if( defined( 'WP_BASE_DIR' ) ) {
-//            $_base = defined( 'WP_BASE_DIR' ) ? WP_BASE_DIR : ABSPATH;
-//          }
-//
-//          $_path = str_replace( '\\', '/', ( $plugin ? $plugin : $url ) );
-//          $_base = str_replace( '\\', '/', $_base );
-//
-//          $_annex = untrailingslashit( str_replace( $_base, '', $_path ) );
-//
-//          // Not sure if should use site_url or home_url..
-//          $url = site_url( $_annex . $path );
-//
-//        }
-
+        /** Strip filename and get just the path */
+        if( strpos( $plugin, '.php' ) ) {
+          $plugin = dirname( $plugin );
+        }        
+        /** First, if we have $plugin and $path defined, we use both */
+        if( $path && $plugin ){
+          $url = str_ireplace( WP_BASE_DIR, '', $plugin );
+          $url = rtrim( site_url( $url ), '/' ) . '/' . ltrim( $path, '/' );
+        }
+        /** Now, if we just have the path, then use that only */
+        if( $path && !$plugin ){
+          $url = str_ireplace( WP_BASE_DIR, '', WP_PLUGIN_DIR );
+          $url = rtrim( site_url( $url ), '/' ) . '/' . ltrim( $path, '/' );
+        }
+        /**
+         * HACKY Fix because composer doesn't install directories with underscores 
+         */
+        switch( true ){
+          case stripos( $url, 'modules/simple_email_subscriber' ) !== false:
+            $url = str_ireplace( 'modules/simple_email_subscriber', 'modules/simple-email-subscriber', $url );
+            break;
+        }
+        /** Ensure a valid site name */
         $url = str_replace( array( $wp_veneer->network ), array( $wp_veneer->site ), $url );
-
         return $url;
 
       }
