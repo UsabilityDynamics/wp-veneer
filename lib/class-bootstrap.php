@@ -395,6 +395,10 @@ namespace UsabilityDynamics\Veneer {
       public function ob_start( &$buffer ) {
         global $post, $wp_query;
 
+        $buffer = str_replace( '/wordpress-seojs',      '/wordpress-seo/js', $buffer );
+        $buffer = str_replace( '/wordpress-seoimages',  '/wordpress-seo/images', $buffer );
+        $buffer = str_replace( '/wp-admin/js',          '/manage/js', $buffer );
+
         if( is_admin() ) {
 
           if( $this->_rewrites ) {
@@ -552,7 +556,7 @@ namespace UsabilityDynamics\Veneer {
           "key"   => "ud:veneer",
         ) );
 
-        // ElasticSearch Service Settings.
+        // ElasticSearch Service $instances.
         $this->set( 'documents', array(
           "active" => true,
           "host"   => "localhost",
