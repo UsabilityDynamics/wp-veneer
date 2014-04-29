@@ -23,11 +23,10 @@
   ],
   "require": {
     "php": ">=5.3",
-    "usabilitydynamics/lib-wp-rpc": "master",
+    "usabilitydynamics/lib-rpc": "master",
     "usabilitydynamics/lib-settings": "master",
     "usabilitydynamics/lib-ui": "master",
     "usabilitydynamics/lib-utility": "master",
-    "aws/aws-sdk-php": "2.5.*@dev",
     "matthiasmullie/minify": "1.2.0",
     "mrclay/minify": "master"
   },
