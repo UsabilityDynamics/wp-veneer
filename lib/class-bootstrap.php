@@ -690,7 +690,7 @@ namespace UsabilityDynamics\Veneer {
         global $wp_admin_bar;
 
         if( !$this->get( 'toolbar.menu.enabled' ) ) {
-          // return;
+          return;
         }
 
         $wp_admin_bar->add_menu( array(
