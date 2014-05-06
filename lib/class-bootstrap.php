@@ -212,7 +212,7 @@ namespace UsabilityDynamics\Veneer {
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
 
-        add_filter( 'theme_root', array( $this, 'theme_root' ), 10 );
+        //add_filter( 'theme_root', array( $this, 'theme_root' ), 10 );
 
         // Initialize Settings.
         $this->_settings();
