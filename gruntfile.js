@@ -9,14 +9,14 @@ module.exports = function build( grunt ) {
 
   grunt.initConfig( {
 
-    pkg: grunt.file.readJSON( 'composer.json' ),
+    package: grunt.file.readJSON( 'composer.json' ),
 
     yuidoc: {
       compile: {
-        name: '<%= pkg.name %>',
-        description: '<%= pkg.description %>',
-        version: '<%= pkg.version %>',
-        url: '<%= pkg.homepage %>',
+        name: '<%= package.name %>',
+        description: '<%= package.description %>',
+        version: '<%= package.version %>',
+        url: '<%= package.homepage %>',
         options: {
           paths: 'lib',
           outdir: 'static/codex/'
@@ -32,7 +32,7 @@ module.exports = function build( grunt ) {
           relativeUrls: true
         },
         files: {
-          'styles/veneer.min.css': [ 'styles/src/veneer.less' ]
+          'static/styles/veneer.min.css': [ 'static/styles/src/veneer.less' ]
         }
       },
       development: {
@@ -40,7 +40,7 @@ module.exports = function build( grunt ) {
           relativeUrls: true
         },
         files: {
-          'styles/veneer.dev.css': [ 'styles/src/veneer.less' ]
+          'static/styles/veneer.dev.css': [ 'static/styles/src/veneer.less' ]
         }
       }
     },
@@ -52,13 +52,13 @@ module.exports = function build( grunt ) {
       },
       less: {
         files: [
-          'styles/src/*.*'
+          'static/styles/src/*.*'
         ],
         tasks: [ 'less' ]
       },
       js: {
         files: [
-          'scripts/src/*.*'
+          'static/scripts/src/*.*'
         ],
         tasks: [ 'uglify' ]
       }
@@ -68,10 +68,10 @@ module.exports = function build( grunt ) {
       minified: {
         options: {
           preserveComments: false,
-          wrap: true,
+          wrap: true
         },
         files: {
-          'scripts/veneer.min.js': [ 'scripts/src/veneer.js' ]
+          'static/scripts/veneer.min.js': [ 'static/scripts/src/veneer.js' ]
         }
       }
     },
@@ -98,38 +98,6 @@ module.exports = function build( grunt ) {
       }
     },
 
-    clean: {
-      all: [
-        "composer.lock",
-        "scripts/app.js",
-        "scripts/contact-form-7.js",
-        "scripts/foobox.js",
-        "scripts/require.js",
-        "scripts/utility.js",
-        "components/*",
-        "vendor/*",
-        "styles/*.css",
-        "scripts/emitter",
-        "scripts/event",
-        "scripts/indexof",
-        "scripts/ui",
-        "scripts/utility"
-      ],
-      "update": [
-        "composer.lock",
-        "vendor/*"
-      ]
-    },
-
-    symlink: {
-
-      explicit: {
-        dest: 'vendor/usabilitydynamics',
-        src: '/vendor/usabilitydynamics'
-      }
-
-    },
-
     shell: {
       update: {
         options: {
@@ -143,14 +111,12 @@ module.exports = function build( grunt ) {
 
   // Load tasks
   grunt.loadNpmTasks( 'grunt-markdown' );
-  grunt.loadNpmTasks( 'grunt-contrib-symlink' );
   grunt.loadNpmTasks( 'grunt-requirejs' );
   grunt.loadNpmTasks( 'grunt-contrib-yuidoc' );
   grunt.loadNpmTasks( 'grunt-contrib-uglify' );
   grunt.loadNpmTasks( 'grunt-contrib-watch' );
   grunt.loadNpmTasks( 'grunt-contrib-less' );
   grunt.loadNpmTasks( 'grunt-contrib-concat' );
-  grunt.loadNpmTasks( 'grunt-contrib-clean' );
   grunt.loadNpmTasks( 'grunt-shell' );
 
   // Register tasks
@@ -160,9 +126,6 @@ module.exports = function build( grunt ) {
   grunt.registerTask( 'distribution', [] );
 
   // Update Environment
-  grunt.registerTask( 'update', [ "clean:update", "shell:update" ] );
-
-  // Clean, preparing for update
-  grunt.registerTask( 'clean', [  ] );
+  grunt.registerTask( 'update', [ "shell:update" ] );
 
 };

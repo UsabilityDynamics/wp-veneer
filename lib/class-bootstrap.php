@@ -324,8 +324,8 @@ namespace UsabilityDynamics\Veneer {
        */
       public function site_settings() {
 
-        if( file_exists( dirname( __DIR__ ) . '/views/settings-site.php' ) ) {
-          include( dirname( __DIR__ ) . '/views/settings-site.php' );
+        if( file_exists( dirname( __DIR__ ) . '/static/views/settings-site.php' ) ) {
+          include( dirname( __DIR__ ) . '/static/views/settings-site.php' );
         }
 
       }
@@ -336,8 +336,8 @@ namespace UsabilityDynamics\Veneer {
        */
       public function network_settings() {
 
-        if( file_exists( dirname( __DIR__ ) . '/views/settings-network.php' ) ) {
-          include( dirname( __DIR__ ) . '/views/settings-network.php' );
+        if( file_exists( dirname( __DIR__ ) . '/static/views/settings-network.php' ) ) {
+          include( dirname( __DIR__ ) . '/static/views/settings-network.php' );
         }
 
       }
@@ -535,7 +535,7 @@ namespace UsabilityDynamics\Veneer {
         global $wp_veneer;
 
         if( is_user_logged_in() ) {
-          wp_enqueue_style( 'veneer', plugins_url( '/styles/veneer.css', dirname( __DIR__ ) ) );
+          wp_enqueue_style( 'veneer', plugins_url( '/static/styles/veneer.css', dirname( __DIR__ ) ) );
         };
 
       }
