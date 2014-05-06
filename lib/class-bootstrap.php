@@ -212,6 +212,8 @@ namespace UsabilityDynamics\Veneer {
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
 
+        add_filter( 'theme_root', array( $this, 'theme_root' ), 10 );
+
         // Initialize Settings.
         $this->_settings();
 
@@ -264,6 +266,29 @@ namespace UsabilityDynamics\Veneer {
       }
 
       /**
+       * Fix Vendor Theme Path
+       *
+       * This only seem to be an issue for the default (WP_DEFAULT_THEME) theme.
+       *
+       * @since 0.6.2
+       * @author potanin@UD
+       * @method theme_root
+       * @param $theme_root
+       * @return mixed
+       */
+      public function theme_root( $theme_root = '' ) {
+
+        if( defined( 'WP_THEMES_DIR' ) && strpos( WP_THEMES_DIR, '/vendor' ) && !strpos( $theme_root, '/vendor' ) ) {
+          $theme_root = str_replace( '/themes', '/vendor/themes', $theme_root );
+        }
+
+        return $theme_root;
+
+      }
+
+      /**
+       *
+       *
        *
        */
       public function _admin_menu() {

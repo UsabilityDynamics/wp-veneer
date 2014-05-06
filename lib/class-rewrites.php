@@ -39,6 +39,7 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'content_url', array( $this, 'replace_network_url' ), 10, 2 );
         add_filter( 'user_admin_url', array( $this, 'replace_network_url' ), 10, 2 );
         add_filter( 'site_url', array( $this, 'replace_network_url' ), 10, 2 );
+        add_filter( 'plugins_url', array( $this, 'replace_network_url' ), 10, 2 );
 
         // Support Vendor paths. Disabled because references get_blogaddress_by_id() too early.
         add_filter( 'update_attached_file', array( $this, 'update_attached_file' ), 50, 2 );
@@ -68,15 +69,37 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'cfct-build-module-urls', array( $this, 'cfct_build_module_urls' ), 100, 3 );
         add_filter( 'cfct-build-module-url', array( $this, 'replace_network_url' ), 10, 3 );
 
-        // print_r( $this->_debug() ); die();
+        // die( json_encode( $this->_debug() ) );
         // add_action( 'template_redirect', function() { global $wp_veneer; wp_send_json_success( $wp_veneer->_rewrites ); });
 
+      }
+
+      /**
+       * Prepent Protocol Prefix to a URL.
+       *
+       * @param $url
+       *
+       * @method prepend_scheme
+       * @since 0.6.2
+       * @return string
+       */
+      public static function prepend_scheme( $url = '' ) {
+
+        $url = str_replace( array( 'https://', 'http://', '//' ), '', $url );
+
+        if( is_ssl() ) {
+          return 'https://' . $url;
+        }
+        
+        return 'http://' . $url;
+        
       }
 
       /**
        * Refreshes our URLs
        */
       public function _refresh_urls(){
+
         /** Setup our array */
         $this->urls = array(
           'home_url' => get_home_url(),
@@ -94,6 +117,7 @@ namespace UsabilityDynamics\Veneer {
           'get_stylesheet_directory_uri' => get_stylesheet_directory_uri(),
           'get_template_directory_uri' => get_template_directory_uri()
         );
+
       }
 
       /**
@@ -106,6 +130,15 @@ namespace UsabilityDynamics\Veneer {
        */
       public function _option_home( $default ) {
         global $wp_veneer;
+
+        if( !$default ) {
+          return self::prepend_scheme( $wp_veneer->site );
+        }
+
+        if( defined( 'WP_HOME' ) ) {
+          // $default = str_replace( WP_HOME, $default, $default );
+        }
+
         return ( $wp_veneer->site ? 'http://' . $wp_veneer->site : $default );
       }
 
@@ -416,7 +449,13 @@ namespace UsabilityDynamics\Veneer {
        */
       public static function replace_network_url( $url ) {
         global $wp_veneer;
-        return $wp_veneer->network && $wp_veneer->site ? str_replace( $wp_veneer->network, $wp_veneer->site, $url ) : $url;
+
+
+        if( defined( 'WP_HOME' ) ) {
+          $url = str_replace( WP_HOME, $wp_veneer->site, $url );
+        }
+
+        return self::prepend_scheme( $wp_veneer->network && $wp_veneer->site ? str_replace( $wp_veneer->network, $wp_veneer->site, $url ) : $url );
       }
 
       /**
@@ -436,20 +475,24 @@ namespace UsabilityDynamics\Veneer {
        */
       public static function plugins_url( $url, $path, $plugin ) {
         global $wp_veneer;
+
         /** Strip filename and get just the path */
         if( strpos( $plugin, '.php' ) ) {
           $plugin = dirname( $plugin );
         }        
+
         /** First, if we have $plugin and $path defined, we use both */
         if( $path && $plugin ){
           $url = str_ireplace( WP_BASE_DIR, '', $plugin );
           $url = rtrim( site_url( $url ), '/' ) . '/' . ltrim( $path, '/' );
         }
+
         /** Now, if we just have the path, then use that only */
         if( $path && !$plugin ){
           $url = str_ireplace( WP_BASE_DIR, '', WP_PLUGIN_DIR );
           $url = rtrim( site_url( $url ), '/' ) . '/' . ltrim( $path, '/' );
         }
+
         /**
          * HACKY Fix because composer doesn't install directories with underscores 
          */
@@ -458,8 +501,10 @@ namespace UsabilityDynamics\Veneer {
             $url = str_ireplace( 'modules/simple_email_subscriber', 'modules/simple-email-subscriber', $url );
             break;
         }
+
         /** Ensure a valid site name */
         $url = str_replace( array( $wp_veneer->network ), array( $wp_veneer->site ), $url );
+
         return $url;
 
       }
