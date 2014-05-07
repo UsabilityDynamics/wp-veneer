@@ -314,7 +314,10 @@ namespace UsabilityDynamics\Veneer {
       public static function content_url( $url ) {
         global $wp_veneer;
 
+
         $url = str_replace( $wp_veneer->network, $wp_veneer->site, $url );
+        $url = str_replace( $wp_veneer->network, $wp_veneer->site, $url );
+
         return $url;
 
       }
@@ -450,9 +453,12 @@ namespace UsabilityDynamics\Veneer {
       public static function replace_network_url( $url ) {
         global $wp_veneer;
 
-
         if( defined( 'WP_HOME' ) ) {
           $url = str_replace( WP_HOME, $wp_veneer->site, $url );
+        }
+
+        if( defined( 'WP_SITE_URL' ) ) {
+          $url = str_replace( WP_SITE_URL, $wp_veneer->site, $url );
         }
 
         return self::prepend_scheme( $wp_veneer->network && $wp_veneer->site ? str_replace( $wp_veneer->network, $wp_veneer->site, $url ) : $url );
@@ -482,13 +488,13 @@ namespace UsabilityDynamics\Veneer {
         }        
 
         /** First, if we have $plugin and $path defined, we use both */
-        if( $path && $plugin ){
+        if( $path && $plugin && defined( 'WP_BASE_DIR' ) ){
           $url = str_ireplace( WP_BASE_DIR, '', $plugin );
           $url = rtrim( site_url( $url ), '/' ) . '/' . ltrim( $path, '/' );
         }
 
         /** Now, if we just have the path, then use that only */
-        if( $path && !$plugin ){
+        if( $path && !$plugin && defined( 'WP_BASE_DIR' ) ) {
           $url = str_ireplace( WP_BASE_DIR, '', WP_PLUGIN_DIR );
           $url = rtrim( site_url( $url ), '/' ) . '/' . ltrim( $path, '/' );
         }

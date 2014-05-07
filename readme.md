@@ -5,6 +5,9 @@
 
 ## Constants
 
+* WP_THEMES_DIR - Absolute path to storage directory.
+* WP_THEME_DIR - Absolute path to theme directory.
+* WP_THEME_URL  - URL to themes directory.
 * WP_VENEER_STORAGE - Absolute path to storage directory.
 * WP_VENEER_PUBLIC  - Absolute path to "public" directory. If multisite is enabled, assets should be organized by apex domains.
 

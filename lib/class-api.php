@@ -29,11 +29,11 @@ namespace UsabilityDynamics\Veneer {
 
         if( !is_callable( $handler ) ) {
           add_action( 'wp_ajax_' . $path, array( 'UsabilityDynamics\Veneer\API', 'default_handler' ) );
-          return _doing_it_wrong( 'UsabilityDynamics\Veneer\API::define', 'Handler not callable.', null );
+          _doing_it_wrong( 'UsabilityDynamics\Veneer\API::define', 'Handler not callable.', null );
+        } else {
+          add_action( 'wp_ajax_' . $path, $handler );
+          add_action( 'wp_ajax_nopriv_' . $path, $handler );
         }
-
-        add_action( 'wp_ajax_' . $path, $handler );
-        add_action( 'wp_ajax_nopriv_' . $path, $handler );
 
       }
 

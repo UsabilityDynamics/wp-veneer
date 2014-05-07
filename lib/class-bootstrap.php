@@ -420,6 +420,8 @@ namespace UsabilityDynamics\Veneer {
       public function ob_start( &$buffer ) {
         global $post, $wp_query;
 
+        return $buffer;
+
         apply_filters( 'wp-veneer:ob_start', $buffer, $this );
 
         // Remove W3 Total Cache generic text.
