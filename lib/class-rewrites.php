@@ -38,7 +38,7 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'pre_option_home', array( $this, '_option_home' ), 10 );
         add_filter( 'content_url', array( $this, 'replace_network_url' ), 10, 2 );
         add_filter( 'user_admin_url', array( $this, 'replace_network_url' ), 10, 2 );
-        add_filter( 'site_url', array( $this, 'replace_network_url' ), 10, 2 );
+        add_filter( 'site_url', array( $this, 'replace_network_url' ), 10, 3 );
         add_filter( 'plugins_url', array( $this, 'replace_network_url' ), 10, 2 );
 
         // Support Vendor paths. Disabled because references get_blogaddress_by_id() too early.
@@ -255,7 +255,7 @@ namespace UsabilityDynamics\Veneer {
        * @return mixed
        */
       public static function logout_url( $url ) {
-        $url = str_replace( 'wp-login.php', 'manage/login', $url );
+        $url = str_replace( '/wp-login.php', '/manage/login', $url );
         return $url;
       }
 
@@ -268,7 +268,7 @@ namespace UsabilityDynamics\Veneer {
        * @return mixed
        */
       public static function login_url( $url, $redirect ) {
-        $url = str_replace( 'wp-login.php', 'manage/login', $url );
+        $url = str_replace( '/wp-login.php', '/manage/login', $url );
         return $url;
       }
 
@@ -447,10 +447,13 @@ namespace UsabilityDynamics\Veneer {
       /**
        * Network URL
        *
-       * @param $url
+       * @param      $url
+       * @param null $path
+       * @param null $schema
+       *
        * @return mixed
        */
-      public static function replace_network_url( $url ) {
+      public static function replace_network_url( $url, $path = null, $schema = null ) {
         global $wp_veneer;
 
         if( defined( 'WP_HOME' ) ) {
@@ -461,7 +464,13 @@ namespace UsabilityDynamics\Veneer {
           $url = str_replace( WP_SITE_URL, $wp_veneer->site, $url );
         }
 
-        return self::prepend_scheme( $wp_veneer->network && $wp_veneer->site ? str_replace( $wp_veneer->network, $wp_veneer->site, $url ) : $url );
+        $url =  $wp_veneer->network && $wp_veneer->site ? str_replace( $wp_veneer->network, $wp_veneer->site, $url ) : $url;
+
+        if( $schema !== 'relative' ) {
+          $url = self::prepend_scheme( $url );
+        }
+
+        return $url;
       }
 
       /**

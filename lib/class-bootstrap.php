@@ -212,7 +212,9 @@ namespace UsabilityDynamics\Veneer {
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
         add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
 
-        //add_filter( 'theme_root', array( $this, 'theme_root' ), 10 );
+        add_filter( 'theme_root', array( $this, 'theme_root' ), 10 );
+
+        // add_filter( 'wp_cache_themes_persistently', function( $current, $callee ) { return 43200;  }, 10, 2);
 
         // Initialize Settings.
         $this->_settings();
@@ -263,6 +265,7 @@ namespace UsabilityDynamics\Veneer {
 
         }
 
+        // die( '<pre>' . print_r( $this->get(), true ) . '</pre>' );
       }
 
       /**
@@ -420,9 +423,13 @@ namespace UsabilityDynamics\Veneer {
       public function ob_start( &$buffer ) {
         global $post, $wp_query;
 
-        return $buffer;
+        // @note Trying to fix weird encoding issue in back-end <script> tag.
+        $buffer = str_replace( 'load-scripts.php?c=1&amp;load%5B%5D=', 'load-scripts.php?=c1&load=', $buffer );
 
-        apply_filters( 'wp-veneer:ob_start', $buffer, $this );
+        // @note thro exception to abort rest of ob_start from a filter.
+        try { $buffer = apply_filters( 'wp-veneer:ob_start', $buffer, $this ); } catch( \Exception $e ) {
+          return $buffer;
+        }
 
         // Remove W3 Total Cache generic text.
         $buffer = str_replace( "Performance optimized by W3 Total Cache. Learn more: http://www.w3-edge.com/wordpress-plugins/", 'Served from', $buffer );
@@ -647,7 +654,7 @@ namespace UsabilityDynamics\Veneer {
         // Render Toolbar.
         add_action( 'wp_before_admin_bar_render', array( $this, 'toolbar' ), 10 );
 
-        if( file_exists( WP_BASE_DIR . '/local-debug.php' ) || in_array( $_SERVER[ 'REMOTE_ADDR' ], array( '127.0.0.1', '10.0.0.1', '0.0.0.0' ) ) ) {
+        if( defined( 'WP_BASE_DIR' ) && file_exists( WP_BASE_DIR . '/local-debug.php' ) || in_array( $_SERVER[ 'REMOTE_ADDR' ], array( '127.0.0.1', '10.0.0.1', '0.0.0.0' ) ) ) {
           add_action( 'wp_before_admin_bar_render', array( $this, 'toolbar_local' ), 100 );
         }
 

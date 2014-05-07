@@ -71,7 +71,6 @@
   RewriteRule ^favicon.ico$ /storage/public/favicon.ico$1 [L]
 
   # Rewrite any of our content URLs to media
-  # RewriteRule ^store/images/(.*)/(.*)$ /media/products/$2 [L]
   RewriteRule ^store/images/(.*)$ /media/products/$2 [L]
   RewriteRule ^blog/wp-content/uploads/(.*)$ /media/$1 [L]
   RewriteRule ^cms/wp-content/uploads/(.*)$ /media/$1 [L]
@@ -117,25 +116,19 @@
 # Management BEGIN
 <IfModule mod_rewrite.c>
 
-  RewriteCond %{ENV:REDIRECT_SUBDOMAIN} =""
-  RewriteRule ^vendor/libraries/automattic/wordpress/wp-admin/(.*)$ /manage/$1 [R=301,L]
-
-  RewriteCond %{ENV:REDIRECT_SUBDOMAIN} =""
-  RewriteRule ^vendor/libraries/automattic/wordpress/wp-(login|signup)\.php$ /manage/$1 [R=301,L]
-
-  RewriteRule ^manage/(login|signup)(.*)$ /vendor/libraries/automattic/wordpress/wp-$1.php [E=SUBDOMAIN:rdr,L]
+  RewriteRule ^manage/(login|signup)(.*)$ /vendor/libraries/automattic/wordpress/wp-$1.php [QSA,L]
 
   # Must redirect to trailing slash for relative links to work
   RewriteRule ^manage$ manage/ [R=301,L]
-
-  RewriteRule ^manage/?(.*)$ /vendor/libraries/automattic/wordpress/wp-admin/$1 [E=SUBDOMAIN:rdr,L]
+  RewriteRule ^manage/?(.*)$ /vendor/libraries/automattic/wordpress/wp-admin/$1 [QSA,L]
 
   ## HACKISH ##
+  RewriteRule ^wp-admin/?(.*)$ /manage/$1 [R=301,L] #
   RewriteRule ^wp-admin/css/?(.*)$ /manage/css/$1 [QSA,L] #
   RewriteRule ^wp-admin/images/?(.*)$ /manage/images/$1 [QSA,L] #
   RewriteRule ^vendor/libraries/automattic/wordpress/manage/?(.*)$ /manage/$1 [QSA,L] # Without this, Media Libary can't make admin-ajax requests...
   RewriteRule ^wp-admin/load-styles.php?(.*)$ /vendor/libraries/automattic/wordpress/wp-admin/load-styles.php$1 [QSA,L]
-  RewriteRule ^wp-admin/load-scripts.php?(.*)$ /vendor/libraries/automattic/wordpress/wp-admin/load-scripts.php$1 [QSA,L]
+  RewriteRule ^wp-admin/load-scripts.php?(.*)$ /vendor/libraries/automattic/wordpress/wp-admin/load-scripts.php$1 [R=301,L]
 
 </IfModule>
 # Management END
@@ -143,24 +136,17 @@
 # Assets BEGIN
 <IfModule mod_rewrite.c>
 
-  RewriteCond %{ENV:REDIRECT_SUBDOMAIN} =""
-  RewriteRule ^wp-includes/js/(.*)$ /assets/scripts/$1 [R=301,L]
+  RewriteRule ^includes/js/(.*)$ /assets/scripts/$1 [QSA,L]
+  RewriteRule ^includes/css/(.*)$ /assets/styles/$1 [QSA,L]
 
-  RewriteCond %{ENV:REDIRECT_SUBDOMAIN} =""
-  RewriteRule ^vendor/libraries/automattic/wordpress/wp-includes/js/(.*)$ /assets/scripts/$1 [R=301,L]
-
-  RewriteCond %{ENV:REDIRECT_SUBDOMAIN} =""
-  RewriteRule ^wp-includes/images/(.*)$ /assets/images/$1 [R=301,L]
-
-  RewriteCond %{ENV:REDIRECT_SUBDOMAIN} =""
+  RewriteRule ^wp-includes/js/(.*)$ /assets/scripts/$1 [QSA,L]
+  RewriteRule ^wp-includes/images/(.*)$ /assets/images/$1 [QSA,L]
   RewriteRule ^wp-includes/css/(.*)$ /assets/styles/$1 [R=301,L]
 
-  RewriteCond %{ENV:REDIRECT_SUBDOMAIN} =""
-  RewriteRule ^vendor/libraries/automattic/wordpress/wp-includes/css/(.*)$ /assets/styles/$1 [R=301,L]
+  RewriteRule ^assets/styles/(.*)$ /vendor/libraries/automattic/wordpress/wp-includes/css/$1 [QSA,L]
+  RewriteRule ^assets/scripts/(.*)$ /vendor/libraries/automattic/wordpress/wp-includes/js/$1 [QSA,L]
+  RewriteRule ^assets/images/(.*)$ /vendor/libraries/automattic/wordpress/wp-includes/images/$1 [QSA,L]
 
-  RewriteRule ^assets/styles/(.*)$ /vendor/libraries/automattic/wordpress/wp-includes/css/$1 [E=SUBDOMAIN:rdr,L]
-  RewriteRule ^assets/scripts/(.*)$ /vendor/libraries/automattic/wordpress/wp-includes/js/$1 [E=SUBDOMAIN:rdr,L]
-  RewriteRule ^assets/images/(.*)$ /vendor/libraries/automattic/wordpress/wp-includes/images/$1 [E=SUBDOMAIN:rdr,L]
 </IfModule>
 # Assets END
 
@@ -185,6 +171,7 @@
   RewriteRule ^application/$ /index.php [L]
   RewriteRule ^application/(config|defaults|lib)/(.*)$ /index.php [L]
 </IfModule>
+
 <FilesMatch "(^#.*#|\.(md|lock|yml|json|bak|config|dist|fla|inc|ini|log|psd|sh|sql|sw[op])|~)$">
   Order allow,deny
   Deny from all
@@ -240,15 +227,6 @@
 </IfModule>
 # Cache END
 
-# If we're using PHP-FPM
-<IfModule mod_proxy_fcgi.c>
-  <IfModule mod_rewrite.c>
-    RewriteCond %{REQUEST_FILENAME} ^.*\.php$
-    RewriteCond %{REQUEST_FILENAME} -f
-    RewriteRule ^(.*\.php(/.*)?)$ fcgi://127.0.0.1:9000/var/www/$1 [P,L]
-  </IfModule>
-</IfModule>
-
 # WordPress BEGIN
 <IfModule mod_rewrite.c>
   RewriteRule ^index\.php$ - [L]
@@ -256,16 +234,4 @@
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule . /index.php [L]
 </IfModule>
-
-# BEGIN WordPress
-<IfModule mod_rewrite.c>
-RewriteEngine On
-RewriteBase /
-RewriteRule ^index\.php$ - [L]
-RewriteRule ^store/images/(\d+)/?\??(.*)$ /wp-content/plugins/shopp/services/image.php?siid=$1&$2 [QSA,L]
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /index.php [L]
-</IfModule>
-
 # END WordPress
