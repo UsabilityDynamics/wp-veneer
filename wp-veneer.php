@@ -9,7 +9,7 @@
  * License: GPLv2 or later
  * Network: False
  *
- * The Loder class is self-initializing.
+ * The Loader class is self-initializing.
  *
  * @example
  *
@@ -22,7 +22,6 @@
  */
 
 // Include bootstrap.
-
 if( !class_exists( 'UsabilityDynamics\Veneer\Bootstrap' ) ) {
   include_once( __DIR__ . '/lib/class-bootstrap.php' );
 }
