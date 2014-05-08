@@ -103,6 +103,7 @@
   RewriteRule ^vendor/libraries/automattic/wordpress/wp-content/plugins/(.*)$ vendor/modules/$1 [QSA,L]
   RewriteRule ^wp-content/plugins/(.*)$ vendor/modules/$1 [QSA,L]
   RewriteRule ^modules/(.*)$ vendor/modules/$1 [QSA,L]
+  RewriteRule ^plugins/(.*)$ vendor/plugins/$1 [QSA,L]
 </IfModule>
 # Modules END
 
