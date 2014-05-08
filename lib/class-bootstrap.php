@@ -265,7 +265,24 @@ namespace UsabilityDynamics\Veneer {
 
         }
 
-        // die( '<pre>' . print_r( $this->get(), true ) . '</pre>' );
+
+        add_filter('template_directory', function( $path ) {
+          return $path;
+        }, 20 );
+
+        add_filter('stylesheet_directory', function( $path ) {
+          return $path;
+        }, 20 );
+
+        add_action('setup_theme', function() {
+          //die('setup_theme');
+
+          if( defined( 'WP_THEME_DIR' ) ) {
+            register_theme_directory( WP_THEME_DIR );
+          }
+
+        });
+
       }
 
       /**
