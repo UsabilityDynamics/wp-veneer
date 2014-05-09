@@ -459,7 +459,7 @@ namespace UsabilityDynamics\Veneer {
         global $post, $wp_query;
 
         // @note Trying to fix weird encoding issue in back-end <script> tag.
-        $buffer = str_replace( 'load-scripts.php?c=1&amp;load%5B%5D=', 'load-scripts.php?=c1&load=', $buffer );
+        $buffer = str_replace( '%5B%5D', '[]', $buffer );
 
         // @note thro exception to abort rest of ob_start from a filter.
         try { $buffer = apply_filters( 'wp-veneer:ob_start', $buffer, $this ); } catch( \Exception $e ) {
