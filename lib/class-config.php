@@ -194,15 +194,21 @@ namespace UsabilityDynamics\Veneer {
 
         /** Set some local variables */
         $base_dir = dirname( dirname( dirname( dirname( $base_dir ) ) ) );
-        $this->config_folders[] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/' . ENVIRONMENT . '/';
-        $this->config_folders[] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/';
 
         /** Bring in our local-debug file if we have it */
         if( is_file( $base_dir . '/local-debug.php' ) ){
           require_once( $base_dir . '/local-debug.php' );
         }
 
+        /** Bring in our environment file if we need to */
+        if( !defined( 'ENVIRONMENT' ) && is_file( $base_dir . '/.environment' ) ){
+          $environment = @file_get_contents( '.environment' );
+          define( 'ENVIRONMENT', trim( $environment ) );
+        }
+
         /** For these variables, make sure they exist */
+        $this->config_folders[] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/' . ENVIRONMENT . '/';
+        $this->config_folders[] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/';
         foreach( $this->config_folders as $key => $value ){
           if( !is_dir( $value ) ){
             unset( $this->config_folders[ $key ] );
