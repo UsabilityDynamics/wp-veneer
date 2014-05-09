@@ -2,15 +2,17 @@
  * Build Plugin
  *
  * @author potanin@UD
- * @version 1.1.2
+ * @version 1.1.4
  * @param grunt
  */
 module.exports = function build( grunt ) {
 
   grunt.initConfig( {
 
+    // Read Composer File.
     package: grunt.file.readJSON( 'composer.json' ),
 
+    // Generate Documentation.
     yuidoc: {
       compile: {
         name: '<%= package.name %>',
@@ -32,19 +34,21 @@ module.exports = function build( grunt ) {
           relativeUrls: true
         },
         files: {
-          'static/styles/veneer.min.css': [ 'static/styles/src/veneer.less' ]
+          'static/styles/veneer.css': [ 'static/styles/src/veneer.less' ],
+          'static/styles/login.css': [ 'static/styles/src/login.less' ]
         }
       },
       development: {
         options: {
+          yuicompress: false,
           relativeUrls: true
         },
         files: {
-          'static/styles/veneer.dev.css': [ 'static/styles/src/veneer.less' ]
         }
       }
     },
 
+    // Development Watch.
     watch: {
       options: {
         interval: 100,
@@ -64,18 +68,28 @@ module.exports = function build( grunt ) {
       }
     },
 
+    // Uglify Scripts.
     uglify: {
-      minified: {
+      production: {
         options: {
           preserveComments: false,
-          wrap: true
+          wrap: false,
+          mangle: {
+            except: [ 'jQuery', 'Bootstrap' ]
+          }
         },
-        files: {
-          'static/scripts/veneer.min.js': [ 'static/scripts/src/veneer.js' ]
-        }
+        files: [
+          {
+            expand: true,
+            cwd: 'static/scripts/src',
+            src: [ '*.js' ],
+            dest: 'static/scripts'
+          }
+        ]
       }
     },
 
+    // Generate Markdown.
     markdown: {
       all: {
         files: [
@@ -98,18 +112,25 @@ module.exports = function build( grunt ) {
       }
     },
 
-    shell: {
-      update: {
-        options: {
-          stdout: true
-        },
-        command: 'composer update --prefer-source'
-      }
+    // Clean for Development.
+    clean: {
+      all: [
+        "vendor",
+        "static/readme.md",
+        "composer.lock",
+        "static/styles/*.css",
+        "static/scripts/*.js"
+      ],
+      vendor: [
+        "composer.lock",
+        "vendor/*"
+      ]
     }
 
   });
 
   // Load tasks
+  grunt.loadNpmTasks( 'grunt-spritefiles' );
   grunt.loadNpmTasks( 'grunt-markdown' );
   grunt.loadNpmTasks( 'grunt-requirejs' );
   grunt.loadNpmTasks( 'grunt-contrib-yuidoc' );
@@ -117,15 +138,13 @@ module.exports = function build( grunt ) {
   grunt.loadNpmTasks( 'grunt-contrib-watch' );
   grunt.loadNpmTasks( 'grunt-contrib-less' );
   grunt.loadNpmTasks( 'grunt-contrib-concat' );
+  grunt.loadNpmTasks( 'grunt-contrib-clean' );
   grunt.loadNpmTasks( 'grunt-shell' );
 
-  // Register tasks
+  // Register default task
   grunt.registerTask( 'default', [ 'markdown', 'less' , 'yuidoc', 'uglify' ] );
 
   // Build Distribution
   grunt.registerTask( 'distribution', [] );
-
-  // Update Environment
-  grunt.registerTask( 'update', [ "shell:update" ] );
 
 };
