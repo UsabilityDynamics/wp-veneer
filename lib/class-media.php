@@ -254,6 +254,11 @@ namespace UsabilityDynamics\Veneer {
 
         }
 
+        if( get_option( 'upload_url_path' ) ) {
+          $settings[ 'url' ] = get_option( 'upload_url_path' );
+          $settings[ 'baseurl' ] = get_option( 'upload_url_path' );
+        }
+
         return $settings;
 
       }

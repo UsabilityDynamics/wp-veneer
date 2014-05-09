@@ -172,12 +172,15 @@ namespace UsabilityDynamics\Veneer {
         if( filter_var( $uri, FILTER_VALIDATE_URL ) === true ){
           return $uri;
         }
+
         /** If the URL has the base directory */
         if( defined( 'WP_BASE_DIR' ) && stripos( $uri, WP_BASE_DIR ) !== false ){
           $uri = rtrim( $siteurl, '/' ) . '/' . trim( str_ireplace( WP_BASE_DIR, '', $uri ), '/' );
         }
+
         /** Return default */
         return $uri;
+
       }
 
       /**
@@ -317,7 +320,6 @@ namespace UsabilityDynamics\Veneer {
         global $wp_veneer;
 
 
-        $url = str_replace( $wp_veneer->network, $wp_veneer->site, $url );
         $url = str_replace( $wp_veneer->network, $wp_veneer->site, $url );
 
         return $url;
@@ -498,7 +500,7 @@ namespace UsabilityDynamics\Veneer {
         /** Strip filename and get just the path */
         if( strpos( $plugin, '.php' ) ) {
           $plugin = dirname( $plugin );
-        }        
+        }
 
         /** First, if we have $plugin and $path defined, we use both */
         if( $path && $plugin && defined( 'WP_BASE_DIR' ) ){
@@ -513,7 +515,7 @@ namespace UsabilityDynamics\Veneer {
         }
 
         /**
-         * HACKY Fix because composer doesn't install directories with underscores 
+         * HACKY Fix because composer doesn't install directories with underscores
          */
         switch( true ){
           case stripos( $url, 'modules/simple_email_subscriber' ) !== false:
