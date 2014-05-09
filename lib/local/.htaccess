@@ -139,6 +139,8 @@
 <IfModule mod_rewrite.c>
 
   # Just do a standard rewrite for plugins to vendor conversion
+  RewriteRule ^modules(.*)$ vendor/modules$1 [QSA,L]
+  RewriteRule ^plugins(.*)$ vendor/plugins$1 [QSA,L]
   RewriteRule ^wp-content/plugins/(.*)$ vendor/plugins/$1 [L]
 
 </IfModule>
@@ -148,6 +150,7 @@
 <IfModule mod_rewrite.c>
 
   # Just do a standard rewrite for wp-content to vendor conversion
+  RewriteRule ^themes(.*)$ vendor/themes$1 [QSA,L]
   RewriteRule ^wp-content/themes/(.*)$ vendor/themes/$1 [L]
 
 </IfModule>
