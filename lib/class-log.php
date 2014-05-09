@@ -44,9 +44,13 @@ namespace UsabilityDynamics\Veneer {
       /**
        * Initialize Log
        *
-       * @for Log
+       * @param boolean $do_stuff If we should actually process (used by 'init')
+       * @returns Log $this
        */
-      public function __construct() {
+      public function __construct( $do_stuff = true ){
+        if( !$do_stuff ){
+          return $this;
+        }
         /** Bring in a copy of the wp cluster object */
         global $current_blog;
         /** Setup the GUID */
@@ -78,6 +82,8 @@ namespace UsabilityDynamics\Veneer {
         /** Default info */
         $this->logger->addDebug( 'GUID: ' . $this->guid );
         $this->logger->addDebug( 'Logging initialized...' );
+        /** Return this */
+        return $this;
       }
 
       /**
@@ -94,6 +100,13 @@ namespace UsabilityDynamics\Veneer {
           $uuid = substr( $charid, 0, 8 ) . $hyphen . substr( $charid, 8, 4 ) . $hyphen . substr( $charid, 12, 4 ) . $hyphen . substr( $charid, 16, 4 ) . $hyphen . substr( $charid, 20, 12 );
           return strtolower( $uuid );
         }
+      }
+
+      /**
+       * This function lets us chain methods without having to instantiate first, YOU MUST COPY THIS TO ALL SUB CLASSES
+       */
+      static public function init(){
+        return new self( false );
       }
 
     }
