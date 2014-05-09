@@ -140,7 +140,7 @@
 
   # Just do a standard rewrite for plugins to vendor conversion
   RewriteRule ^libraries/(.*)$ vendor/libraries/$1 [QSA,L]
-  RewriteRule ^modules(.*)$ vendor/modules$1 [QSA,L]
+  #RewriteRule ^modules(.*)$ vendor/modules$1 [QSA,L]
   RewriteRule ^plugins(.*)$ vendor/plugins$1 [QSA,L]
   RewriteRule ^wp-content/plugins/(.*)$ vendor/plugins/$1 [L]
 

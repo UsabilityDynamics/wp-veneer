@@ -34,8 +34,8 @@ module.exports = function build( grunt ) {
           relativeUrls: true
         },
         files: {
-          'static/styles/veneer.css': [ 'static/styles/src/veneer.less' ],
-          'static/styles/login.css': [ 'static/styles/src/login.less' ]
+          'static/styles/wp-veneer.css': [ 'static/styles/src/wp-veneer.less' ],
+          'static/styles/wp-veneer-login.css': [ 'static/styles/src/wp-veneer-login.less' ]
         }
       },
       development: {
