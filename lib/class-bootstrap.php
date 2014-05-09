@@ -165,6 +165,13 @@ namespace UsabilityDynamics\Veneer {
       public $_rewrites = null;
 
       /**
+       * Plugins handler
+       *
+       * @public
+       */
+      public $_plugins = null;
+
+      /**
        * Singleton Instance Reference.
        *
        * @public
@@ -207,8 +214,8 @@ namespace UsabilityDynamics\Veneer {
           _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized before "init" filter.', '0.6.1' );
         }
 
-        /** Setup our various requirements */
-        $this->log = new Log();
+        /** Initialize Components. */
+        $this->_components();
 
         // Requires $this->site to be defined, therefore being ignored on single-site installs.
         if( defined( 'MULTISITE' ) && MULTISITE && $wpdb->site ) {
@@ -234,9 +241,6 @@ namespace UsabilityDynamics\Veneer {
 
         // Initialize Settings.
         $this->_settings();
-
-        // Initialize Components.
-        $this->_components();
 
         // Initialize Interfaces.
         $this->_interfaces();
@@ -658,6 +662,21 @@ namespace UsabilityDynamics\Veneer {
        */
       private function _components() {
 
+        // Init our logging mechanism
+        if( class_exists( 'UsabilityDynamics\Veneer\Log' ) ) {
+          $this->_log = Log::init()->__construct();
+        }
+
+        // Init the api
+        if( class_exists( 'UsabilityDynamics\Veneer\API' ) ) {
+          $this->_api = API::init()->__construct();
+        }
+
+        // Init the plugin handler
+        if( class_exists( 'UsabilityDynamics\Veneer\Plugins' ) ) {
+          $this->_plugins = Plugins::init()->__construct();
+        }
+
         // Initialize W3 Total Cachen Handlers.
         if( class_exists( 'UsabilityDynamics\Veneer\W3' ) ) {
           $this->_cache =     new W3( $this->get( 'cache' ) );
@@ -827,6 +846,33 @@ namespace UsabilityDynamics\Veneer {
 
     }
 
+  }
+
+  /**
+   * Ok, create our shorthand function to get the veneer object
+   */
+  if( !class_exists( 'Veneeer' ) ){
+    class Veneer{
+      /**
+       * Get the Veneer Singleton
+       *
+       * Concept based on the CodeIgniter get_instance() concept.
+       *
+       * @example
+       *
+       *      var settings = Veneer::get_instance()->Settings;
+       *      var api = Veneer::$instance()->API;
+       *
+       * @static
+       * @return object
+       *
+       * @method get_instance
+       * @for Veneer
+       */
+      public static function &get_instance() {
+        return Bootstrap::$instance;
+      }
+    }
   }
 
 }
