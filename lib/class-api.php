@@ -69,9 +69,12 @@ namespace UsabilityDynamics\Veneer {
           'version' => ''
         ) );
         /** Call our function to install the plugins */
-        $return = call_user_func_array( array( Veneer::get_instance()->_plugins, 'installPlugin' ), array( $args ) );
+        // $return = call_user_func_array( array( Veneer::get_instance()->_plugins, 'installPlugin' ), array( $args ) );
         /** @todo WIP! */
-        prq( $return );
+        self::send( array(
+          'ok' => false,
+          'message' => 'This function needs to be completed.'
+        ) );
       }
 
       /**
