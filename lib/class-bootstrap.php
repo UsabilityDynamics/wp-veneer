@@ -185,14 +185,30 @@ namespace UsabilityDynamics\Veneer {
        * @method __construct
        */
       public function __construct() {
-        global $wpdb, $current_site, $current_blog, $wp_veneer, $wp_cluster;
+        global $wpdb, $current_site, $current_blog, $wp_veneer;
 
-        // Save context reference.
+        /** Return Singleton Instance */
+        if( self::$instance ) {
+          return self::$instance;
+        }
+
+        /** If we currently have a wp_veener object, we should copy it */
+        if( isset( $wp_veneer ) && is_object( $wp_veneer ) && count( get_object_vars( $wp_veneer ) ) ){
+          foreach( array_keys( get_object_vars( $wp_veneer ) ) as $key ){
+            $this->{$key} = $wp_veneer->{$key};
+          }
+        }
+
+        /** Set the singleton instance */
         $wp_veneer = self::$instance = &$this;
 
+        /** Make sure we're not too late to init this */
         if( did_action( 'init' ) ) {
           _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized before "init" filter.', '0.6.1' );
         }
+
+        /** Setup our various requirements */
+        $this->log = new Log();
 
         // Requires $this->site to be defined, therefore being ignored on single-site installs.
         if( defined( 'MULTISITE' ) && MULTISITE && $wpdb->site ) {
