@@ -7,7 +7,9 @@
  */
 namespace UsabilityDynamics\Veneer {
 
+  use UsabilityDynamics as UD;
   use Monolog\Logger;
+  use Monolog\Handler\StreamHandler;
   use Monolog\Handler\SyslogHandler;
   use Monolog\Formatter\LineFormatter;
   use Monolog\ErrorHandler;
@@ -37,7 +39,7 @@ namespace UsabilityDynamics\Veneer {
       /**
        * The line format we'll be using
        */
-      private $line_format = '%channel% - %level_name% - %datetime% - %message%';
+      private $line_format = '%channel% - %datetime% - %level_name% - %message%';
 
       /**
        * Initialize Log
@@ -46,18 +48,27 @@ namespace UsabilityDynamics\Veneer {
        */
       public function __construct() {
         /** Bring in a copy of the wp cluster object */
-        global $wp_veneer;
-        $this->cluster =& $wp_veneer->cluster;
+        global $current_blog;
         /** Setup the GUID */
         $this->guid = $this->create_guid();
         /** Setup the logger */
         $this->logger = new Logger( $this->guid );
         /** Build our line formatter */
-        $this->line_format = $this->cluster->domain . ' - ' . $this->line_format . PHP_EOL;
+        $this->line_format = $current_blog->domain . ' - ' . $this->line_format . PHP_EOL;
         /** Setup the formatter */
         $this->formatter = new LineFormatter( $this->line_format );
-        /** Ok, now we can create/add our handler */
-        $this->handler = new SyslogHandler( self::CHANNEL, self::FACILITY, Logger::DEBUG );
+        /** Add our handler */
+        switch( true ){
+          case defined( 'WP_LOGS_HANDLER' ) && WP_LOGS_HANDLER == 'syslog':
+            /** Syslog handler */
+            $this->handler = new SyslogHandler( self::CHANNEL, self::FACILITY, Logger::DEBUG );
+            break;
+          case !defined( 'WP_LOGS_HANDLER' ):
+          default:
+            /** File handler */
+            $this->handler = new StreamHandler( rtrim( WP_LOGS_DIR, '/' ) . '/' . WP_LOGS_FILE, Logger::DEBUG );
+            break;
+        }
         /** Implement the formatter */
         $this->handler->setFormatter( $this->formatter );
         /** Now, bring in our file handler */
