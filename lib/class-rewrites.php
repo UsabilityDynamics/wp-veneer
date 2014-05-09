@@ -162,16 +162,18 @@ namespace UsabilityDynamics\Veneer {
        * Fixing issue where theme resides outside any known directories
        */
       public function theme_root_uri( $uri, $siteurl, $tofind ){
+
         /** If we don't have the custom location defined, bail */
         if( !defined( 'WP_THEME_STORAGE_DIR' ) ){
           return $uri;
         }
+
         /** If the URI is actually a valid URL, bail */
         if( filter_var( $uri, FILTER_VALIDATE_URL ) === true ){
           return $uri;
         }
         /** If the URL has the base directory */
-        if( stripos( $uri, WP_BASE_DIR ) !== false ){
+        if( defined( 'WP_BASE_DIR' ) && stripos( $uri, WP_BASE_DIR ) !== false ){
           $uri = rtrim( $siteurl, '/' ) . '/' . trim( str_ireplace( WP_BASE_DIR, '', $uri ), '/' );
         }
         /** Return default */
@@ -183,7 +185,7 @@ namespace UsabilityDynamics\Veneer {
        */
       function cfct_build_module_urls( $urls ){
         foreach( $urls as &$url ){
-          if( stripos( $url, WP_BASE_DIR ) === 0 ){
+          if( defined( 'WP_BASE_DIR' ) && stripos( $url, WP_BASE_DIR ) === 0 ){
             $url = str_ireplace( WP_BASE_DIR, WP_BASE_URL, $url );
           }
         }
@@ -491,6 +493,8 @@ namespace UsabilityDynamics\Veneer {
       public static function plugins_url( $url, $path, $plugin ) {
         global $wp_veneer;
 
+        $path = wp_normalize_path( $path );
+
         /** Strip filename and get just the path */
         if( strpos( $plugin, '.php' ) ) {
           $plugin = dirname( $plugin );
@@ -514,7 +518,7 @@ namespace UsabilityDynamics\Veneer {
         switch( true ){
           case stripos( $url, 'modules/simple_email_subscriber' ) !== false:
             $url = str_ireplace( 'modules/simple_email_subscriber', 'modules/simple-email-subscriber', $url );
-            break;
+          break;
         }
 
         /** Ensure a valid site name */
