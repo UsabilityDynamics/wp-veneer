@@ -26,55 +26,70 @@ namespace UsabilityDynamics\Veneer {
        * @version 0.1.5
        * @for API
        */
-      public function __construct(){
-        if( is_callable( array( 'parent', '__construct' ) ) ){
+      public function __construct() {
+        if( is_callable( array( 'parent', '__construct' ) ) ) {
           parent::__construct();
         }
         /** Let's go ahead and add our routes */
-        add_action( 'plugins_loaded', array( $this, 'create_routes' ) );
+        add_action( 'plugins_loaded', array( $this, 'create_routes' ));
+
         /** Return this */
+
         return $this;
       }
 
       /**
        * This function lets us chain methods without having to instantiate first, YOU MUST COPY THIS TO ALL SUB CLASSES
        */
-      static public function init(){
+      static public function init() {
         return new self( __DIR__, false );
       }
 
       /**
        * Creates our routes
        */
-      public function create_routes(){
-        if( is_callable( array( 'parent', 'create_routes' ) ) ){
+      public function create_routes() {
+
+        if( is_callable( array( 'parent', 'create_routes' ) ) ) {
           parent::create_routes();
         }
+
         /** @url http://{domain}/wp-veneer/api/v1/migrate */
-        self::define( '/v1/migrate', array( $this, 'migrateSite' ) );
-        /** @url http://{domain}/wp-veneer/api/v1/install/plugin */
-        self::define( '/v1/install/plugin', array( $this, 'installPlugin' ), array(
+        self::define( '/system/v1/migrate', array(
           'parameters' => array( 'name', 'version' ),
-          'scopes' => array( 'install_plugins', 'activate_plugins' )
-        ) );
+          'scopes'     => array( 'install_plugins', 'activate_plugins' ),
+          'handler'    => array( $this, 'migrateSite' )
+        ));
+
+        /** @url http://{domain}/wp-veneer/api/v1/install/plugin */
+        self::define( '/system/v1/install', array(
+          'parameters' => array( 'name', 'version' ),
+          'scopes'     => array( 'install_plugins', 'activate_plugins' ),
+          'handler'    => array( $this, 'installPlugin' )
+        ));
+
       }
 
       /**
        * Install a specific plugin
        */
-      public function installPlugin(){
+      public function installPlugin() {
+        
         /** Setup our args */
         $args = (array) Utility::parse_args( $_GET, array(
-          'name' => '',
+          'name'    => '',
           'version' => ''
-        ) );
+        ));
+        
         /** Call our function to install the plugins */
-        // $return = call_user_func_array( array( Veneer::get_instance()->_plugins, 'installPlugin' ), array( $args ) );
+        // $return = call_user_func_array( array( Veneer::get_instance()->_plugins, 'installPlugin' ), array( $args ));
+        
         /** @todo WIP! */
         self::send( array(
-          'ok' => false,
+          'ok'      => false,
           'message' => 'This function needs to be completed.'
-        ) );
+        ));
+        
       }
 
       /**
@@ -84,29 +99,12 @@ namespace UsabilityDynamics\Veneer {
         global $wpdb, $current_site, $current_blog;
 
         if( !current_user_can( 'manage_options' ) ) {
-          wp_send_json(array( 'ok' => false, 'message' => __( 'Invalid capabilities.' ) ));
+          wp_send_json( array( 'ok' => false, 'message' => __( 'Invalid capabilities.' ) ));
+
           return;
         }
 
-        $activePlugins = array(
-          'gravityforms',
-          'brightcove-video-cloud',
-          'google-analytics-for-wordpress',
-          'real-user-monitoring-by-pingdom',
-          'wordpress-seo',
-          'wp-pagenavi',
-          'public-post-preview',
-          'wpmandrill',
-          'regenerate-thumbnails',
-          'video',
-          'jetpack',
-          'widget-css-classes',
-          'w3-total-cache',
-          'wp-rpc',
-          'wp-elastic',
-          'sitepress-multilingual-cms',
-          'wpml-translation-management'
-        );
+        $activePlugins = array();
 
         $_results = array();
 
@@ -125,7 +123,7 @@ namespace UsabilityDynamics\Veneer {
         self::send( array(
           'message' => __( 'Sstem upgrade ran.' ),
           'results' => $_results
-        ) );
+        ));
 
       }
 
