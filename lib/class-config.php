@@ -246,8 +246,13 @@ namespace UsabilityDynamics\Veneer {
   if( !defined( 'WP_BASE_DOMAIN' ) && !defined( 'WP_DEBUG' ) && !defined( 'AUTH_KEY' ) ){
     global $wp_veneer;
     /** Init our config object */
-    $wp_veneer = new \stdClass();
-    $wp_veneer->_config = Config::init()->__construct();
+    if( !is_object( $wp_veneer ) ){
+      $wp_veneer = new \stdClass();
+    }
+    /** Add to our object, if we don't have the config object */
+    if( !isset( $wp_veneer->config ) ){
+      $wp_veneer->config = new Config();
+    }
     /** Is this needed? */
     $table_prefix = defined( 'DB_PREFIX' ) ? DB_PREFIX : 'wp_';
     /** Now that we've done that, lets include our wp settings file, as per normal operations */

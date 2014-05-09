@@ -274,14 +274,13 @@ namespace UsabilityDynamics\Veneer {
           return $path;
         }, 20 );
 
-        add_action('setup_theme', function() {
 
-          register_theme_directory( ABSPATH . 'wp-content/themes' );
-          if( defined( 'WP_THEME_DIR' ) ) {
-            register_theme_directory( WP_THEME_DIR );
-          }
+        register_theme_directory( ABSPATH . 'wp-content/themes' );
+        if( defined( 'WP_THEME_DIR' ) ) {
+          register_theme_directory( WP_THEME_DIR );
+        }
 
-        });
+
 
       }
 
