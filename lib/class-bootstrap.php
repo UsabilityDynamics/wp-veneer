@@ -292,8 +292,11 @@ namespace UsabilityDynamics\Veneer {
 
 
         register_theme_directory( ABSPATH . 'wp-content/themes' );
-        if( defined( 'WP_THEME_DIR' ) ) {
+        if( defined( 'WP_THEME_DIR' ) && is_dir( WP_THEME_DIR ) ){
           register_theme_directory( WP_THEME_DIR );
+        }
+        if( defined( 'WP_VENEER_THEME_DIR' ) && is_dir( WP_VENEER_THEME_DIR ) ){
+          register_theme_directory( WP_VENEER_THEME_DIR );
         }
 
 
