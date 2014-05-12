@@ -316,8 +316,6 @@ namespace UsabilityDynamics\Veneer {
       public static function content_url( $url ) {
         global $wp_veneer;
 
-
-        $url = str_replace( $wp_veneer->network, $wp_veneer->site, $url );
         $url = str_replace( $wp_veneer->network, $wp_veneer->site, $url );
 
         return $url;
@@ -497,18 +495,18 @@ namespace UsabilityDynamics\Veneer {
 
         /** Strip filename and get just the path */
         if( strpos( $plugin, '.php' ) ) {
-          $plugin = dirname( $plugin );
+          $plugin = wp_normalize_path( dirname( $plugin ) );
         }        
 
         /** First, if we have $plugin and $path defined, we use both */
         if( $path && $plugin && defined( 'WP_BASE_DIR' ) ){
-          $url = str_ireplace( WP_BASE_DIR, '', $plugin );
+          $url = str_ireplace( wp_normalize_path( WP_BASE_DIR ), '', $plugin );
           $url = rtrim( site_url( $url ), '/' ) . '/' . ltrim( $path, '/' );
         }
 
         /** Now, if we just have the path, then use that only */
         if( $path && !$plugin && defined( 'WP_BASE_DIR' ) ) {
-          $url = str_ireplace( WP_BASE_DIR, '', WP_PLUGIN_DIR );
+          $url = str_ireplace( wp_normalize_path( WP_BASE_DIR ), '', wp_normalize_path( WP_PLUGIN_DIR ) );
           $url = rtrim( site_url( $url ), '/' ) . '/' . ltrim( $path, '/' );
         }
 
@@ -523,7 +521,10 @@ namespace UsabilityDynamics\Veneer {
 
         /** Ensure a valid site name */
         $url = str_replace( array( $wp_veneer->network ), array( $wp_veneer->site ), $url );
-
+        
+        /** Fix for Win system */
+        $url = str_replace( '\\', '/', $url );
+        
         return $url;
 
       }
