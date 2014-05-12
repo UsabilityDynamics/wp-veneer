@@ -200,35 +200,35 @@ namespace UsabilityDynamics\Veneer {
         }
 
         /** If we currently have a wp_veener object, we should copy it */
-        if( isset( $wp_veneer ) && is_object( $wp_veneer ) && count( get_object_vars( $wp_veneer ) ) ){
-          foreach( array_keys( get_object_vars( $wp_veneer ) ) as $key ){
+        if( isset( $wp_veneer ) && is_object( $wp_veneer ) && count( get_object_vars( $wp_veneer ) ) ) {
+          foreach( array_keys( get_object_vars( $wp_veneer ) ) as $key ) {
             $this->{$key} = $wp_veneer->{$key};
           }
         }
 
         /** Set the singleton instance */
-        $wp_veneer = self::$instance = &$this;
+        $wp_veneer = self::$instance = & $this;
 
         /** Make sure we're not too late to init this */
         if( did_action( 'init' ) ) {
           _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized before "init" filter.', '0.6.1' );
         }
 
-        /** Initialize Components. */
-        $this->_components();
-
         // Requires $this->site to be defined, therefore being ignored on single-site installs.
         if( defined( 'MULTISITE' ) && MULTISITE && $wpdb->site ) {
-          $this->site     = $wpdb->get_var( "SELECT domain FROM {$wpdb->blogs} WHERE blog_id = '{$wpdb->blogid}' LIMIT 1" );
-          $this->network  = $wpdb->get_var( "SELECT domain FROM {$wpdb->site} WHERE id = {$wpdb->siteid}" );
+          $this->site    = $wpdb->get_var( "SELECT domain FROM {$wpdb->blogs} WHERE blog_id = '{$wpdb->blogid}' LIMIT 1" );
+          $this->network = $wpdb->get_var( "SELECT domain FROM {$wpdb->site}  WHERE id = {$wpdb->siteid}" );
         } else {
-          $this->site     = str_replace( array( 'http://', 'https://' ), '', get_bloginfo( 'url' ) );
-          $this->network  = str_replace( array( 'http://', 'https://' ), '', get_bloginfo( 'url' ) );
-          $this->apex     = str_replace( array( 'http://', 'https://' ), '', get_bloginfo( 'url' ) );
+          $this->site    = str_replace( array( 'http://', 'https://' ), '', get_bloginfo( 'url' ) );
+          $this->network = str_replace( array( 'http://', 'https://' ), '', get_bloginfo( 'url' ) );
+          $this->apex    = str_replace( array( 'http://', 'https://' ), '', get_bloginfo( 'url' ) );
         }
 
-        $this->site_id = $wpdb->blogid;
+        $this->site_id = $wpdb->siteid;
         $this->apex    = isset( $current_blog->apex ) ? $current_blog->apex : $apex = str_replace( "www.", '', $this->site );
+
+        /** Initialize Components. */
+        $this->_components();
 
         add_action( 'init', array( $this, 'init' ) );
         add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -236,8 +236,6 @@ namespace UsabilityDynamics\Veneer {
         add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
 
         add_filter( 'theme_root', array( $this, 'theme_root' ), 10 );
-
-        // add_filter( 'wp_cache_themes_persistently', function( $current, $callee ) { return 43200;  }, 10, 2);
 
         // Initialize Settings.
         $this->_settings();
@@ -262,10 +260,10 @@ namespace UsabilityDynamics\Veneer {
             $_public_path = $_public_path . trailingslashit( $this->site );
           }
 
-          $this->set( 'media.path.disk',    $_public_path . 'media' );
-          $this->set( 'assets.path.disk',   $_public_path . 'assets' );
-          $this->set( 'scripts.path.disk',  $_public_path . 'assets/scripts' );
-          $this->set( 'styles.path.disk',   $_public_path . 'assets/styles' );
+          $this->set( 'media.path.disk', $_public_path . 'media' );
+          $this->set( 'assets.path.disk', $_public_path . 'assets' );
+          $this->set( 'scripts.path.disk', $_public_path . 'assets/scripts' );
+          $this->set( 'styles.path.disk', $_public_path . 'assets/styles' );
 
           if( $this->get( 'media.path.disk' ) && !wp_mkdir_p( $this->get( 'media.path.disk' ) ) ) {
             $this->set( 'media.available', false );
@@ -285,25 +283,17 @@ namespace UsabilityDynamics\Veneer {
 
         }
 
+        if( is_dir( ABSPATH . 'wp-content/themes' ) ) {
+          register_theme_directory( ABSPATH . 'wp-content/themes' );
+        }
 
-        add_filter('template_directory', function( $path ) {
-          return $path;
-        }, 20 );
-
-        add_filter('stylesheet_directory', function( $path ) {
-          return $path;
-        }, 20 );
-
-
-        register_theme_directory( ABSPATH . 'wp-content/themes' );
-        if( defined( 'WP_THEME_DIR' ) && is_dir( WP_THEME_DIR ) ){
+        if( defined( 'WP_THEME_DIR' ) && is_dir( WP_THEME_DIR ) ) {
           register_theme_directory( WP_THEME_DIR );
         }
-        if( defined( 'WP_VENEER_THEME_DIR' ) && is_dir( WP_VENEER_THEME_DIR ) ){
+
+        if( defined( 'WP_VENEER_THEME_DIR' ) && is_dir( WP_VENEER_THEME_DIR ) ) {
           register_theme_directory( WP_VENEER_THEME_DIR );
         }
-
-
 
       }
 
@@ -315,7 +305,9 @@ namespace UsabilityDynamics\Veneer {
        * @since 0.6.2
        * @author potanin@UD
        * @method theme_root
+       *
        * @param $theme_root
+       *
        * @return mixed
        */
       public function theme_root( $theme_root = '' ) {
@@ -383,6 +375,7 @@ namespace UsabilityDynamics\Veneer {
         }
 
       }
+
       /**
        * Outline Scripts and Styles.
        *
@@ -408,7 +401,7 @@ namespace UsabilityDynamics\Veneer {
 
           // @todo Write extracted Scripts to an /asset file to be served.
           foreach( $scripts as $script ) {
-            $_output[] = $script;
+            $_output[ ] = $script;
           }
 
           // Remove all found <script> tags.
@@ -438,11 +431,11 @@ namespace UsabilityDynamics\Veneer {
         $etagHeader     = ( isset( $_SERVER[ "HTTP_IF_NONE_MATCH" ] ) ? trim( $_SERVER[ "HTTP_IF_NONE_MATCH" ] ) : false );
 
         $meta = array(
-          'etag' => md5( time() ),
-          'x-server' => 'wp-veneer/v' . self::$version,
-          'public' => 'true',
+          'etag'          => md5( time() ),
+          'x-server'      => 'wp-veneer/v' . self::$version,
+          'public'        => 'true',
           'cache-control' => 'max-age=3600, must-revalidate',
-          'last-modified' => gmdate( "D, d M Y H:i:s", time() )." GMT"
+          'last-modified' => gmdate( "D, d M Y H:i:s", time() ) . " GMT"
         );
 
         foreach( (array) $meta as $key => $value ) {
@@ -466,7 +459,9 @@ namespace UsabilityDynamics\Veneer {
         $buffer = str_replace( '%5B%5D', '[]', $buffer );
 
         // @note thro exception to abort rest of ob_start from a filter.
-        try { $buffer = apply_filters( 'wp-veneer:ob_start', $buffer, $this ); } catch( \Exception $e ) {
+        try {
+          $buffer = apply_filters( 'wp-veneer:ob_start', $buffer, $this );
+        } catch( \Exception $e ) {
           return $buffer;
         }
 
@@ -501,7 +496,7 @@ namespace UsabilityDynamics\Veneer {
         }
 
         // Bypass non-get requests.
-        if( $_SERVER[ 'REQUEST_METHOD' ] !== 'GET'  ) {
+        if( $_SERVER[ 'REQUEST_METHOD' ] !== 'GET' ) {
           return $buffer;
         }
 
@@ -512,7 +507,7 @@ namespace UsabilityDynamics\Veneer {
 
         // Media Domain Sharding.
         if( $this->get( 'media.shard.enabled' ) ) {
-          $buffer = str_replace( "//{$this->site}/" . $this->get( 'media.path.public' ) . "/",  "//" . $this->get( 'media.shard.subdomain' ) . ".{$this->apex}/", $buffer );
+          $buffer = str_replace( "//{$this->site}/" . $this->get( 'media.path.public' ) . "/", "//" . $this->get( 'media.shard.subdomain' ) . ".{$this->apex}/", $buffer );
         }
 
         // Asset Domain Sharding.
@@ -613,23 +608,23 @@ namespace UsabilityDynamics\Veneer {
           "active" => false,
           "host"   => "localhost",
           "key"    => null
-        ));
+        ) );
 
         // CDN Service Settings.
         $this->set( 'media', array(
-          "relative"  => true
-        ));
+          "relative" => true
+        ) );
 
         // CDN Service Settings.
         $this->set( 'cdn', array(
-          "provider"  => array(
+          "provider" => array(
             "active"   => false,
             "provider" => "cf",
             "key"      => null,
             "secret"   => null,
             "bucket"   => null
           )
-        ));
+        ) );
 
         $this->set( 'static.enabled', true );
         $this->set( 'cdn.enabled', true );
@@ -679,22 +674,22 @@ namespace UsabilityDynamics\Veneer {
 
         // Initialize W3 Total Cachen Handlers.
         if( class_exists( 'UsabilityDynamics\Veneer\W3' ) ) {
-          $this->_cache =     new W3( $this->get( 'cache' ) );
+          $this->_cache = new W3( $this->get( 'cache' ) );
         }
 
         // Enable CDN Media.
         if( class_exists( 'UsabilityDynamics\Veneer\Media' ) ) {
-          $this->_media =     new Media( $this->get( 'media' ) );
+          $this->_media = new Media( $this->get( 'media' ) );
         }
 
         // Enable Varnish.
         if( class_exists( 'UsabilityDynamics\Veneer\Varnish' ) ) {
-          $this->_varnish =   new Varnish( $this->get( 'varnish' ) );
+          $this->_varnish = new Varnish( $this->get( 'varnish' ) );
         }
 
         // Enable URL Rewrites.
         if( class_exists( 'UsabilityDynamics\Veneer\Rewrites' ) ) {
-          $this->_rewrites =  new Rewrites( $this->get( 'rewrites' ) );
+          $this->_rewrites = new Rewrites( $this->get( 'rewrites' ) );
         }
 
       }
@@ -750,9 +745,9 @@ namespace UsabilityDynamics\Veneer {
         }
 
         $wp_admin_bar->add_menu( array(
-          'id'    => 'veneer',
-          'parent'    => 'top-secondary',
-          'meta'  => array(
+          'id'     => 'veneer',
+          'parent' => 'top-secondary',
+          'meta'   => array(
             'html'     => '<div class="veneer-toolbar-info"></div>',
             'target'   => '',
             'onclick'  => '',
@@ -760,9 +755,9 @@ namespace UsabilityDynamics\Veneer {
             'tabindex' => 10,
             'class'    => 'veneer-toolbar'
           ),
-          'title' => 'Veneer',
-          'href'  => network_admin_url( 'admin.php?page=veneer' )
-        ));
+          'title'  => 'Veneer',
+          'href'   => network_admin_url( 'admin.php?page=veneer' )
+        ) );
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
@@ -770,7 +765,7 @@ namespace UsabilityDynamics\Veneer {
           'meta'   => array(),
           'title'  => 'PageSpeed',
           'href'   => network_admin_url( 'admin.php?page=veneer#panel=cdn' )
-        ));
+        ) );
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
@@ -778,7 +773,7 @@ namespace UsabilityDynamics\Veneer {
           'meta'   => array(),
           'title'  => 'CloudFront',
           'href'   => network_admin_url( 'admin.php?page=veneer#panel=cdn' )
-        ));
+        ) );
 
         $wp_admin_bar->add_menu( array(
           'parent' => 'veneer',
@@ -786,7 +781,7 @@ namespace UsabilityDynamics\Veneer {
           'meta'   => array(),
           'title'  => 'Varnish',
           'href'   => network_admin_url( 'admin.php?page=veneer#panel=cdn' )
-        ));
+        ) );
 
       }
 
@@ -851,8 +846,8 @@ namespace UsabilityDynamics\Veneer {
   /**
    * Ok, create our shorthand function to get the veneer object
    */
-  if( !class_exists( 'Veneeer' ) ){
-    class Veneer{
+  if( !class_exists( 'Veneeer' ) ) {
+    class Veneer {
       /**
        * Get the Veneer Singleton
        *

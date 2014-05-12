@@ -496,7 +496,7 @@ namespace UsabilityDynamics\Veneer {
         /** Strip filename and get just the path */
         if( strpos( $plugin, '.php' ) ) {
           $plugin = wp_normalize_path( dirname( $plugin ) );
-        }        
+        }
 
         /** First, if we have $plugin and $path defined, we use both */
         if( $path && $plugin && defined( 'WP_BASE_DIR' ) ){

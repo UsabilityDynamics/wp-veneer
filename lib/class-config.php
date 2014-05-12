@@ -200,6 +200,11 @@ namespace UsabilityDynamics\Veneer {
           require_once( $base_dir . '/local-debug.php' );
         }
 
+        /** If we've got WP_CLI, we need to fix the base dir */
+        if( defined( 'WP_CLI' ) && WP_CLI ){
+          $_SERVER[ 'DOCUMENT_ROOT' ] = $base_dir;
+        }
+
         /** Bring in our environment file if we need to */
         if( !defined( 'ENVIRONMENT' ) && is_file( $base_dir . '/.environment' ) ){
           $environment = @file_get_contents( '.environment' );
@@ -232,7 +237,12 @@ namespace UsabilityDynamics\Veneer {
           }
         }
         /** Finally, go through the composer.json file and add all the configs there */
-        foreach( $_composer = (array) json_decode( file_get_contents( $_SERVER[ 'DOCUMENT_ROOT' ] . '/composer.json' ) )->settings as $key => $value ) {
+        if( is_file( $_SERVER[ 'DOCUMENT_ROOT' ] . '/composer.json' ) ){
+          $composer_file = $_SERVER[ 'DOCUMENT_ROOT' ] . '/composer.json';
+        }else if( is_file( $base_dir . '/composer.json' ) ){
+          $composer_file = $base_dir . '/composer.json';
+        }
+        foreach( $_composer = (array) json_decode( file_get_contents( $composer_file ) )->settings as $key => $value ) {
           if( !defined( strtoupper( $key ) ) ){
             define( strtoupper( $key ), strpos( $value, '/' ) === 0 && realpath( $_SERVER[ 'DOCUMENT_ROOT' ] . $value ) ? realpath( $_SERVER[ 'DOCUMENT_ROOT' ] . $value ) : $value );
           }
