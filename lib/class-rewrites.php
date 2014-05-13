@@ -90,9 +90,9 @@ namespace UsabilityDynamics\Veneer {
         if( is_ssl() ) {
           return 'https://' . $url;
         }
-        
+
         return 'http://' . $url;
-        
+
       }
 
       /**
@@ -147,6 +147,9 @@ namespace UsabilityDynamics\Veneer {
        */
       public function template_directory_uri( $template_dir_uri, $template, $theme_root_uri ) {
 
+        $template_dir_uri = preg_replace( '~(^|[^:])//+~', '\\1/', str_replace( '\\', '/', $template_dir_uri ) );
+        $theme_root_uri   = preg_replace( '~(^|[^:])//+~', '\\1/', str_replace( '\\', '/', $theme_root_uri ) );
+
         if( strpos( $template_dir_uri, get_home_url() ) === 0 ) {
           return $template_dir_uri;
         }
@@ -196,6 +199,9 @@ namespace UsabilityDynamics\Veneer {
        * Fix DDP problem
        */
       public function stylesheet_directory_uri( $stylesheet_dir_uri, $stylesheet, $theme_root_uri ) {
+
+        $stylesheet_dir_uri = preg_replace( '~(^|[^:])//+~', '\\1/', str_replace( '\\', '/', $stylesheet_dir_uri ) );
+        $theme_root_uri   = preg_replace( '~(^|[^:])//+~', '\\1/', str_replace( '\\', '/', $theme_root_uri ) );
 
         if( strpos( $stylesheet_dir_uri, get_home_url() ) === 0 ) {
           return $stylesheet_dir_uri;
@@ -511,7 +517,7 @@ namespace UsabilityDynamics\Veneer {
         }
 
         /**
-         * HACKY Fix because composer doesn't install directories with underscores 
+         * HACKY Fix because composer doesn't install directories with underscores
          */
         switch( true ){
           case stripos( $url, 'modules/simple_email_subscriber' ) !== false:
@@ -521,10 +527,10 @@ namespace UsabilityDynamics\Veneer {
 
         /** Ensure a valid site name */
         $url = str_replace( array( $wp_veneer->network ), array( $wp_veneer->site ), $url );
-        
+
         /** Fix for Win system */
         $url = str_replace( '\\', '/', $url );
-        
+
         return $url;
 
       }
