@@ -516,6 +516,13 @@ namespace UsabilityDynamics\Veneer {
           $url = rtrim( site_url( $url ), '/' ) . '/' . ltrim( $path, '/' );
         }
 
+        /** Finally, if we don't have $path but have $plugin, then maybe fix url to plugin. peshkov@UD */
+        if( !$path && $plugin ) {
+          if( strpos( $url, basename( $plugin ) ) === false ) {
+            $url = rtrim( $url, '/' ) . '/' . basename( $plugin );
+          }
+        }
+
         /**
          * HACKY Fix because composer doesn't install directories with underscores
          */
