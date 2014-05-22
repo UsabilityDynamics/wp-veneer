@@ -1,8 +1,6 @@
-# WP Veneer
+# WordPress Network
 #
-# This file should be symbolically linked to Veneer root.
-#
-# @version 3.0.1
+# @version 3.0.2
 # @author potanin@UD
 
 # Required at beginning
@@ -12,6 +10,12 @@
   RewriteBase /
 
 </IfModule>
+
+# BEGIN Environment
+<IfModule mod_setenvif.c>
+  SetEnvIfNoCase X-UDS-Environment "(.*)" APPLICATION_ENVIRONMENT=$1
+</IfModule>
+# END Environment
 
 # BEGIN Mimes
 <IfModule mod_mime.c>
@@ -48,9 +52,7 @@
 
 # BEGIN Format
 <IfModule mod_mime.c>
-
   AddCharset utf-8 .atom .css .js .json .rss .vtt .webapp .xml .html .htm
-
 </IfModule>
 # END Format
 
