@@ -110,6 +110,7 @@ namespace UsabilityDynamics\Veneer {
 
         /** Setup our array */
         $this->urls = array(
+          'relative:admin-ajax' => admin_url( 'admin-ajax.php', 'relative' ),
           'home_url' => get_home_url(),
           'login_url' => wp_login_url(),
           'site_url' => get_site_url(),
@@ -243,6 +244,10 @@ namespace UsabilityDynamics\Veneer {
       public static function user_admin_url( $url ) {
         global $wp_veneer;
         $url = str_replace( '/wp-admin', '/manage', $url );
+
+        if( strpos( $url, 'http' ) !== 0 ) {
+          die($url);
+        }
         return $url;
       }
 
@@ -470,12 +475,19 @@ namespace UsabilityDynamics\Veneer {
       public static function replace_network_url( $url, $path = null, $schema = null ) {
         global $wp_veneer;
 
-        if( defined( 'WP_HOME' ) ) {
-          $url = str_replace( WP_HOME, $wp_veneer->site, $url );
+        $_home_url = defined( 'WP_HOME' ) ? WP_HOME : ( defined( 'WP_SITE_URL' ) ? WP_SITE_URL : '' );
+
+        // Relative URLs are opoosite, we actually try to strip our URL.
+        if( $schema === 'relative' && ( strpos( $url, $_home_url ) === 0 ) ) {
+          return str_replace( $_home_url, '', $url );
         }
 
-        if( defined( 'WP_SITE_URL' ) ) {
-          $url = str_replace( WP_SITE_URL, $wp_veneer->site, $url );
+        if( $schema !== 'relative' && $_home_url ) {
+          $url = str_replace( $_home_url, $wp_veneer->site, $url );
+        }
+
+        if( $schema !== 'relative' ) {
+          $url = str_replace( $_home_url, $wp_veneer->site, $url );
         }
 
         $url =  $wp_veneer->network && $wp_veneer->site ? str_replace( $wp_veneer->network, $wp_veneer->site, $url ) : $url;

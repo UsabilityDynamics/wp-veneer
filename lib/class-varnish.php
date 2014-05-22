@@ -51,7 +51,7 @@ namespace UsabilityDynamics\Veneer {
         }
 
         if( '' == get_option( 'permalink_structure' ) && current_user_can( 'manage_options' ) ) {
-          add_action( 'admin_notices', array( $this, 'prettyPermalinksMessage' ) );
+          // add_action( 'admin_notices', array( $this, 'prettyPermalinksMessage' ) );
         }
 
       }

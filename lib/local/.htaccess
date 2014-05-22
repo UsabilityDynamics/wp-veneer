@@ -146,17 +146,16 @@
   #RewriteRule ^modules(.*)$ vendor/modules$1 [QSA,L]
   RewriteRule ^plugins(.*)$ vendor/plugins$1 [QSA,L]
   RewriteRule ^wp-content/plugins/(.*)$ vendor/plugins/$1 [L]
+  RewriteRule ^wp-content/vendor/(.*)$ vendor/$1 [R=301,L] # DO NOT REOMVE
 
 </IfModule>
 # END Modules
 
 # BEGIN Theme
 <IfModule mod_rewrite.c>
-
   # Just do a standard rewrite for wp-content to vendor conversion
   RewriteRule ^themes(.*)$ vendor/themes$1 [QSA,L]
   RewriteRule ^wp-content/themes/(.*)$ vendor/themes/$1 [L]
-
 </IfModule>
 # END Theme
 
