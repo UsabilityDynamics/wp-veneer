@@ -1,7 +1,0 @@
-path: vendor/libraries/automattic/wordpress
-url: http://edm.cluster.uds.io
-user: andy.potanin@usabilitydynamics.com
-password: kjmfxdwnbdhgqijm
-color: true
-disabled_commands:
-  - db drop

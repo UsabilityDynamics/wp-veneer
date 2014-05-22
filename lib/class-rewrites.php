@@ -31,7 +31,15 @@ namespace UsabilityDynamics\Veneer {
         }
 
         if( !defined( 'WP_BASE_DOMAIN' ) ) {
-          wp_die( '<h1>Veneer Error</h1><p>The WP_BASE_DOMAIN constant is not defined.</p>' );
+
+          if( defined( 'WP_HOME' ) ) {
+            define( 'WP_BASE_DOMAIN', str_replace( array( 'https://', 'http://' ), '', WP_HOME ) );
+          }
+
+          if( !defined( 'WP_BASE_DOMAIN' ) ) {
+            wp_die( '<h1>Veneer Error</h1><p>The WP_BASE_DOMAIN constant is not defined.</p>' );
+          }
+
         }
 
         // Replace Network URL with Site URL.
@@ -69,7 +77,7 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'cfct-build-module-urls', array( $this, 'cfct_build_module_urls' ), 100, 3 );
         add_filter( 'cfct-build-module-url', array( $this, 'replace_network_url' ), 10, 3 );
 
-        // die( json_encode( $this->_debug() ) );
+        die( json_encode( $this->_debug() ) );
         // add_action( 'template_redirect', function() { global $wp_veneer; wp_send_json_success( $wp_veneer->_rewrites ); });
 
       }

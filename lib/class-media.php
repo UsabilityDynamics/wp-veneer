@@ -82,7 +82,7 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'pre_option_upload_url_path', array( $this, '_media_url_path' ) );
 
         // Extend Arguments with defaults.
-        $args = \UsabilityDynamics\Utility::parse_args( $args, array(
+        $args = Utility::parse_args( $args, array(
           "active"    => true,
           "subdomain" => "media",
           "cdn"       => array(),
@@ -91,7 +91,7 @@ namespace UsabilityDynamics\Veneer {
 
         $this->site     = $wp_veneer->site;
         $this->site_id  = $wp_veneer->site_id;
-        $this->cluster  = WP_BASE_DOMAIN;
+        $this->cluster  = defined( 'WP_BASE_DOMAIN' ) ? WP_BASE_DOMAIN : null;
 
         if( defined( 'MULTISITE' ) && MULTISITE && $wpdb->site ) {
           $this->network   = $wpdb->get_var( "SELECT domain FROM {$wpdb->site} WHERE id = {$wpdb->siteid}" );
