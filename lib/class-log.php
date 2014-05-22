@@ -39,7 +39,7 @@ namespace UsabilityDynamics\Veneer {
       /**
        * The line format we'll be using
        */
-      private $line_format = '%channel% - %datetime% - %level_name% - %message%';
+      private $line_format = '%channel% - %datetime% - %level_name% - %message% - %extra% - %context%';
 
       /**
        * Initialize Log
