@@ -29,6 +29,11 @@ namespace UsabilityDynamics\Veneer {
       public function __construct() {
         add_action( 'init', array( &$this, 'init' ) );
 
+        // @legacy
+        if( !defined( 'helf_vhp' ) ) {
+          define( 'helf_vhp', 'helf_vhp' );
+        }
+
         // add_action( 'admin_bar_menu', array( $this, 'varnish_links' ), 100 );
         // add_action( 'rightnow_end', array( $this, 'varnish_rightnow' ) );
 
@@ -38,6 +43,7 @@ namespace UsabilityDynamics\Veneer {
         foreach( $this->getRegisterEvents() as $event ) {
           add_action( $event, array( $this, 'purgePost' ), 10, 2 );
         }
+
         add_action( 'shutdown', array( $this, 'executePurge' ) );
 
         if( isset( $_GET[ 'vhp_flush_all' ] ) && current_user_can( 'manage_options' ) && check_admin_referer( 'helf_vhp' ) ) {
@@ -55,7 +61,7 @@ namespace UsabilityDynamics\Veneer {
       }
 
       function prettyPermalinksMessage() {
-        echo "<div id='message' class='error'><p>" . __( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="options-permalink.php">Permalinks Options Page</a> to configure them.', helf_vhp ) . "</p></div>";
+        echo "<div id='message' class='error'><p>" . __( 'Varnish HTTP Purge requires you to use custom permalinks. Please go to the <a href="options-permalink.php">Permalinks Options Page</a> to configure them.', defined( 'helf_vhp' ) ? helf_vhp : null ) . "</p></div>";
       }
 
       function varnish_rightnow() {
@@ -68,7 +74,10 @@ namespace UsabilityDynamics\Veneer {
 
       }
 
-      // For the not being used at this moment admin bar
+      /**
+       * For the not being used at this moment admin bar
+       *
+       */
       function varnish_links() {
         global $wp_admin_bar;
         if( !is_super_admin() || !is_admin_bar_showing() || !is_admin() )

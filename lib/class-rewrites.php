@@ -77,7 +77,7 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'cfct-build-module-urls', array( $this, 'cfct_build_module_urls' ), 100, 3 );
         add_filter( 'cfct-build-module-url', array( $this, 'replace_network_url' ), 10, 3 );
 
-        die( json_encode( $this->_debug() ) );
+        // die( json_encode( $this->_debug() ) );
         // add_action( 'template_redirect', function() { global $wp_veneer; wp_send_json_success( $wp_veneer->_rewrites ); });
 
       }
