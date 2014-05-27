@@ -43,6 +43,7 @@ namespace UsabilityDynamics\Veneer {
         }
 
         // Replace Network URL with Site URL.
+        add_filter( 'wp_redirect', array( $this, 'wp_redirect' ), 10, 2 );
         add_filter( 'pre_option_home', array( $this, '_option_home' ), 10 );
         add_filter( 'content_url', array( $this, 'replace_network_url' ), 10, 2 );
         add_filter( 'user_admin_url', array( $this, 'replace_network_url' ), 10, 2 );
@@ -127,6 +128,17 @@ namespace UsabilityDynamics\Veneer {
           'get_template_directory_uri' => get_template_directory_uri()
         );
 
+      }
+
+      /**
+       *
+       * @param $location
+       * @param $status
+       *
+       * @return mixed
+       */
+      public function wp_redirect( $location, $status ) {
+        return $location;
       }
 
       /**

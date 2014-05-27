@@ -14,8 +14,8 @@
  */
 namespace UsabilityDynamics\Veneer {
 
-  if( !class_exists( 'UsabilityDynamics\Veneer\Config' ) ){
-    class Config{
+  if( !class_exists( 'UsabilityDynamics\Veneer\Config' ) ) {
+    class Config {
 
       /**
        * Holds the arrayed location of our config files/folders
@@ -53,23 +53,23 @@ namespace UsabilityDynamics\Veneer {
        * This function looks through the configuration options that are stored and returns them
        *
        * @param string $config The config we're trying to load
-       * @param mixed $value Whether we want to get a specific value from this config, or the whole thing
+       * @param mixed  $value Whether we want to get a specific value from this config, or the whole thing
        *
        * @return mixed False on failure, config array on success
        */
-      function get_config( $config, $value = false ){
-        if( isset( $this->loaded[ $config ] ) && is_array( $this->loaded[ $config ] ) && isset( $this->loaded[ $config ][ 'vars' ] ) ){
-          if( is_string( $value ) && !empty( $value ) && isset( $this->loaded[ $config ][ 'vars' ][ $value ] ) ){
+      function get_config( $config, $value = false ) {
+        if( isset( $this->loaded[ $config ] ) && is_array( $this->loaded[ $config ] ) && isset( $this->loaded[ $config ][ 'vars' ] ) ) {
+          if( is_string( $value ) && !empty( $value ) && isset( $this->loaded[ $config ][ 'vars' ][ $value ] ) ) {
             return $this->loaded[ $config ][ 'vars' ][ $value ];
-          }else{
+          } else {
             /** If there is only one item, return it directly */
-            if( count( $this->loaded[ $config ][ 'vars' ] ) == 1 ){
+            if( count( $this->loaded[ $config ][ 'vars' ] ) == 1 ) {
               return array_pop( array_values( $this->loaded[ $config ][ 'vars' ] ) );
-            }else{
+            } else {
               return $this->loaded[ $config ][ 'vars' ];
             }
           }
-        }else{
+        } else {
           return false;
         }
       }
@@ -81,60 +81,60 @@ namespace UsabilityDynamics\Veneer {
        * @param string $file The file we want to include
        * @param string $scope The scope for the variables, globally or locally, defaults to 'local'
        */
-      function load_config( $file, $scope = 'local' ){
+      function load_config( $file, $scope = 'local' ) {
         /** Ok, make sure our variables are good */
-        if( !( is_string( $scope ) && $scope == 'global' ) ){
+        if( !( is_string( $scope ) && $scope == 'global' ) ) {
           $scope = 'local';
         }
         $files = array();
         /** Loop through our config folders, stopping at the first one we can find and include */
-        foreach( $this->config_folders as $config_folder ){
-          if( is_dir( $config_folder . $file ) ){
+        foreach( $this->config_folders as $config_folder ) {
+          if( is_dir( $config_folder . $file ) ) {
             // echo 'Directory: ' . $config_folder . $file . "\r\n";
             $config_folder = $config_folder . $file . DIRECTORY_SEPARATOR;
             /** Scan the directory */
             $possibles = scandir( $config_folder );
             /** Loop through the possibles and include them if you can */
-            foreach( $possibles as $possible ){
+            foreach( $possibles as $possible ) {
               /** Skip root folders */
-              if( $possible == '.' || $possible == '..' ){
+              if( $possible == '.' || $possible == '..' ) {
                 continue;
               }
               /** Remove the '.php' file from the name if it has it */
-              if( substr( $possible, strlen( $possible ) - 4, 4 ) == '.php' ){
+              if( substr( $possible, strlen( $possible ) - 4, 4 ) == '.php' ) {
                 $possible = substr( $possible, 0, strlen( $possible ) - 4 );
               }
               /** Remove the '.json' file from the name if it has it */
-              if( substr( $possible, strlen( $possible ) - 5, 5 ) == '.json' ){
+              if( substr( $possible, strlen( $possible ) - 5, 5 ) == '.json' ) {
                 $possible = substr( $possible, 0, strlen( $possible ) - 5 );
               }
               /** Ok, now call ourselves, so we'll recurse through directories */
               $this->load_config( $file . DIRECTORY_SEPARATOR . $possible, $scope );
             }
-          }elseif( is_file( $config_folder . $file . '.php' ) ){
+          } elseif( is_file( $config_folder . $file . '.php' ) ) {
             // echo 'File: ' . $config_folder . $file . '.php' . "\r\n";
             /** Try to include the file in our exclusions list, if not already included */
-            if( !isset( $files[ $file ] ) ){
+            if( !isset( $files[ $file ] ) ) {
               $files[ $file ] = array(
                 'scope' => $scope,
-                'file' => $config_folder . $file . '.php'
+                'file'  => $config_folder . $file . '.php'
               );
             }
-          }elseif( is_file( $config_folder . $file . '.json' ) ){
+          } elseif( is_file( $config_folder . $file . '.json' ) ) {
             // echo 'File: ' . $config_folder . $file . '.json' . "\r\n";
             /** Try to include the file in our exclusions list, if not already included */
-            if( !isset( $files[ $file ] ) ){
+            if( !isset( $files[ $file ] ) ) {
               $files[ $file ] = array(
                 'scope' => $scope,
-                'file' => $config_folder . $file . '.json'
+                'file'  => $config_folder . $file . '.json'
               );
             }
           }
         }
         /** If we have a files array that is not empty, go through and include them */
-        if( is_array( $files ) && count( $files ) ){
+        if( is_array( $files ) && count( $files ) ) {
           /** Go ahead and require the file */
-          foreach( $files as $slug => $file ){
+          foreach( $files as $slug => $file ) {
             /** Ok, call our function (so we don't have to do a bunch of unsets) */
             $this->_try_load_config_file( $slug, $file );
           }
@@ -145,19 +145,19 @@ namespace UsabilityDynamics\Veneer {
        * This function actually does the requiring
        *
        * @param string $slug File's slug to store
-       * @param array $file File definition array as done in 'load_config'
+       * @param array  $file File definition array as done in 'load_config'
        */
-      function _try_load_config_file( $slug, $file ){
-        if( !in_array( $slug, array_keys( $this->loaded ) ) ){
+      function _try_load_config_file( $slug, $file ) {
+        if( !in_array( $slug, array_keys( $this->loaded ) ) ) {
           /** Now, require the file, base on the type it is */
-          if( substr( $file[ 'file' ], strlen( $file[ 'file' ] ) - 4, 4 ) == '.php' ){
+          if( substr( $file[ 'file' ], strlen( $file[ 'file' ] ) - 4, 4 ) == '.php' ) {
             require_once( $file[ 'file' ] );
             $file[ 'vars' ] = get_defined_vars();
-          }elseif( substr( $file[ 'file' ], strlen( $file[ 'file' ] ) - 5, 5 ) == '.json' ){
+          } elseif( substr( $file[ 'file' ], strlen( $file[ 'file' ] ) - 5, 5 ) == '.json' ) {
             $file[ 'vars' ] = json_decode( file_get_contents( $file[ 'file' ] ), true );
             /** Loop through the items, and if they prefix with 'c:', they should be defined constants */
-            foreach( $file[ 'vars' ] as $key => $value ){
-              if( substr( $key, 0, 2 ) == 'c:' ){
+            foreach( $file[ 'vars' ] as $key => $value ) {
+              if( substr( $key, 0, 2 ) == 'c:' ) {
                 /** Let's go ahead and unset the key */
                 unset( $file[ 'vars' ][ $key ] );
                 /** Set the constant */
@@ -166,14 +166,14 @@ namespace UsabilityDynamics\Veneer {
             }
           }
           /** Go through and unset the protected variables */
-          foreach( $this->protected_variables as $protected_variable ){
-            if( isset( $file[ 'vars' ][ $protected_variable ] ) ){
+          foreach( $this->protected_variables as $protected_variable ) {
+            if( isset( $file[ 'vars' ][ $protected_variable ] ) ) {
               unset( $file[ 'vars' ][ $protected_variable ] );
             }
           }
           /** Now, determine what to do with the vars */
-          if( isset( $file[ 'scope' ] ) && $file[ 'scope' ] == 'global' ){
-            foreach( $file[ 'vars' ] as $key => $value ){
+          if( isset( $file[ 'scope' ] ) && $file[ 'scope' ] == 'global' ) {
+            foreach( $file[ 'vars' ] as $key => $value ) {
               $GLOBALS[ $key ] = $value;
             }
           }
@@ -184,11 +184,12 @@ namespace UsabilityDynamics\Veneer {
 
       /**
        * On init, we're just going to setup and include all our config files
+       *
        * @param string $base_dir Override the base dir to search for files (defaults to __DIR__)
-       * @param bool $do_stuff Whether we should actually do initialization( needed for 'init' )
+       * @param bool   $do_stuff Whether we should actually do initialization( needed for 'init' )
        */
-      function __construct( $base_dir = __DIR__, $do_stuff = true ){
-        if( !( is_bool( $do_stuff ) && $do_stuff ) ){
+      function __construct( $base_dir = __DIR__, $do_stuff = true ) {
+        if( !( is_bool( $do_stuff ) && $do_stuff ) ) {
           return;
         }
 
@@ -196,40 +197,40 @@ namespace UsabilityDynamics\Veneer {
         $base_dir = dirname( dirname( dirname( dirname( $base_dir ) ) ) );
 
         /** Bring in our local-debug file if we have it */
-        if( is_file( $base_dir . '/local-debug.php' ) ){
+        if( is_file( $base_dir . '/local-debug.php' ) ) {
           require_once( $base_dir . '/local-debug.php' );
         }
 
         /** If we've got WP_CLI, we need to fix the base dir */
-        if( defined( 'WP_CLI' ) && WP_CLI ){
+        if( defined( 'WP_CLI' ) && WP_CLI ) {
           $_SERVER[ 'DOCUMENT_ROOT' ] = $base_dir;
         }
 
         /** Bring in our environment file if we need to */
-        if( !defined( 'ENVIRONMENT' ) && is_file( $base_dir . '/.environment' ) ){
-          $environment = @file_get_contents( '.environment' );
+        if( !defined( 'ENVIRONMENT' ) && is_file( $base_dir . '/.environment' ) ) {
+          $environment = @file_get_contents( $base_dir . '/.environment' );
           define( 'ENVIRONMENT', trim( $environment ) );
         }
 
         /** For these variables, make sure they exist */
-        $this->config_folders[] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/' . ENVIRONMENT . '/';
-        $this->config_folders[] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/';
-        foreach( $this->config_folders as $key => $value ){
-          if( !is_dir( $value ) ){
+        $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/' . ENVIRONMENT . '/';
+        $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/';
+        foreach( $this->config_folders as $key => $value ) {
+          if( !is_dir( $value ) ) {
             unset( $this->config_folders[ $key ] );
           }
         }
         /** Renumber the array */
         $this->config_folders = array_values( $this->config_folders );
         /** If we don't have any config folders, bail */
-        if( !( is_array( $this->config_folders ) && !count( $this->config_folders ) ) ){
+        if( !( is_array( $this->config_folders ) && !count( $this->config_folders ) ) ) {
           /** Now, go through our autoloaded configs, and bring them in */
-          foreach( $this->autoload_files as $autoload_file ){
+          foreach( $this->autoload_files as $autoload_file ) {
             /** See if it needs to be global or local */
-            if( substr( $autoload_file, 0, 2 ) == 'g:' ){
+            if( substr( $autoload_file, 0, 2 ) == 'g:' ) {
               $autoload_scope = 'global';
-              $autoload_file = substr( $autoload_file, 2, strlen( $autoload_file ) - 2 );
-            }else{
+              $autoload_file  = substr( $autoload_file, 2, strlen( $autoload_file ) - 2 );
+            } else {
               $autoload_scope = 'local';
             }
             /** Include the files then */
@@ -237,24 +238,26 @@ namespace UsabilityDynamics\Veneer {
           }
         }
         /** Finally, go through the composer.json file and add all the configs there */
-        if( is_file( $_SERVER[ 'DOCUMENT_ROOT' ] . '/composer.json' ) ){
+        if( is_file( $_SERVER[ 'DOCUMENT_ROOT' ] . '/composer.json' ) ) {
           $composer_file = $_SERVER[ 'DOCUMENT_ROOT' ] . '/composer.json';
-        }else if( is_file( $base_dir . '/composer.json' ) ){
+        } else if( is_file( $base_dir . '/composer.json' ) ) {
           $composer_file = $base_dir . '/composer.json';
         }
         foreach( $_composer = (array) json_decode( file_get_contents( $composer_file ) )->settings as $key => $value ) {
-          if( !defined( strtoupper( $key ) ) ){
+          if( !defined( strtoupper( $key ) ) ) {
             define( strtoupper( $key ), strpos( $value, '/' ) === 0 && realpath( $_SERVER[ 'DOCUMENT_ROOT' ] . $value ) ? realpath( $_SERVER[ 'DOCUMENT_ROOT' ] . $value ) : $value );
           }
         }
+
         /** Return this own object */
+
         return $this;
       }
 
       /**
        * This function lets us chain methods without having to instantiate first, YOU MUST COPY THIS TO ALL SUB CLASSES
        */
-      static public function init(){
+      static public function init() {
         return new self( __DIR__, false );
       }
 
@@ -265,16 +268,18 @@ namespace UsabilityDynamics\Veneer {
    * If we don't have the following defined, we should assume that we're directly including this file,
    * so we should initialize it
    */
-  if( !defined( 'WP_BASE_DOMAIN' ) && !defined( 'WP_DEBUG' ) && !defined( 'AUTH_KEY' ) ){
+  if( !defined( 'WP_BASE_DOMAIN' ) && !defined( 'WP_DEBUG' ) && !defined( 'AUTH_KEY' ) ) {
     global $wp_veneer;
     /** Init our config object */
-    if( !is_object( $wp_veneer ) ){
+    if( !is_object( $wp_veneer ) ) {
       $wp_veneer = new \stdClass();
     }
+
     /** Add to our object, if we don't have the config object */
-    if( !isset( $wp_veneer->config ) ){
+    if( !isset( $wp_veneer->config ) ) {
       $wp_veneer->config = new Config();
     }
+
     /** Is this needed? */
     $table_prefix = defined( 'DB_PREFIX' ) ? DB_PREFIX : 'wp_';
     /** Now that we've done that, lets include our wp settings file, as per normal operations */
