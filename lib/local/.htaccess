@@ -131,9 +131,10 @@
 # BEGIN Public API
 <IfModule mod_rewrite.c>
 
-  RewriteRule ^api/(.*).xml$ /manage/admin-ajax.php?action=/$1&format=xml [QSA,L]
-  RewriteRule ^api/(.*).json$ /manage/admin-ajax.php?action=/$1&format=json [QSA,L]
-  RewriteRule ^api/(.*)$ /manage/admin-ajax.php?action=/$1&format=json [QSA,L]
+  RewriteRule ^api/rpc.xml$     /vendor/libraries/automattic/wordpress/xmlrpc.php [QSA,L]
+  RewriteRule ^api/(.*).xml$    /manage/admin-ajax.php?action=/$1&format=xml [QSA,L]
+  RewriteRule ^api/(.*).json$   /manage/admin-ajax.php?action=/$1&format=json [QSA,L]
+  RewriteRule ^api/(.*)$        /manage/admin-ajax.php?action=/$1&format=json [QSA,L]
 
 </IfModule>
 # END Public API
