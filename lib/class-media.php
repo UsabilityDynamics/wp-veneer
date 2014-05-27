@@ -82,7 +82,7 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'pre_option_upload_url_path', array( $this, '_media_url_path' ) );
 
         // Extend Arguments with defaults.
-        $args = Utility::parse_args( $args, array(
+        $args = \UsabilityDynamics\Utility::parse_args( $args, array(
           "active"    => true,
           "subdomain" => "media",
           "cdn"       => array(),
