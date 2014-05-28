@@ -49,7 +49,7 @@ namespace UsabilityDynamics\Veneer {
        * @returns Log $this
        */
       public function __construct( $do_stuff = true ) {
-        if( !$do_stuff ) {
+        if( !$do_stuff || !file_exists( rtrim( WP_LOGS_DIR, '/' ) . '/' . WP_LOGS_FILE ) ) {
           return $this;
         }
         /** Bring in a copy of the wp cluster object */
