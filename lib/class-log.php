@@ -7,7 +7,6 @@
  */
 namespace UsabilityDynamics\Veneer {
 
-  use UsabilityDynamics as UD;
   use Monolog\Logger;
   use Monolog\Handler\StreamHandler;
   use Monolog\Handler\SyslogHandler;
@@ -26,14 +25,29 @@ namespace UsabilityDynamics\Veneer {
        * Declare some static constants
        */
       const CHANNEL  = 'veneer';
+
+      /**
+       *
+       */
       const FACILITY = 'local6';
 
       /**
        * Holds our required Monolog objects
        */
       private $handler;
+
+      /**
+       * @var \Monolog\Logger
+       */
       private $logger;
+
+      /**
+       * @var \Monolog\Formatter\LineFormatter
+       */
       private $formatter;
+      /**
+       * @var string
+       */
       private $guid;
 
       /**
@@ -49,11 +63,12 @@ namespace UsabilityDynamics\Veneer {
        * @returns Log $this
        */
       public function __construct( $do_stuff = true ) {
-        if( !$do_stuff || !file_exists( rtrim( WP_LOGS_DIR, '/' ) . '/' . WP_LOGS_FILE ) ) {
+        global $current_blog;
+
+        if( !$do_stuff || !defined( 'WP_LOGS_DIR' ) || !file_exists( rtrim( WP_LOGS_DIR, '/' ) . '/' . WP_LOGS_FILE ) ) {
           return $this;
         }
-        /** Bring in a copy of the wp cluster object */
-        global $current_blog;
+
         /** Setup the GUID */
         $this->guid = $this->create_guid();
         /** Setup the logger */
@@ -64,6 +79,7 @@ namespace UsabilityDynamics\Veneer {
 
         /** Setup the formatter */
         $this->formatter = new LineFormatter( $this->line_format );
+
         /** Add our handler */
         switch( true ) {
           case defined( 'WP_LOGS_HANDLER' ) && WP_LOGS_HANDLER == 'syslog':
@@ -119,4 +135,5 @@ namespace UsabilityDynamics\Veneer {
 
     }
   }
+
 }
