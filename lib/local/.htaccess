@@ -130,6 +130,7 @@
 
 # BEGIN Public API
 <IfModule mod_rewrite.c>
+  RewriteRule ^xmlrpc.php$     /vendor/libraries/automattic/wordpress/xmlrpc.php   [QSA,L]
   RewriteRule ^api/rpc.xml$     /vendor/libraries/automattic/wordpress/xmlrpc.php   [QSA,L]
   RewriteRule ^api/rpc.json$    /manage/admin-ajax.php?action=/api/json-rpc         [QSA,L]
   RewriteRule ^api/(.*).xml$    /manage/admin-ajax.php?action=/$1&format=xml        [QSA,L]
