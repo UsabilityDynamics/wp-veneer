@@ -7,7 +7,7 @@
  * Author: Usability Dynamics
  * Author URI: http://usabilitydynamics.com/
  * License: GPLv2 or later
- * Network: False
+ * Network: True
  *
  * The Loader class is self-initializing.
  *
