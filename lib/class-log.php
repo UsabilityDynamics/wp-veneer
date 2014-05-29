@@ -69,8 +69,14 @@ namespace UsabilityDynamics\Veneer {
           return $this;
         }
 
+        // Verify Class Exists.
+        if( !class_exists( 'Monolog\Logger' ) ) {
+          return $this;
+        }
+
         /** Setup the GUID */
         $this->guid = $this->create_guid();
+
         /** Setup the logger */
         $this->logger = new Logger( $this->guid );
 
@@ -95,10 +101,13 @@ namespace UsabilityDynamics\Veneer {
 
         /** Implement the formatter */
         $this->handler->setFormatter( $this->formatter );
+
         /** Now, bring in our file handler */
         $this->logger->pushHandler( $this->handler );
+
         /** Register the new error handler */
         ErrorHandler::register( $this->logger );
+
         /** Default info */
         $this->logger->addDebug( 'GUID: ' . $this->guid );
         $this->logger->addDebug( 'Logging initialized...' );
