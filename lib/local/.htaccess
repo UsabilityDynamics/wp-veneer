@@ -161,6 +161,10 @@
 # BEGIN Management
 <IfModule mod_rewrite.c>
 
+  #RewriteRule ^manage/udx.utility.activity.js$  /vendor/libraries/usabilitydyanmics/lib/utlity/scripts/udx.utility.activity.js$1 [QSA,L]
+  #RewriteRule ^manage/wpp.importer.overview.js$ /vendor/plugins/wp-property/vendor/modules/importer/static/scripts/wpp.importer.overview.js$1 [QSA,L]
+  #RewriteRule ^manage/wpp.importer.editor.js$   /vendor/plugins/wp-property/vendor/modules/importer/static/scripts/wpp.importer.editor.js$1 [QSA,L]
+
   RewriteRule ^wp-admin/admin-ajax.php?(.*)$  /vendor/libraries/automattic/wordpress/wp-admin/admin-ajax.php$1 [QSA,L]
 
   RewriteRule ^wp-admin/css/?(.*)$            /manage/css/$1          [QSA,L] #
