@@ -194,9 +194,14 @@ namespace UsabilityDynamics\Veneer {
       public function __construct() {
         global $wpdb, $current_site, $current_blog, $wp_veneer;
 
-        /** Return Singleton Instance */
+        // Return Singleton Instance
         if( self::$instance ) {
           return self::$instance;
+        }
+
+        // Check if being called too early, such as during Unit Testing.
+        if( !function_exists( 'did_action' ) ) {
+          return $this;
         }
 
         /** If we currently have a wp_veener object, we should copy it */

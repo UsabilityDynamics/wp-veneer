@@ -68,32 +68,13 @@
 # END Security
 
 # BEGIN W3TC CDN
-
+<FilesMatch "\.(ttf|ttc|otf|eot|woff|font.css)$">
 
   <IfModule mod_headers.c>
-    <FilesMatch "\.(ttf|ttc|otf|eot|woff|font.css)$">
-      Header set Cache-Control "max-age=290304000, public"
-      Header set Expires "Thu, 15 Apr 2015 20:00:00 GMT"
-      Header set Access-Control-Allow-Origin "*"
-    </FilesMatch>
-
-    <FilesMatch "\.(js|css)$">
-      Header set Cache-Control "public, max-age=290304000"
-      Header set Expires "Thu, 15 Apr 2015 20:00:00 GMT"
-    </FilesMatch>
-
-    <FilesMatch "\.(xml|json)$">
-      Header set Cache-Control "public, must-revalidate, max-age=172800"
-    </FilesMatch>
-
-    <FilesMatch "\.(html|htm)$">
-      Header set Cache-Control "max-age=7200, must-revalidate"
-      Header set Access-Control-Allow-Origin "*"
-    </FilesMatch>
-
-
+    Header set Access-Control-Allow-Origin "*"
   </IfModule>
 
+</FilesMatch>
 # END W3TC CDN
 
 # BEGIN Browser Optimization
@@ -149,50 +130,47 @@
 
 # BEGIN Public API
 <IfModule mod_rewrite.c>
-  RewriteRule ^xmlrpc.php$     /vendor/libraries/automattic/wordpress/xmlrpc.php   [QSA,L]
-  RewriteRule ^api/rpc.xml$     /vendor/libraries/automattic/wordpress/xmlrpc.php   [QSA,L]
-  RewriteRule ^api/rpc.json$    /manage/admin-ajax.php?action=/api/json-rpc         [QSA,L]
-  RewriteRule ^api/(.*).xml$    /manage/admin-ajax.php?action=/$1&format=xml        [QSA,L]
-  RewriteRule ^api/(.*).json$   /manage/admin-ajax.php?action=/$1&format=json       [QSA,L]
-  RewriteRule ^api/(.*)$        /manage/admin-ajax.php?action=/$1&format=json       [QSA,L]
+
+  RewriteRule ^api/rpc.xml$     /vendor/libraries/automattic/wordpress/xmlrpc.php [QSA,L]
+  RewriteRule ^api/(.*).xml$ /manage/admin-ajax.php?action=/$1&format=xml [QSA,L]
+  RewriteRule ^api/(.*).json$ /manage/admin-ajax.php?action=/$1&format=json [QSA,L]
+  RewriteRule ^api/(.*)$ /manage/admin-ajax.php?action=/$1&format=json [QSA,L]
+
 </IfModule>
 # END Public API
 
 # BEGIN Modules
 <IfModule mod_rewrite.c>
+
   # Just do a standard rewrite for plugins to vendor conversion
   RewriteRule ^libraries/(.*)$ vendor/libraries/$1 [QSA,L]
   #RewriteRule ^modules(.*)$ vendor/modules$1 [QSA,L]
   RewriteRule ^plugins(.*)$ vendor/plugins$1 [QSA,L]
   RewriteRule ^wp-content/plugins/(.*)$ vendor/plugins/$1 [L]
-  RewriteRule ^wp-content/vendor/(.*)$ vendor/$1 [R=301,L] # DO NOT REOMVE
+
 </IfModule>
 # END Modules
 
 # BEGIN Theme
 <IfModule mod_rewrite.c>
+
   # Just do a standard rewrite for wp-content to vendor conversion
   RewriteRule ^themes(.*)$ vendor/themes$1 [QSA,L]
   RewriteRule ^wp-content/themes/(.*)$ vendor/themes/$1 [L]
+
 </IfModule>
 # END Theme
 
 # BEGIN Management
 <IfModule mod_rewrite.c>
 
-  #RewriteRule ^manage/udx.utility.activity.js$  /vendor/libraries/usabilitydyanmics/lib/utlity/scripts/udx.utility.activity.js$1 [QSA,L]
-  #RewriteRule ^manage/wpp.importer.overview.js$ /vendor/plugins/wp-property/vendor/modules/importer/static/scripts/wpp.importer.overview.js$1 [QSA,L]
-  #RewriteRule ^manage/wpp.importer.editor.js$   /vendor/plugins/wp-property/vendor/modules/importer/static/scripts/wpp.importer.editor.js$1 [QSA,L]
-
-  RewriteRule ^wp-admin/admin-ajax.php?(.*)$  /vendor/libraries/automattic/wordpress/wp-admin/admin-ajax.php$1 [QSA,L]
-
-  RewriteRule ^wp-admin/css/?(.*)$            /manage/css/$1          [QSA,L] #
-  RewriteRule ^wp-admin/images/?(.*)$         /manage/images/$1       [QSA,L] #
-  RewriteRule ^wp-admin/install.php?(.*)$     /manage/install.php$1   [R=301,L] #
-
   # Ensure that we're forwarding all manage requests to the right place
-  RewriteRule ^manage/(login|signup)/?(.*)$   /vendor/libraries/automattic/wordpress/wp-$1.php [QSA,L]
-  RewriteRule ^manage/?(.*)$                  /vendor/libraries/automattic/wordpress/wp-admin/$1 [QSA,L]
+  RewriteRule ^manage/(login|signup)/?(.*)$ /vendor/libraries/automattic/wordpress/wp-$1.php [QSA,L]
+  RewriteRule ^manage/?(.*)$ /vendor/libraries/automattic/wordpress/wp-admin/$1 [QSA,L]
+
+  RewriteRule ^wp-admin/?(.*)$        /manage/$1 [R=301,L] #
+  RewriteRule ^wp-admin/css/?(.*)$    /manage/css/$1 [QSA,L] #
+  RewriteRule ^wp-admin/images/?(.*)$ /manage/images/$1 [QSA,L] #
 
   # Without this, Media Libary can't make admin-ajax requests...
   RewriteRule ^vendor/libraries/automattic/wordpress/manage/?(.*)$ /manage/$1 [QSA,L]
@@ -200,8 +178,6 @@
   # Script Builders.
   RewriteRule ^wp-admin/load-styles.php?(.*)$ /vendor/libraries/automattic/wordpress/wp-admin/load-styles.php$1 [QSA,L]
   RewriteRule ^wp-admin/load-scripts.php?(.*)$ /vendor/libraries/automattic/wordpress/wp-admin/load-scripts.php$1 [R=301,L]
-
-  #RewriteRule ^wp-admin(.*)$ /vendor/libraries/automattic/wordpress/wp-admin$1 [QSA,L]
 
 </IfModule>
 # END Management

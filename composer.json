@@ -31,18 +31,20 @@
     "mrclay/minify": "master"
   },
   "autoload": {
-    "classmap": [ 
+    "classmap": [
       "lib/class-api.php",
       "lib/class-bootstrap.php",
       "lib/class-w3.php",
       "lib/class-cache.php",
       "lib/class-documents.php",
+      "lib/class-utility.php",
+      "lib/class-rewrites.php",
       "lib/class-image.php",
       "lib/class-log.php",
       "lib/class-media.php",
       "lib/class-security.php",
       "lib/class-varnish.php",
-      "lib/class-search.php"  
+      "lib/class-search.php"
      ]
   }
 }

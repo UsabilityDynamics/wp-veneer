@@ -31,10 +31,19 @@ namespace UsabilityDynamics\Veneer {
         }
 
         if( !defined( 'WP_BASE_DOMAIN' ) ) {
-          wp_die( '<h1>Veneer Error</h1><p>The WP_BASE_DOMAIN constant is not defined.</p>' );
+
+          if( defined( 'WP_HOME' ) ) {
+            define( 'WP_BASE_DOMAIN', str_replace( array( 'https://', 'http://' ), '', WP_HOME ) );
+          }
+
+          if( !defined( 'WP_BASE_DOMAIN' ) ) {
+            wp_die( '<h1>Veneer Error</h1><p>The WP_BASE_DOMAIN constant is not defined.</p>' );
+          }
+
         }
 
         // Replace Network URL with Site URL.
+        add_filter( 'wp_redirect', array( $this, 'wp_redirect' ), 10, 2 );
         add_filter( 'pre_option_home', array( $this, '_option_home' ), 10 );
         add_filter( 'content_url', array( $this, 'replace_network_url' ), 10, 2 );
         add_filter( 'user_admin_url', array( $this, 'replace_network_url' ), 10, 2 );
@@ -90,9 +99,9 @@ namespace UsabilityDynamics\Veneer {
         if( is_ssl() ) {
           return 'https://' . $url;
         }
-        
+
         return 'http://' . $url;
-        
+
       }
 
       /**
@@ -102,6 +111,7 @@ namespace UsabilityDynamics\Veneer {
 
         /** Setup our array */
         $this->urls = array(
+          'relative:admin-ajax' => admin_url( 'admin-ajax.php', 'relative' ),
           'home_url' => get_home_url(),
           'login_url' => wp_login_url(),
           'site_url' => get_site_url(),
@@ -118,6 +128,17 @@ namespace UsabilityDynamics\Veneer {
           'get_template_directory_uri' => get_template_directory_uri()
         );
 
+      }
+
+      /**
+       *
+       * @param $location
+       * @param $status
+       *
+       * @return mixed
+       */
+      public function wp_redirect( $location, $status ) {
+        return $location;
       }
 
       /**
@@ -147,6 +168,9 @@ namespace UsabilityDynamics\Veneer {
        */
       public function template_directory_uri( $template_dir_uri, $template, $theme_root_uri ) {
 
+        $template_dir_uri = preg_replace( '~(^|[^:])//+~', '\\1/', str_replace( '\\', '/', $template_dir_uri ) );
+        $theme_root_uri   = preg_replace( '~(^|[^:])//+~', '\\1/', str_replace( '\\', '/', $theme_root_uri ) );
+
         if( strpos( $template_dir_uri, get_home_url() ) === 0 ) {
           return $template_dir_uri;
         }
@@ -172,15 +196,12 @@ namespace UsabilityDynamics\Veneer {
         if( filter_var( $uri, FILTER_VALIDATE_URL ) === true ){
           return $uri;
         }
-
         /** If the URL has the base directory */
         if( defined( 'WP_BASE_DIR' ) && stripos( $uri, WP_BASE_DIR ) !== false ){
           $uri = rtrim( $siteurl, '/' ) . '/' . trim( str_ireplace( WP_BASE_DIR, '', $uri ), '/' );
         }
-
         /** Return default */
         return $uri;
-
       }
 
       /**
@@ -199,6 +220,9 @@ namespace UsabilityDynamics\Veneer {
        * Fix DDP problem
        */
       public function stylesheet_directory_uri( $stylesheet_dir_uri, $stylesheet, $theme_root_uri ) {
+
+        $stylesheet_dir_uri = preg_replace( '~(^|[^:])//+~', '\\1/', str_replace( '\\', '/', $stylesheet_dir_uri ) );
+        $theme_root_uri   = preg_replace( '~(^|[^:])//+~', '\\1/', str_replace( '\\', '/', $theme_root_uri ) );
 
         if( strpos( $stylesheet_dir_uri, get_home_url() ) === 0 ) {
           return $stylesheet_dir_uri;
@@ -232,6 +256,10 @@ namespace UsabilityDynamics\Veneer {
       public static function user_admin_url( $url ) {
         global $wp_veneer;
         $url = str_replace( '/wp-admin', '/manage', $url );
+
+        if( strpos( $url, 'http' ) !== 0 ) {
+          die($url);
+        }
         return $url;
       }
 
@@ -318,7 +346,6 @@ namespace UsabilityDynamics\Veneer {
        */
       public static function content_url( $url ) {
         global $wp_veneer;
-
 
         $url = str_replace( $wp_veneer->network, $wp_veneer->site, $url );
 
@@ -460,12 +487,19 @@ namespace UsabilityDynamics\Veneer {
       public static function replace_network_url( $url, $path = null, $schema = null ) {
         global $wp_veneer;
 
-        if( defined( 'WP_HOME' ) ) {
-          $url = str_replace( WP_HOME, $wp_veneer->site, $url );
+        $_home_url = defined( 'WP_HOME' ) ? WP_HOME : ( defined( 'WP_SITE_URL' ) ? WP_SITE_URL : '' );
+
+        // Relative URLs are opoosite, we actually try to strip our URL.
+        if( $schema === 'relative' && ( strpos( $url, $_home_url ) === 0 ) ) {
+          return str_replace( $_home_url, '', $url );
         }
 
-        if( defined( 'WP_SITE_URL' ) ) {
-          $url = str_replace( WP_SITE_URL, $wp_veneer->site, $url );
+        if( $schema !== 'relative' && $_home_url ) {
+          $url = str_replace( $_home_url, $wp_veneer->site, $url );
+        }
+
+        if( $schema !== 'relative' ) {
+          $url = str_replace( $_home_url, $wp_veneer->site, $url );
         }
 
         $url =  $wp_veneer->network && $wp_veneer->site ? str_replace( $wp_veneer->network, $wp_veneer->site, $url ) : $url;
@@ -499,19 +533,26 @@ namespace UsabilityDynamics\Veneer {
 
         /** Strip filename and get just the path */
         if( strpos( $plugin, '.php' ) ) {
-          $plugin = dirname( $plugin );
+          $plugin = wp_normalize_path( dirname( $plugin ) );
         }
 
         /** First, if we have $plugin and $path defined, we use both */
         if( $path && $plugin && defined( 'WP_BASE_DIR' ) ){
-          $url = str_ireplace( WP_BASE_DIR, '', $plugin );
+          $url = str_ireplace( wp_normalize_path( WP_BASE_DIR ), '', $plugin );
           $url = rtrim( site_url( $url ), '/' ) . '/' . ltrim( $path, '/' );
         }
 
         /** Now, if we just have the path, then use that only */
         if( $path && !$plugin && defined( 'WP_BASE_DIR' ) ) {
-          $url = str_ireplace( WP_BASE_DIR, '', WP_PLUGIN_DIR );
+          $url = str_ireplace( wp_normalize_path( WP_BASE_DIR ), '', wp_normalize_path( WP_PLUGIN_DIR ) );
           $url = rtrim( site_url( $url ), '/' ) . '/' . ltrim( $path, '/' );
+        }
+
+        /** Finally, if we don't have $path but have $plugin, then maybe fix url to plugin. peshkov@UD */
+        if( !$path && $plugin ) {
+          if( strpos( $url, basename( $plugin ) ) === false ) {
+            $url = rtrim( $url, '/' ) . '/' . basename( $plugin );
+          }
         }
 
         /**
@@ -525,6 +566,9 @@ namespace UsabilityDynamics\Veneer {
 
         /** Ensure a valid site name */
         $url = str_replace( array( $wp_veneer->network ), array( $wp_veneer->site ), $url );
+
+        /** Fix for Win system */
+        $url = str_replace( '\\', '/', $url );
 
         return $url;
 

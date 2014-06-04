@@ -91,7 +91,7 @@ namespace UsabilityDynamics\Veneer {
 
         $this->site     = $wp_veneer->site;
         $this->site_id  = $wp_veneer->site_id;
-        $this->cluster  = WP_BASE_DOMAIN;
+        $this->cluster  = defined( 'WP_BASE_DOMAIN' ) ? WP_BASE_DOMAIN : null;
 
         if( defined( 'MULTISITE' ) && MULTISITE && $wpdb->site ) {
           $this->network   = $wpdb->get_var( "SELECT domain FROM {$wpdb->site} WHERE id = {$wpdb->siteid}" );
