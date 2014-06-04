@@ -67,46 +67,44 @@
 </FilesMatch>
 # END Security
 
-# BEGIN W3TC CDN
+# BEGIN Static Cache
+<IfModule mod_headers.c>
 
+  <FilesMatch "\.(ttf|ttc|otf|eot|woff|font.css)$">
+    Header set Cache-Control "max-age=290304000, public"
+    Header set Expires "Thu, 15 Apr 2015 20:00:00 GMT"
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
 
-  <IfModule mod_headers.c>
-    <FilesMatch "\.(ttf|ttc|otf|eot|woff|font.css)$">
-      Header set Cache-Control "max-age=290304000, public"
-      Header set Expires "Thu, 15 Apr 2015 20:00:00 GMT"
-      Header set Access-Control-Allow-Origin "*"
-    </FilesMatch>
+  <FilesMatch "\.(js|css)$">
+    Header set Cache-Control "public, max-age=290304000"
+    Header set Expires "Thu, 15 Apr 2015 20:00:00 GMT"
+  </FilesMatch>
 
-    <FilesMatch "\.(js|css)$">
-      Header set Cache-Control "public, max-age=290304000"
-      Header set Expires "Thu, 15 Apr 2015 20:00:00 GMT"
-    </FilesMatch>
+  <FilesMatch "\.(xml|json)$">
+    Header set Cache-Control "public, must-revalidate, max-age=172800"
+  </FilesMatch>
 
-    <FilesMatch "\.(xml|json)$">
-      Header set Cache-Control "public, must-revalidate, max-age=172800"
-    </FilesMatch>
+  <FilesMatch "\.(html|htm)$">
+    Header set Cache-Control "max-age=7200, must-revalidate"
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
 
-    <FilesMatch "\.(html|htm)$">
-      Header set Cache-Control "max-age=7200, must-revalidate"
-      Header set Access-Control-Allow-Origin "*"
-    </FilesMatch>
+</IfModule>
 
-
-  </IfModule>
-
-# END W3TC CDN
+# END Static Cache
 
 # BEGIN Browser Optimization
 <IfModule mod_deflate.c>
 
-    <IfModule mod_headers.c>
-        Header append Vary User-Agent env=!dont-vary
-    </IfModule>
-        AddOutputFilterByType DEFLATE text/css text/x-component application/x-javascript application/javascript text/javascript text/x-js text/html text/richtext image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon application/json
-    <IfModule mod_mime.c>
-        # DEFLATE by extension
-        AddOutputFilter DEFLATE js css htm html xml
-    </IfModule>
+  <IfModule mod_headers.c>
+    Header append Vary User-Agent env=!dont-vary
+  </IfModule>
+    AddOutputFilterByType DEFLATE text/css text/x-component application/x-javascript application/javascript text/javascript text/x-js text/html text/richtext image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon application/json
+  <IfModule mod_mime.c>
+    # DEFLATE by extension
+    AddOutputFilter DEFLATE js css htm html xml
+  </IfModule>
 
 </IfModule>
 # END Browser Optimization
