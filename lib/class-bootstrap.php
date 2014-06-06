@@ -708,6 +708,8 @@ namespace UsabilityDynamics\Veneer {
         // Render Toolbar.
         add_action( 'wp_before_admin_bar_render', array( $this, 'toolbar' ), 10 );
 
+        $_SERVER[ 'REMOTE_ADDR' ] = isset( $_SERVER[ 'REMOTE_ADDR' ] ) ? $_SERVER[ 'REMOTE_ADDR' ] : '';
+        
         if( defined( 'WP_BASE_DIR' ) && file_exists( WP_BASE_DIR . '/local-debug.php' ) || in_array( $_SERVER[ 'REMOTE_ADDR' ], array( '127.0.0.1', '10.0.0.1', '0.0.0.0' ) ) ) {
           add_action( 'wp_before_admin_bar_render', array( $this, 'toolbar_local' ), 100 );
         }
