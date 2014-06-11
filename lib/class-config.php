@@ -50,6 +50,94 @@ namespace UsabilityDynamics\Veneer {
       );
 
       /**
+       * On init, we're just going to setup and include all our config files
+       *
+       * @param string $base_dir Override the base dir to search for files (defaults to __DIR__)
+       * @param bool   $do_stuff Whether we should actually do initialization( needed for 'init' )
+       */
+      public function __construct( $base_dir = __DIR__, $do_stuff = true ) {
+        if( !( is_bool( $do_stuff ) && $do_stuff ) ) {
+          return;
+        }
+
+        /** Set some local variables */
+        $base_dir = dirname( dirname( dirname( dirname( $base_dir ) ) ) );
+
+        /** Bring in our local-debug file if we have it */
+        if( is_file( $base_dir . '/local-debug.php' ) ) {
+          require_once( $base_dir . '/local-debug.php' );
+        }
+
+        /** If we've got WP_CLI, we need to fix the base dir */
+        if( defined( 'WP_CLI' ) && WP_CLI ) {
+          $_SERVER[ 'DOCUMENT_ROOT' ] = $base_dir;
+        }
+
+        /** Bring in our environment file if we need to */
+        if( !defined( 'ENVIRONMENT' ) && is_file( $base_dir . '/.environment' ) ) {
+          $environment = @file_get_contents( $base_dir . '/.environment' );
+          define( 'ENVIRONMENT', trim( $environment ) );
+        }
+
+        /** For these variables, make sure they exist */
+        $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/' . ENVIRONMENT . '/';
+        $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/';
+
+        foreach( $this->config_folders as $key => $value ) {
+          if( !is_dir( $value ) ) {
+            unset( $this->config_folders[ $key ] );
+          }
+        }
+
+        /** Renumber the array */
+        $this->config_folders = array_values( $this->config_folders );
+
+        /** If we don't have any config folders, bail */
+        if( !( is_array( $this->config_folders ) && !count( $this->config_folders ) ) ) {
+          /** Now, go through our autoloaded configs, and bring them in */
+          foreach( $this->autoload_files as $autoload_file ) {
+            /** See if it needs to be global or local */
+            if( substr( $autoload_file, 0, 2 ) == 'g:' ) {
+              $autoload_scope = 'global';
+              $autoload_file  = substr( $autoload_file, 2, strlen( $autoload_file ) - 2 );
+            } else {
+              $autoload_scope = 'local';
+            }
+            /** Include the files then */
+            $this->load_config( $autoload_file, $autoload_scope );
+          }
+        }
+
+        /** Finally, go through the composer.json file and add all the configs there */
+        if( is_file( $_SERVER[ 'DOCUMENT_ROOT' ] . '/composer.json' ) ) {
+          $composer_file = $_SERVER[ 'DOCUMENT_ROOT' ] . '/composer.json';
+        } else if( is_file( $base_dir . '/composer.json' ) ) {
+          $composer_file = $base_dir . '/composer.json';
+        }
+
+        $_settings = self::get_settings( $composer_file );
+
+        foreach( self::get_settings( $composer_file ) as $key => $value ) {
+
+          if( !defined( strtoupper( $key ) ) ) {
+            define( strtoupper( $key ), strpos( $value, '/' ) === 0 && realpath( $_SERVER[ 'DOCUMENT_ROOT' ] . $value ) ? realpath( $_SERVER[ 'DOCUMENT_ROOT' ] . $value ) : $value );
+          }
+
+        }
+
+        /** Return this own object */
+        return $this;
+
+      }
+
+      /**
+       * This function lets us chain methods without having to instantiate first, YOU MUST COPY THIS TO ALL SUB CLASSES
+       */
+      static public function init() {
+        return new self( __DIR__, false );
+      }
+
+      /**
        * This function looks through the configuration options that are stored and returns them
        *
        * @param string $config The config we're trying to load
@@ -72,6 +160,41 @@ namespace UsabilityDynamics\Veneer {
         } else {
           return false;
         }
+      }
+
+      /**
+       * Parse comoser.json file for settings and extra.settings
+       *
+       * @author potanin@UD
+       * @param null $composer_file
+       *
+       * @return array
+       */
+      private function get_settings( $composer_file = null ) {
+
+        $_composer = json_decode( file_get_contents( $composer_file ) );
+        $_settings = array();
+
+        if( isset( $_composer->settings ) && is_object( $_composer->settings ) ) {
+
+          foreach( (array) $_composer->settings as $key => $value ) {
+            $_settings[ $key ] = $value;
+          }
+
+        }
+
+        if( isset( $_composer->extra ) && isset( $_composer->extra->settings ) && is_object( $_composer->extra->settings ) ) {
+
+          foreach( (array) $_composer->extra->settings as $key => $value ) {
+            $_settings[ $key ] = $value;
+          }
+
+        }
+
+        ksort( $_settings );
+
+        return $_settings;
+
       }
 
       /**
@@ -182,86 +305,8 @@ namespace UsabilityDynamics\Veneer {
         }
       }
 
-      /**
-       * On init, we're just going to setup and include all our config files
-       *
-       * @param string $base_dir Override the base dir to search for files (defaults to __DIR__)
-       * @param bool   $do_stuff Whether we should actually do initialization( needed for 'init' )
-       */
-      function __construct( $base_dir = __DIR__, $do_stuff = true ) {
-        if( !( is_bool( $do_stuff ) && $do_stuff ) ) {
-          return;
-        }
-
-        /** Set some local variables */
-        $base_dir = dirname( dirname( dirname( dirname( $base_dir ) ) ) );
-
-        /** Bring in our local-debug file if we have it */
-        if( is_file( $base_dir . '/local-debug.php' ) ) {
-          require_once( $base_dir . '/local-debug.php' );
-        }
-
-        /** If we've got WP_CLI, we need to fix the base dir */
-        if( defined( 'WP_CLI' ) && WP_CLI ) {
-          $_SERVER[ 'DOCUMENT_ROOT' ] = $base_dir;
-        }
-
-        /** Bring in our environment file if we need to */
-        if( !defined( 'ENVIRONMENT' ) && is_file( $base_dir . '/.environment' ) ) {
-          $environment = @file_get_contents( $base_dir . '/.environment' );
-          define( 'ENVIRONMENT', trim( $environment ) );
-        }
-
-        /** For these variables, make sure they exist */
-        $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/' . ENVIRONMENT . '/';
-        $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/';
-        foreach( $this->config_folders as $key => $value ) {
-          if( !is_dir( $value ) ) {
-            unset( $this->config_folders[ $key ] );
-          }
-        }
-        /** Renumber the array */
-        $this->config_folders = array_values( $this->config_folders );
-        /** If we don't have any config folders, bail */
-        if( !( is_array( $this->config_folders ) && !count( $this->config_folders ) ) ) {
-          /** Now, go through our autoloaded configs, and bring them in */
-          foreach( $this->autoload_files as $autoload_file ) {
-            /** See if it needs to be global or local */
-            if( substr( $autoload_file, 0, 2 ) == 'g:' ) {
-              $autoload_scope = 'global';
-              $autoload_file  = substr( $autoload_file, 2, strlen( $autoload_file ) - 2 );
-            } else {
-              $autoload_scope = 'local';
-            }
-            /** Include the files then */
-            $this->load_config( $autoload_file, $autoload_scope );
-          }
-        }
-        /** Finally, go through the composer.json file and add all the configs there */
-        if( is_file( $_SERVER[ 'DOCUMENT_ROOT' ] . '/composer.json' ) ) {
-          $composer_file = $_SERVER[ 'DOCUMENT_ROOT' ] . '/composer.json';
-        } else if( is_file( $base_dir . '/composer.json' ) ) {
-          $composer_file = $base_dir . '/composer.json';
-        }
-        foreach( $_composer = (array) json_decode( file_get_contents( $composer_file ) )->settings as $key => $value ) {
-          if( !defined( strtoupper( $key ) ) ) {
-            define( strtoupper( $key ), strpos( $value, '/' ) === 0 && realpath( $_SERVER[ 'DOCUMENT_ROOT' ] . $value ) ? realpath( $_SERVER[ 'DOCUMENT_ROOT' ] . $value ) : $value );
-          }
-        }
-
-        /** Return this own object */
-
-        return $this;
-      }
-
-      /**
-       * This function lets us chain methods without having to instantiate first, YOU MUST COPY THIS TO ALL SUB CLASSES
-       */
-      static public function init() {
-        return new self( __DIR__, false );
-      }
-
     }
+
   }
 
   /**
