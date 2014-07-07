@@ -149,6 +149,11 @@ namespace UsabilityDynamics\Veneer {
         $this->logger->addDebug( 'GUID: ' . $this->guid );
         $this->logger->addDebug( 'Logging initialized...' );
 
+        /** If we made it here, we should go aheand and just kill any 'debug.log' files that might exist */
+        @unlink( rtrim( WP_BASE_DIR, '/' ) . '/debug.log' );
+        @unlink( rtrim( WP_SYSTEM_DIRECTORY, '/' ) . '/debug.log' );
+        @unlink( rtrim( WP_SYSTEM_DIRECTORY, '/' ) . '/wp-admin/debug.log' );
+
         /** Return this */
         return $this;
       }
