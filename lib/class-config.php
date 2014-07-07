@@ -57,7 +57,12 @@ namespace UsabilityDynamics\Veneer {
         'WP_BASE_DOMAIN',
         'WP_DEFAULT_PROTOCOL',
         'WP_BASE_URL',
-        'WP_HOME'
+        'WP_HOME',
+        'WP_CACHE',
+        'WP_ALLOW_MULTISITE',
+        'MULTISITE',
+        'SUBDOMAIN_INSTALL',
+        'SUNRISE'
       );
 
       /**
@@ -145,6 +150,33 @@ namespace UsabilityDynamics\Veneer {
         define( 'WP_DEFAULT_PROTOCOL', @isset( $_SERVER[ 'HTTPS' ] ) && $_SERVER[ 'HTTPS' ] == 'on' ? 'https' : 'http' );
         define( 'WP_BASE_URL', WP_DEFAULT_PROTOCOL . '://' . WP_BASE_DOMAIN );
         define( 'WP_HOME', rtrim( WP_BASE_URL, '/' ) );
+
+        /** Ok, we need to make some other determinations based on the file structure */
+        if( file_exists( WP_BASE_DIR . '/db.php' ) ){
+          define( 'IS_CLUSTER', true );
+          define( 'IS_MULTISITE', false );
+          define( 'IS_STANDALONE', false );
+          define( 'WP_ALLOW_MULTISITE', true );
+          define( 'MULTISITE', true );
+          define( 'SUBDOMAIN_INSTALL', true );
+          define( 'SUNRISE', 'on' );
+        }elseif( file_exists( WP_BASE_DIR . '/sunrise.php' ) ){
+          define( 'IS_CLUSTER', false );
+          define( 'IS_MULTISITE', true );
+          define( 'IS_STANDALONE', false );
+          define( 'WP_ALLOW_MULTISITE', true );
+          define( 'MULTISITE', true );
+          define( 'SUBDOMAIN_INSTALL', true );
+          define( 'SUNRISE', 'on' );
+        }else{
+          define( 'IS_CLUSTER', false );
+          define( 'IS_MULTISITE', false );
+          define( 'IS_STANDALONE', true );
+          define( 'WP_ALLOW_MULTISITE', false );
+          define( 'MULTISITE', false );
+          define( 'SUBDOMAIN_INSTALL', false );
+          define( 'SUNRISE', 'off' );
+        }
 
         /** Finally, go through the composer.json file and add all the configs there */
         if( is_file( $_SERVER[ 'DOCUMENT_ROOT' ] . '/composer.json' ) ) {
