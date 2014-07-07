@@ -2,6 +2,8 @@
 /**
  * Log Access Controller
  *
+ * @todo Implement the JustInTime handler for production sites
+ *
  * @module Veneer
  * @author potanin@UD
  */
@@ -10,6 +12,7 @@ namespace UsabilityDynamics\Veneer {
   use Monolog\Logger;
   use Monolog\Handler\StreamHandler;
   use Monolog\Handler\SyslogHandler;
+  use Monolog\Handler\RotatingFileHandler;
   use Monolog\Formatter\LineFormatter;
   use Monolog\ErrorHandler;
 
@@ -27,7 +30,7 @@ namespace UsabilityDynamics\Veneer {
       const CHANNEL  = 'veneer';
 
       /**
-       *
+       * Facility for syslog, if that's what we're using
        */
       const FACILITY = 'local6';
 
@@ -40,6 +43,11 @@ namespace UsabilityDynamics\Veneer {
        * @var \Monolog\Logger
        */
       private $logger;
+
+      /**
+       * Our log level
+       */
+      private $log_level = Logger::DEBUG;
 
       /**
        * @var \Monolog\Formatter\LineFormatter
@@ -59,19 +67,31 @@ namespace UsabilityDynamics\Veneer {
        * Initialize Log
        *
        * @param boolean $do_stuff If we should actually process (used by 'init')
-       *
+       * @throws \Exception on error
        * @returns Log $this
        */
       public function __construct( $do_stuff = true ) {
         global $current_blog;
 
-        if( !$do_stuff || !defined( 'WP_LOGS_DIR' ) || !file_exists( rtrim( WP_LOGS_DIR, '/' ) . '/' . WP_LOGS_FILE ) ) {
+        /** Make sure we've got valid data */
+        if( !$do_stuff || !defined( 'WP_LOGS_DIR' ) ){
           return $this;
         }
 
-        // Verify Class Exists.
+        /** Verify Class Exists.  */
         if( !class_exists( 'Monolog\Logger' ) ) {
           return $this;
+        }
+
+        $this->logs_dir = rtrim( WP_LOGS_DIR, '/' ) . '/' . rtrim( WP_BASE_DOMAIN, '/' );
+        /** Ok, if the directory doesn't exist, let's try to create it */
+        if( !is_dir( $this->logs_dir ) ){
+          if( !@mkdir( $this->logs_dir, 0755, true ) ){
+            throw new \Exception( 'Could not create logs directory: ' . $this->logs_dir );
+          }
+          if( !@chmod( $this->logs_dir, 0755 ) ){
+            throw new \Exception( 'Could not set proper permissions on logs directory: ' . $this->logs_dir );
+          }
         }
 
         /** Setup the GUID */
@@ -90,12 +110,29 @@ namespace UsabilityDynamics\Veneer {
         switch( true ) {
           case defined( 'WP_LOGS_HANDLER' ) && WP_LOGS_HANDLER == 'syslog':
             /** Syslog handler */
-            $this->handler = new SyslogHandler( self::CHANNEL, self::FACILITY, Logger::DEBUG );
+            $this->handler = new SyslogHandler( self::CHANNEL, self::FACILITY, $this->log_level );
+            break;
+          case defined( 'WP_LOGS_HANDLER' ) && WP_LOGS_HANDLER == 'file':
+            /** File name to write to */
+            $this->log_file = rtrim( $this->logs_dir, '/' ) . '/debug.log';
+            /** Ok, attempt to create the file */
+            if( !is_file( $this->log_file ) ){
+              if( !@touch( $this->log_file ) ){
+                throw new \Exception( 'Could not create logs file: ' . $this->log_file );
+              }
+              if( !@chmod( $this->log_file, 0644 ) ){
+                throw new \Exception( 'Could not set proper permissions on logs file: ' . $this->log_file );
+              }
+            }
+            /** File handler */
+            $this->handler = new StreamHandler( $this->log_file, $this->log_level );
             break;
           case !defined( 'WP_LOGS_HANDLER' ):
           default:
-            /** File handler */
-            $this->handler = new StreamHandler( rtrim( WP_LOGS_DIR, '/' ) . '/' . WP_LOGS_FILE, Logger::DEBUG );
+            /** File name to write to */
+            $this->log_file = rtrim( $this->logs_dir, '/' ) . '/debug.log';
+            /** Rotating file handler */
+            $this->handler = new RotatingFileHandler( $this->log_file, 14, $this->log_level, true, 0644 );
             break;
         }
 
@@ -113,7 +150,6 @@ namespace UsabilityDynamics\Veneer {
         $this->logger->addDebug( 'Logging initialized...' );
 
         /** Return this */
-
         return $this;
       }
 
@@ -130,7 +166,6 @@ namespace UsabilityDynamics\Veneer {
           $charid = strtoupper( md5( uniqid( rand(), true ) ) );
           $hyphen = chr( 45 );
           $uuid   = substr( $charid, 0, 8 ) . $hyphen . substr( $charid, 8, 4 ) . $hyphen . substr( $charid, 12, 4 ) . $hyphen . substr( $charid, 16, 4 ) . $hyphen . substr( $charid, 20, 12 );
-
           return strtolower( $uuid );
         }
       }

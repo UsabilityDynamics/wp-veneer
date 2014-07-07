@@ -5,9 +5,10 @@
  * .htaccess.tpl
  *
  * Configs are loaded based on the following hierarchy, and you can do both folders and files:
- *  1) application/etc/wp-config/{ENVIRONMENT}/{FILE_NAME}
- *  2) application/etc/wp-config/{FILE_NAME}
- *  3) All items defined in composer.json, in the settings object key
+ *  1) ENVIRONMENT variables, these supercede anything else, and can also define 'ENVIRONMENT'
+ *  2) application/etc/wp-config/{ENVIRONMENT}/{FILE_NAME}
+ *  3) application/etc/wp-config/{FILE_NAME}
+ *  4) All items defined in composer.json, in the settings object key
  *
  * @author Reid Williams
  * @class UsabilityDynamics\Veneer\Config
@@ -103,6 +104,13 @@ namespace UsabilityDynamics\Veneer {
           $_SERVER[ 'DOCUMENT_ROOT' ] = $base_dir;
         }
 
+        /** Check for any ENVIRONMENT variables first */
+        foreach( $_ENV as $key => $value ){
+          if( !defined( strtoupper( $key ) ) ){
+            define( strtoupper( $key ), $value );
+          }
+        }
+
         /** Bring in our environment file if we need to */
         if( !defined( 'ENVIRONMENT' ) && is_file( $base_dir . '/.environment' ) ) {
           $environment = @file_get_contents( $base_dir . '/.environment' );
@@ -110,8 +118,8 @@ namespace UsabilityDynamics\Veneer {
         }
 
         /** For these variables, make sure they exist */
-        $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/' . ENVIRONMENT . '/';
-        $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/etc/wp-config/';
+        $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/static/etc/wp-config/' . ENVIRONMENT . '/';
+        $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/static/etc/wp-config/';
         foreach( $this->config_folders as $key => $value ) {
           if( !is_dir( $value ) ) {
             unset( $this->config_folders[ $key ] );
@@ -207,10 +215,12 @@ namespace UsabilityDynamics\Veneer {
               foreach( $patterns as $pattern ){
                 $constant = strtoupper( trim( $pattern, '{}' ) );
                 if( !defined( $constant ) ){
-                  throw new \Exception( 'The constant "' . $constant . '" is not defined, but it is used in our composer config.' );
+                  /** Trigger a notice */
+                  trigger_error( 'The constant "' . $constant . '" is not defined, but it is used in our composer config between two {} characters for the variable "' . $key . '".', E_USER_NOTICE );
+                }else{
+                  /** Go ahead and string replace the value */
+                  $value = str_ireplace( $pattern, constant( $constant ), $value );
                 }
-                /** Go ahead and string replace the value */
-                $value = str_ireplace( $pattern, constant( $constant ), $value );
               }
 
             }
