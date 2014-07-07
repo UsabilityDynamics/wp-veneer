@@ -24,7 +24,7 @@
   ],
   "require": {
     "php": ">=5.3",
-    "composer/installers": "~1.0",
+    "usabilitydynamics/lib-installer": "master",
     "usabilitydynamics/lib-api": "master",
     "usabilitydynamics/lib-settings": "master",
     "usabilitydynamics/lib-ui": "master",
