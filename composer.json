@@ -48,7 +48,10 @@
       "lib/class-security.php",
       "lib/class-varnish.php",
       "lib/class-search.php"
-     ]
+    ],
+    "files": [
+      "wp-cluster.php"
+    ]
   },
   "dist": {
     "url": "https://github.com/usabilitydynamics/wp-veneer/archive/master.zip",
