@@ -48,9 +48,6 @@
       "lib/class-security.php",
       "lib/class-varnish.php",
       "lib/class-search.php"
-    ],
-    "files": [
-      "wp-cluster.php"
     ]
   },
   "dist": {
