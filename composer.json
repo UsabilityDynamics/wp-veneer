@@ -47,5 +47,14 @@
       "lib/class-varnish.php",
       "lib/class-search.php"
      ]
+  },
+  "dist": {
+    "url": "https://github.com/usabilitydynamics/wp-veneer/archive/0.6.3.zip",
+     "type": "zip"
+  },
+  "source": {
+    "url": "git@github.com:UsabilityDynamics/wp-veneer",
+    "type": "git",
+    "reference": "0.6.3"
   }
 }
