@@ -2,14 +2,13 @@
 /**
  * Log Access Controller
  *
- * @todo Implement the JustInTime handler for production sites
- *
  * @module Veneer
  * @author potanin@UD
  */
 namespace UsabilityDynamics\Veneer {
 
   use Monolog\Logger;
+  use Monolog\Handler\FingersCrossedHandler;
   use Monolog\Handler\StreamHandler;
   use Monolog\Handler\SyslogHandler;
   use Monolog\Handler\RotatingFileHandler;
@@ -110,7 +109,7 @@ namespace UsabilityDynamics\Veneer {
         switch( true ) {
           case defined( 'WP_LOGS_HANDLER' ) && WP_LOGS_HANDLER == 'syslog':
             /** Syslog handler */
-            $this->handler = new SyslogHandler( self::CHANNEL, self::FACILITY, $this->log_level );
+            $handler = new SyslogHandler( self::CHANNEL, self::FACILITY, $this->log_level );
             break;
           case defined( 'WP_LOGS_HANDLER' ) && WP_LOGS_HANDLER == 'file':
             /** File name to write to */
@@ -125,22 +124,29 @@ namespace UsabilityDynamics\Veneer {
               }
             }
             /** File handler */
-            $this->handler = new StreamHandler( $this->log_file, $this->log_level );
+            $handler = new StreamHandler( $this->log_file, $this->log_level );
             break;
           case !defined( 'WP_LOGS_HANDLER' ):
           default:
             /** File name to write to */
             $this->log_file = rtrim( $this->logs_dir, '/' ) . '/debug.log';
             /** Rotating file handler */
-            $this->handler = new RotatingFileHandler( $this->log_file, 14, $this->log_level, true, 0644 );
+            $handler = new RotatingFileHandler( $this->log_file, 14, $this->log_level, true, 0644 );
             break;
         }
 
         /** Implement the formatter */
-        $this->handler->setFormatter( $this->formatter );
+        $handler->setFormatter( $this->formatter );
 
-        /** Now, bring in our file handler */
-        $this->logger->pushHandler( $this->handler );
+        /** Setup our FingersCrossedHandler */
+        $this->handler = new FingersCrossedHandler( $handler, Logger::ERROR );
+
+        /** Now, bring in our file handler, depending on what kind of system we're in */
+        if( ENVIRONMENT == 'production' ){
+          $this->logger->pushHandler( $this->handler );
+        }else{
+          $this->logger->pushHandler( $handler );
+        }
 
         /** Register the new error handler */
         ErrorHandler::register( $this->logger );
