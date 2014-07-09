@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Our custom wp-config bootstrapper, it looks at the environment, and then loads config files
  * based on those environment variables - typically environment set in .htaccess, see
@@ -101,6 +102,7 @@ namespace UsabilityDynamics\Veneer {
 
         /** If we've got WP_CLI, we need to fix the base dir */
         if( defined( 'WP_CLI' ) && WP_CLI ) {
+          /** Setup the base directory */
           $_SERVER[ 'DOCUMENT_ROOT' ] = $base_dir;
         }
 
@@ -184,6 +186,11 @@ namespace UsabilityDynamics\Veneer {
           define( 'MULTISITE', false );
           define( 'SUBDOMAIN_INSTALL', false );
           define( 'SUNRISE', 'off' );
+        }
+
+        /** Ok, if we're on a production system, we should assume we're caching */
+        if( ENVIRONMENT == 'production' && !defined( 'WP_CACHE' ) ){
+          define( 'WP_CACHE', true );
         }
 
         /** Finally, go through the composer.json file and add all the configs there */
