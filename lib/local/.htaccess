@@ -184,9 +184,10 @@
 
   RewriteRule ^wp-admin/admin-ajax.php?(.*)$  /vendor/libraries/automattic/wordpress/wp-admin/admin-ajax.php$1 [QSA,L]
 
-  RewriteRule ^wp-admin/css/?(.*)$            /manage/css/$1          [QSA,L] #
-  RewriteRule ^wp-admin/images/?(.*)$         /manage/images/$1       [QSA,L] #
-  RewriteRule ^wp-admin/install.php?(.*)$     /manage/install.php$1   [R=301,L] #
+  RewriteRule ^wp-admin/js/?(.*)$             /manage/js/$1           [QSA,L]
+  RewriteRule ^wp-admin/css/?(.*)$            /manage/css/$1          [QSA,L]
+  RewriteRule ^wp-admin/images/?(.*)$         /manage/images/$1       [QSA,L]
+  RewriteRule ^wp-admin/install.php?(.*)$     /manage/install.php$1   [R=301,L]
 
   # Ensure that we're forwarding all manage requests to the right place
   RewriteRule ^manage/(login|signup)/?(.*)$   /vendor/libraries/automattic/wordpress/wp-$1.php [QSA,L]
@@ -220,6 +221,19 @@
 
 </IfModule>
 # END Assets
+
+# BEGIN Legacy
+# These rewrites exist to fix old or broken functionality
+<IfModule mod_rewrite.c>
+
+  # Rewrite old to new location for vendor libraries
+  RewriteCond %{REQUEST_URI} !^/vendor/(libraries|modules|plugins|themes)/(.*)
+  RewriteRule ^vendor/(.*) /vendor/libraries/$1 [R=301,L]
+
+</IfModule>
+
+
+# END Legacy
 
 # BEGIN PHP-FPM
 <IfModule mod_proxy_fcgi.c>
