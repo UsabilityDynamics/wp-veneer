@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Our custom wp-config bootstrapper, it looks at the environment, and then loads config files
  * based on those environment variables - typically environment set in .htaccess, see
@@ -189,7 +188,7 @@ namespace UsabilityDynamics\Veneer {
         }
 
         /** Ok, if we're on a production system, we should assume we're caching */
-        if( ENVIRONMENT == 'production' && !defined( 'WP_CACHE' ) ){
+        if( ENVIRONMENT == 'production' && !defined( 'WP_CACHE' ) ) {
           define( 'WP_CACHE', true );
         }
 
