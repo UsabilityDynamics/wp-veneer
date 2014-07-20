@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "805d6a96bbd95a4e4c23a9be97ed8552",
+    "hash": "6b7125a3affdf2806567521ace05440d",
     "packages": [
         {
             "name": "composer/installers",
@@ -191,6 +191,56 @@
             "description": "CSS & JS minifier",
             "homepage": "https://github.com/matthiasmullie/minify",
             "time": "2013-12-01 22:51:43"
+        },
+        {
+            "name": "mindscape/raygun4php",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/MindscapeHQ/raygun4php.git",
+                "reference": "a70a1facc3aa6a1d3f0f02dac7aaa6d4fcbbb222"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/MindscapeHQ/raygun4php/zipball/a70a1facc3aa6a1d3f0f02dac7aaa6d4fcbbb222",
+                "reference": "a70a1facc3aa6a1d3f0f02dac7aaa6d4fcbbb222",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
+            "suggest": {
+                "ext-curl": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Raygun4php": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mindscape",
+                    "email": "contact@mindscape.co.nz",
+                    "homepage": "http://www.mindscapehq.com"
+                }
+            ],
+            "description": "Raygun.io client for PHP 5.3, to send errors and exceptions automatically.",
+            "homepage": "http://raygun.io",
+            "keywords": [
+                "errors",
+                "exceptions",
+                "logging",
+                "raygun"
+            ],
+            "time": "2014-07-07 21:53:20"
         },
         {
             "name": "monolog/monolog",
@@ -529,9 +579,9 @@
 
     ],
     "minimum-stability": "dev",
-    "stability-flags": [
-
-    ],
+    "stability-flags": {
+        "mindscape/raygun4php": 20
+    },
     "prefer-stable": false,
     "platform": {
         "php": ">=5.3"

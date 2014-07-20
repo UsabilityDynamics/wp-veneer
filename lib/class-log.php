@@ -14,6 +14,8 @@ namespace UsabilityDynamics\Veneer {
   use Monolog\Handler\RotatingFileHandler;
   use Monolog\Formatter\LineFormatter;
   use Monolog\ErrorHandler;
+  use Graze\Monolog\Handler\RaygunHandler;
+  use Raygun4php\RaygunClient;
 
   if( !class_exists( 'UsabilityDynamics\Cluster\Log' ) ) {
     /**
@@ -125,6 +127,12 @@ namespace UsabilityDynamics\Veneer {
             }
             /** File handler */
             $handler = new StreamHandler( $this->log_file, $this->log_level );
+            break;
+          case defined( 'RAYGUN_API_KEY' ) && ( ( defined( 'WP_LOGS_HANDLER' ) && WP_LOGS_HANDLER == 'raygun' ) || ( !defined( 'WP_LOGS_HANDLER' ) && ENVIRONMENT == 'production' ) ):
+            /** Create the client for RayGun */
+            $client = new RaygunClient( RAYGUN_API_KEY );
+            /** Create the handler */
+            $handler = new RaygunHandler( $client );
             break;
           case !defined( 'WP_LOGS_HANDLER' ):
           default:
