@@ -710,32 +710,44 @@ namespace UsabilityDynamics\Veneer {
 
         $_SERVER[ 'REMOTE_ADDR' ] = isset( $_SERVER[ 'REMOTE_ADDR' ] ) ? $_SERVER[ 'REMOTE_ADDR' ] : '';
         
-        if( defined( 'WP_BASE_DIR' ) && file_exists( WP_BASE_DIR . '/local-debug.php' ) || in_array( $_SERVER[ 'REMOTE_ADDR' ], array( '127.0.0.1', '10.0.0.1', '0.0.0.0' ) ) ) {
-          add_action( 'wp_before_admin_bar_render', array( $this, 'toolbar_local' ), 100 );
-        }
+        add_action( 'wp_before_admin_bar_render', array( $this, 'toolbar_local' ), 100 );
+
 
       }
 
       /**
        * Administrative Toolbar.
-       *
        */
-      public function toolbar_local() {
+      public function toolbar_local(){
         global $wp_admin_bar;
-
-        $wp_admin_bar->add_menu( array(
-          'id'     => 'localhost',
-          'parent' => 'top-secondary',
-          'meta'   => array(
-            'html'    => '<div class="veneer-toolbar-environment"></div>',
-            'target'  => '',
-            'onclick' => '',
-            'title'   => __( 'Local' ),
-            'class'   => 'veneer-toolbar-local'
-          ),
-          'title'  => __( 'Local' ),
-        ) );
-
+        if( current_user_can( 'manage_options' ) ){
+          /** Add the style we need */ ?>
+          <style>
+            #wp-admin-bar-server_name > a:before {
+              content: "\f177";
+              top: 2px;
+            }
+          </style> <?php 
+          /** Add the menu items */
+          $wp_admin_bar->add_menu( array(
+            'id' => 'server_name',
+            'parent' => 'top-secondary',
+            'title' => ucwords( gethostname() ),
+            'href' => '#'
+          ) );
+          $wp_admin_bar->add_menu( array(
+            'id' => 'environment',
+            'parent' => 'server_name',
+            'title' => ucwords( ENVIRONMENT ),
+            'href' => '#'
+          ) );
+          $wp_admin_bar->add_menu( array(
+            'id' => 'ip_address',
+            'parent' => 'server_name',
+            'title' => $_SERVER[ 'SERVER_ADDR' ],
+            'href' => '#'
+          ) );
+        }
       }
 
       /**

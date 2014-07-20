@@ -101,6 +101,22 @@ namespace UsabilityDynamics\Veneer {
 
         /** If we've got WP_CLI, we need to fix the base dir */
         if( defined( 'WP_CLI' ) && WP_CLI ) {
+          /** Go ahead and turn off error reporting */
+          if( !defined( 'WP_DEBUG' ) ){
+            define( 'WP_DEBUG', false );
+          }
+          if( !defined( 'WP_DEBUG_DISPLAY' ) ){
+            define( 'WP_DEBUG_DISPLAY', false );
+          }
+          if( !defined( 'WP_DEBUG_LOG' ) ){
+            define( 'WP_DEBUG_LOG', true );
+          }
+          if( !defined( 'SCRIPT_DEBUG' ) ){
+            define( 'SCRIPT_DEBUG', false );
+          }
+          if( !defined( 'SAVEQUERIES' ) ){
+            define( 'SAVEQUERIES', false );
+          }
           /** Setup the base directory */
           $_SERVER[ 'DOCUMENT_ROOT' ] = $base_dir;
         }
