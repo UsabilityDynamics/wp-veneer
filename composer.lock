@@ -1,9 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
     ],
-    "hash": "61d4da081aa33e2896993b0946025fdd",
+    "hash": "805d6a96bbd95a4e4c23a9be97ed8552",
     "packages": [
         {
             "name": "composer/installers",
@@ -11,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/installers.git",
-                "reference": "9eb391bcafef76503d0bd4e585756391efc8740f"
+                "reference": "020fa1983597249bfcb947b485c5aac8e0e36652"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/installers/zipball/9eb391bcafef76503d0bd4e585756391efc8740f",
-                "reference": "9eb391bcafef76503d0bd4e585756391efc8740f",
+                "url": "https://api.github.com/repos/composer/installers/zipball/020fa1983597249bfcb947b485c5aac8e0e36652",
+                "reference": "020fa1983597249bfcb947b485c5aac8e0e36652",
                 "shasum": ""
             },
             "replace": {
@@ -92,7 +93,65 @@
                 "zend",
                 "zikula"
             ],
-            "time": "2014-06-27 16:11:39"
+            "time": "2014-07-09 14:29:42"
+        },
+        {
+            "name": "graze/monolog-extensions",
+            "version": "1.4.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/graze/MonologExtensions.git",
+                "reference": "3d1e3986da9a2cb6aca91f91498ace72ec134448"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/graze/MonologExtensions/zipball/3d1e3986da9a2cb6aca91f91498ace72ec134448",
+                "reference": "3d1e3986da9a2cb6aca91f91498ace72ec134448",
+                "shasum": ""
+            },
+            "require": {
+                "monolog/monolog": "~1.7"
+            },
+            "require-dev": {
+                "adlawson/timezone": "~1.0",
+                "aws/aws-sdk-php": "~2.4",
+                "mindscape/raygun4php": "dev-master",
+                "mockery/mockery": "~0.9",
+                "phpunit/phpunit": "~4.0"
+            },
+            "suggest": {
+                "aws/aws-sdk-php": "Write records to AWS services like DynamoDb",
+                "mindscape/raygun4php": "Write records to Raygun.io"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Graze\\Monolog": "./src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Graze tech team",
+                    "homepage": "https://github.com/graze/MonologExtensions/graphs/contributors"
+                }
+            ],
+            "description": "Monolog extensions for use within Graze",
+            "keywords": [
+                "debug",
+                "debugging",
+                "error",
+                "exception",
+                "handler",
+                "handling",
+                "log",
+                "logger",
+                "logging"
+            ],
+            "time": "2014-07-09 12:06:29"
         },
         {
             "name": "matthiasmullie/minify",
@@ -134,6 +193,76 @@
             "time": "2013-12-01 22:51:43"
         },
         {
+            "name": "monolog/monolog",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Seldaek/monolog.git",
+                "reference": "61145103b6521d04c0386d1ea6899437df9d45e2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/61145103b6521d04c0386d1ea6899437df9d45e2",
+                "reference": "61145103b6521d04c0386d1ea6899437df9d45e2",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0",
+                "psr/log": "~1.0"
+            },
+            "provide": {
+                "psr/log-implementation": "1.0.0"
+            },
+            "require-dev": {
+                "aws/aws-sdk-php": "~2.4, >2.4.8",
+                "doctrine/couchdb": "~1.0@dev",
+                "graylog2/gelf-php": "~1.0",
+                "phpunit/phpunit": "~3.7.0",
+                "raven/raven": "~0.5",
+                "ruflin/elastica": "0.90.*"
+            },
+            "suggest": {
+                "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
+                "doctrine/couchdb": "Allow sending log messages to a CouchDB server",
+                "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
+                "ext-mongo": "Allow sending log messages to a MongoDB server",
+                "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
+                "raven/raven": "Allow sending log messages to a Sentry server",
+                "rollbar/rollbar": "Allow sending log messages to Rollbar",
+                "ruflin/elastica": "Allow sending log messages to an Elastic Search server"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.10.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Monolog\\": "src/Monolog"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                }
+            ],
+            "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
+            "homepage": "http://github.com/Seldaek/monolog",
+            "keywords": [
+                "log",
+                "logging",
+                "psr-3"
+            ],
+            "time": "2014-07-19 19:11:34"
+        },
+        {
             "name": "mrclay/minify",
             "version": "dev-master",
             "source": {
@@ -163,7 +292,7 @@
             ],
             "authors": [
                 {
-                    "name": "Stephen Clay",
+                    "name": "Steve Clay",
                     "email": "steve@mrclay.org",
                     "homepage": "http://www.mrclay.org/",
                     "role": "Developer"
@@ -172,6 +301,49 @@
             "description": "Minify is a PHP5 app that helps you follow several rules for client-side performance. It combines multiple CSS or Javascript files, removes unnecessary whitespace and comments, and serves them with gzip encoding and optimal client-side cache headers",
             "homepage": "http://code.google.com/p/minify/",
             "time": "2014-04-03 23:53:48"
+        },
+        {
+            "name": "psr/log",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log.git",
+                "reference": "a78d6504ff5d4367497785ab2ade91db3a9fbe11"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/a78d6504ff5d4367497785ab2ade91db3a9fbe11",
+                "reference": "a78d6504ff5d4367497785ab2ade91db3a9fbe11",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Psr\\Log\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "time": "2014-01-18 15:33:09"
         },
         {
             "name": "usabilitydynamics/lib-api",
@@ -313,7 +485,7 @@
                     "lib"
                 ]
             },
-            "time": "2014-06-03 13:46:45"
+            "time": "2014-07-15 16:52:21"
         },
         {
             "name": "usabilitydynamics/lib-utility",
@@ -347,7 +519,7 @@
                     "lib"
                 ]
             },
-            "time": "2014-06-25 21:24:06"
+            "time": "2014-07-18 17:34:11"
         }
     ],
     "packages-dev": [
@@ -360,6 +532,7 @@
     "stability-flags": [
 
     ],
+    "prefer-stable": false,
     "platform": {
         "php": ">=5.3"
     },

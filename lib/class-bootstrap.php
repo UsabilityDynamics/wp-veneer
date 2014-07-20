@@ -732,13 +732,13 @@ namespace UsabilityDynamics\Veneer {
           $wp_admin_bar->add_menu( array(
             'id' => 'server_name',
             'parent' => 'top-secondary',
-            'title' => ucwords( gethostname() ),
+            'title' => gethostname(),
             'href' => '#'
           ) );
           $wp_admin_bar->add_menu( array(
             'id' => 'environment',
             'parent' => 'server_name',
-            'title' => ucwords( ENVIRONMENT ),
+            'title' => ENVIRONMENT,
             'href' => '#'
           ) );
           $wp_admin_bar->add_menu( array(
