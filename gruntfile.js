@@ -35,7 +35,7 @@ module.exports = function build( grunt ) {
         },
         files: {
           'static/styles/wp-veneer.css': [ 'static/styles/src/wp-veneer.less' ],
-          'static/styles/wp-veneer-login.css': [ 'static/styles/src/wp-veneer-login.less' ]
+          'static/styles/wp-login.css': [ 'static/styles/src/wp-login.less' ]
         }
       },
       development: {
@@ -143,6 +143,9 @@ module.exports = function build( grunt ) {
 
   // Register default task
   grunt.registerTask( 'default', [ 'markdown', 'less' , 'yuidoc', 'uglify' ] );
+
+  grunt.registerTask( 'install', [ 'default' ] );
+  grunt.registerTask( 'build', [ 'default' ] );
 
   // Build Distribution
   grunt.registerTask( 'distribution', [] );
