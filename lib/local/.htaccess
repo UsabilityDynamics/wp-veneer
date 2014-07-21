@@ -120,12 +120,24 @@
   RewriteRule ^uploads/(.*)$ /media/$1 [L]
 
   # Now, we're going to look in the public directory to see if the file exists, and serve
-  # it if it does
+  # it if it does, this URL should work:
+  # http://discodonniepresents.com/media/2014/04/4e46e8caed44b6ceae3f26cb48d321da78-890x460.jpg
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{HTTP_HOST}::%{REQUEST_URI} ^(.*)::/(.*)$
   RewriteCond %{DOCUMENT_ROOT}/storage/public/%1/%2 -f
   RewriteRule ^.*$ /storage/public/%1/%2 [L]
+  
+  # Now, look to see if we have a subdomain, with the request so we can properly route
+  # it:
+  # http://media.discodonniepresents.com/media/2014/04/4e46e8caed44b6ceae3f26cb48d321da78-890x460.jpg
+  # -OR-
+  # http://media.discodonniepresents.com/2014/04/4e46e8caed44b6ceae3f26cb48d321da78-890x460.jpg
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{HTTP_HOST}::%{REQUEST_URI} ^(assets|media|api|cache|static)\.(.*)::/(?:assets|media|api|cache|static)?/?(.*)$
+  RewriteCond %{DOCUMENT_ROOT}/storage/public/%2/%1/%3 -f
+  RewriteRule ^.*$ /storage/public/%2/%1/%3 [L]
 
   # Ok, now we're going to rewrite to static html files if they exist
   # for the request
@@ -147,12 +159,25 @@
 
 # BEGIN Public API
 <IfModule mod_rewrite.c>
-  RewriteRule ^xmlrpc.php$     /vendor/libraries/automattic/wordpress/xmlrpc.php   [QSA,L]
-  RewriteRule ^api/rpc.xml$     /vendor/libraries/automattic/wordpress/xmlrpc.php   [QSA,L]
-  RewriteRule ^api/rpc.json$    /manage/admin-ajax.php?action=/api/json-rpc         [QSA,L]
-  RewriteRule ^api/(.*).xml$    /manage/admin-ajax.php?action=/$1&format=xml        [QSA,L]
-  RewriteRule ^api/(.*).json$   /manage/admin-ajax.php?action=/$1&format=json       [QSA,L]
-  RewriteRule ^api/(.*)$        /manage/admin-ajax.php?action=/$1&format=json       [QSA,L]
+
+  # Now, if we have a subdomain request to API, forward it to admin AJAX, these requests are like follows:
+  # http://api.discodonniepresents.com/some/path/to/api
+  # -OR-
+  # http://api.discodonniepresents.com/api/some/path/to/api
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} !^.*admin-ajax\.php.*$
+  RewriteCond %{HTTP_HOST}::%{REQUEST_URI} ^(api)\.(.*)::/(?:api)?/?(.*)$
+  RewriteRule ^.*$ /manage/admin-ajax.php?action=/%3&format=json [L]
+
+  # Do our default API requests
+  RewriteRule ^xmlrpc.php$ /vendor/libraries/automattic/wordpress/xmlrpc.php [QSA,L]
+  RewriteRule ^api/rpc.xml$ /vendor/libraries/automattic/wordpress/xmlrpc.php [QSA,L]
+  RewriteRule ^api/rpc.json$ /manage/admin-ajax.php?action=/api/json-rpc [QSA,L]
+  RewriteRule ^api/(.*).xml$ /manage/admin-ajax.php?action=/$1&format=xml [QSA,L]
+  RewriteRule ^api/(.*).json$ /manage/admin-ajax.php?action=/$1&format=json [QSA,L]
+  RewriteRule ^api/(.*)$ /manage/admin-ajax.php?action=/$1&format=json [QSA,L]
+  
 </IfModule>
 # END Public API
 
