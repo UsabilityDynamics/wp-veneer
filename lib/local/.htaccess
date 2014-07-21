@@ -214,9 +214,12 @@
   RewriteRule ^wp-admin/images/?(.*)$         /manage/images/$1       [QSA,L]
   RewriteRule ^wp-admin/install.php?(.*)$     /manage/install.php$1   [R=301,L]
 
+  # Must have the following to avoid having a broken admin panel
+  RewriteRule ^manage$                         /manage/ [R=301,L]
+
   # Ensure that we're forwarding all manage requests to the right place
-  RewriteRule ^manage/(login|signup)/?(.*)$   /vendor/libraries/automattic/wordpress/wp-$1.php [QSA,L]
-  RewriteRule ^manage/?(.*)$                  /vendor/libraries/automattic/wordpress/wp-admin/$1 [QSA,L]
+  RewriteRule ^manage/(login|signup)/?(.*)$    /vendor/libraries/automattic/wordpress/wp-$1.php [QSA,L]
+  RewriteRule ^manage/?(.*)$                   /vendor/libraries/automattic/wordpress/wp-admin/$1 [QSA,L]
 
   # Without this, Media Libary can't make admin-ajax requests...
   RewriteRule ^vendor/libraries/automattic/wordpress/manage/?(.*)$ /manage/$1 [QSA,L]
