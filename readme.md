@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/usabilitydynamics/wp-veneer.png?label=ready&title=Ready)](https://waffle.io/usabilitydynamics/wp-veneer)
 ## Manages
 * Varnish Purging
 * URL Rewrites
