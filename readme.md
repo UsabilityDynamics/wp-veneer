@@ -1,5 +1,15 @@
-[![Stories in Ready](https://badge.waffle.io/usabilitydynamics/wp-veneer.png?label=ready&title=Ready)](https://waffle.io/usabilitydynamics/wp-veneer)
-## Manages
+***
+[![Issues - Bug](https://badge.waffle.io/usabilitydynamics/wp-veneer.png?label=bug&title=Bugs)](http://waffle.io/usabilitydynamics/wp-veneer)
+[![Issues - Backlog](https://badge.waffle.io/usabilitydynamics/wp-veneer.png?label=backlog&title=Backlog)](http://waffle.io/usabilitydynamics/wp-veneer/)
+[![Issues - Active](https://badge.waffle.io/usabilitydynamics/wp-veneer.png?label=in progress&title=Active)](http://waffle.io/usabilitydynamics/wp-veneer/)
+***
+[![Dependency Status](https://gemnasium.com/UsabilityDynamics/wp-veneer.svg)](https://gemnasium.com/UsabilityDynamics/wp-veneer)
+[![Scrutinizer Quality](http://img.shields.io/scrutinizer/g/UsabilityDynamics/wp-veneer.svg)](https://scrutinizer-ci.com/g/UsabilityDynamics/wp-veneer)
+[![Scrutinizer Coverage](http://img.shields.io/scrutinizer/coverage/g/UsabilityDynamics/wp-veneer.svg)](https://scrutinizer-ci.com/g/UsabilityDynamics/wp-veneer)
+[![CircleCI](https://circleci.com/gh/UsabilityDynamics/wp-veneer.png?circle-token=08ed40a6f722782ae229774ee7a208a1167b012f)](https://circleci.com/gh/UsabilityDynamics/wp-veneer)
+***
+
+## Features
 * Varnish Purging
 * URL Rewrites
 * vElasic Search
