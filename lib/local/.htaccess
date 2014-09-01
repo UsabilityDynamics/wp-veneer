@@ -118,10 +118,20 @@
   RewriteRule ^system/media/(.*)$ /media/$1 [L]
   RewriteRule ^files/(.*)$ /media/$1 [L]
   RewriteRule ^uploads/(.*)$ /media/$1 [L]
+  
+  # Rewrite static assets specifically to the static directory if they exist:
+  # http://wildwood.beachblanketfestival.com/img/logo-small.png
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{HTTP_HOST}::%{REQUEST_URI} ^(.*)::/(.*)$
+  RewriteCond %{DOCUMENT_ROOT}/storage/public/%1/static/%2 -f
+  RewriteRule ^(.*) /storage/public/%1/static/%2 [L]
 
   # Now, we're going to look in the public directory to see if the file exists, and serve
   # it if it does, this URL should work:
   # http://discodonniepresents.com/media/2014/04/4e46e8caed44b6ceae3f26cb48d321da78-890x460.jpg
+  # -AND-
+  # http://wildwood.beachblanketfestival.com/static/img/logo-small.png
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{HTTP_HOST}::%{REQUEST_URI} ^(.*)::/(.*)$
@@ -139,7 +149,7 @@
   RewriteCond %{DOCUMENT_ROOT}/storage/public/%2/%1/%3 -f
   RewriteRule ^.*$ /storage/public/%2/%1/%3 [L]
 
-  # Rewrite static assets that exist in the storage directory with a sub-directory
+  # Rewrite static index HTML that exist in the storage directory with a sub-directory
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{HTTP_HOST}::%{REQUEST_URI} ^(.*)::/(.*)$
@@ -151,15 +161,15 @@
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{HTTP_HOST}::%{REQUEST_URI} ^(.*)::/(.*)$
-  RewriteCond %{DOCUMENT_ROOT}/storage/public/%1/%2.html -f
-  RewriteRule ^.*$ /storage/public/%1/%2.html [L]
+  RewriteCond %{DOCUMENT_ROOT}/storage/public/%1/static/%2.html -f
+  RewriteRule ^.*$ /storage/public/%1/static/%2.html [L]
 
   # Look to rewrite for the root specifically to index.html if it exists,
   # but only if we don't actually have a query string
   RewriteCond %{REQUEST_FILENAME} !-f
-  RewriteCond %{DOCUMENT_ROOT}/storage/public/%{HTTP_HOST}/index\.html -f
+  RewriteCond %{DOCUMENT_ROOT}/storage/public/%{HTTP_HOST}/static/index\.html -f
   RewriteCond %{QUERY_STRING} ^$
-  RewriteRule ^$ /storage/public/%{HTTP_HOST}/index.html [L]
+  RewriteRule ^$ /storage/public/%{HTTP_HOST}/static/index.html [L]
 
 </IfModule>
 # END Static and Media
@@ -188,24 +198,46 @@
 </IfModule>
 # END Public API
 
-# BEGIN Modules
+# BEGIN Legacy
+# These rewrites exist to fix old or broken functionality
 <IfModule mod_rewrite.c>
+
+  # Rewrite old to new location for vendor libraries
+  RewriteCond %{REQUEST_URI} !^/vendor/(libraries|modules|plugins|themes)/(.*)
+  RewriteRule ^vendor/(.*) /vendor/libraries/$1 [R=301,L]
+  
+  # Rewrite old modules/themes
+  RewriteRule ^themes/(.*)$ /vendor/themes/$1 [QSA,L]
+  RewriteRule ^modules/(.*)$ /vendor/plugins/$1 [QSA,L]
+  RewriteRule ^plugins/(.*)$ /vendor/plugins/$1 [QSA,L]
+  
   # Just do a standard rewrite for plugins to vendor conversion
   RewriteRule ^libraries/(.*)$ vendor/libraries/$1 [QSA,L]
-  #RewriteRule ^modules(.*)$ vendor/modules$1 [QSA,L]
-  RewriteRule ^plugins(.*)$ vendor/plugins$1 [QSA,L]
-  RewriteRule ^wp-content/plugins/(.*)$ vendor/plugins/$1 [L]
-  RewriteRule ^wp-content/vendor/(.*)$ vendor/$1 [R=301,L] # DO NOT REOMVE
-</IfModule>
-# END Modules
 
-# BEGIN Theme
-<IfModule mod_rewrite.c>
-  # Just do a standard rewrite for wp-content to vendor conversion
-  RewriteRule ^themes(.*)$ vendor/themes$1 [QSA,L]
-  RewriteRule ^wp-content/themes/(.*)$ vendor/themes/$1 [L]
+  # Rewrite anything in wp-content
+  RewriteRule ^wp-content/plugins/(.*)$ vendor/plugins/$1 [QSA,L]
+  RewriteRule ^wp-content/themes/(.*)$ vendor/themes/$1 [QSA,L]
+  RewriteRule ^wp-content/vendor/(.*)$ vendor/$1 [R=301,L] # DO NOT REMOVE
+
 </IfModule>
-# END Theme
+# END Legacy
+
+# BEGIN Assets
+<IfModule mod_rewrite.c>
+
+  RewriteRule ^includes/js/(.*)$ /assets/scripts/$1 [QSA,L]
+  RewriteRule ^includes/css/(.*)$ /assets/styles/$1 [QSA,L]
+
+  RewriteRule ^wp-includes/js/(.*)$ /assets/scripts/$1 [QSA,L]
+  RewriteRule ^wp-includes/images/(.*)$ /assets/images/$1 [QSA,L]
+  RewriteRule ^wp-includes/css/(.*)$ /assets/styles/$1 [R=301,L]
+
+  RewriteRule ^assets/styles/(.*)$ /vendor/libraries/automattic/wordpress/wp-includes/css/$1 [QSA,L]
+  RewriteRule ^assets/scripts/(.*)$ /vendor/libraries/automattic/wordpress/wp-includes/js/$1 [QSA,L]
+  RewriteRule ^assets/images/(.*)$ /vendor/libraries/automattic/wordpress/wp-includes/images/$1 [QSA,L]
+
+</IfModule>
+# END Assets
 
 # BEGIN Management
 <IfModule mod_rewrite.c>
@@ -233,36 +265,6 @@
 
 </IfModule>
 # END Management
-
-# BEGIN Assets
-<IfModule mod_rewrite.c>
-
-  RewriteRule ^includes/js/(.*)$ /assets/scripts/$1 [QSA,L]
-  RewriteRule ^includes/css/(.*)$ /assets/styles/$1 [QSA,L]
-
-  RewriteRule ^wp-includes/js/(.*)$ /assets/scripts/$1 [QSA,L]
-  RewriteRule ^wp-includes/images/(.*)$ /assets/images/$1 [QSA,L]
-  RewriteRule ^wp-includes/css/(.*)$ /assets/styles/$1 [R=301,L]
-
-  RewriteRule ^assets/styles/(.*)$ /vendor/libraries/automattic/wordpress/wp-includes/css/$1 [QSA,L]
-  RewriteRule ^assets/scripts/(.*)$ /vendor/libraries/automattic/wordpress/wp-includes/js/$1 [QSA,L]
-  RewriteRule ^assets/images/(.*)$ /vendor/libraries/automattic/wordpress/wp-includes/images/$1 [QSA,L]
-
-</IfModule>
-# END Assets
-
-# BEGIN Legacy
-# These rewrites exist to fix old or broken functionality
-<IfModule mod_rewrite.c>
-
-  # Rewrite old to new location for vendor libraries
-  RewriteCond %{REQUEST_URI} !^/vendor/(libraries|modules|plugins|themes)/(.*)
-  RewriteRule ^vendor/(.*) /vendor/libraries/$1 [R=301,L]
-
-</IfModule>
-
-
-# END Legacy
 
 # BEGIN PHP-FPM
 <IfModule mod_proxy_fcgi.c>
