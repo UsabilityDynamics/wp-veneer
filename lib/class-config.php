@@ -87,7 +87,7 @@ namespace UsabilityDynamics\Veneer {
         }
 
         /** Fix HTTPS if we're proxied */
-        if( @isset( $_SERVER[ 'HTTP_X_FORWARDED_PROTO' ] ) ) {
+        if( @isset( $_SERVER[ 'HTTP_X_FORWARDED_PROTO' ] ) && strtolower( $_SERVER[ 'HTTP_X_FORWARDED_PROTO' ] ) == 'https' ) {
           $_SERVER[ 'HTTPS' ] = 'on';
         }
 

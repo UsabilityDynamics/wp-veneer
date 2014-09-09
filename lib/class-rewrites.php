@@ -569,6 +569,9 @@ namespace UsabilityDynamics\Veneer {
 
         /** Fix for Win system */
         $url = str_replace( '\\', '/', $url );
+        
+        /** Hack for Multilingual CMS bug */
+        $url = str_ireplace( 'plugins/sitepress-multilingual-cms/inc/installer/includes', 'plugins/sitepress-multilingual-cms/inc/installer', $url );
 
         return $url;
 
