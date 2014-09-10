@@ -1,6 +1,6 @@
 {
   "name": "wp-veneer",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "description": "wp-veneer plugin",
   "private": true,
   "engines": {
