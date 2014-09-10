@@ -103,6 +103,15 @@ namespace UsabilityDynamics\Veneer {
         /** If we've got WP_CLI, we need to fix the base dir */
         if( defined( 'WP_CLI' ) && WP_CLI ) {
           $_SERVER[ 'DOCUMENT_ROOT' ] = $base_dir;
+
+          if( !defined( 'WP_DEBUG' ) ) {
+            define( 'WP_DEBUG', false );
+          }
+
+          if( !defined( 'WP_DEBUG_DISPLAY' ) ) {
+            define( 'WP_DEBUG_DISPLAY', false );
+          }
+
         }
 
         if( !defined( 'WP_ENV' ) && isset( $_SERVER[ 'WP_ENV' ] ) ) {
