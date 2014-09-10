@@ -134,7 +134,11 @@ namespace UsabilityDynamics\Veneer {
         }
 
         if( !defined( 'WP_DEBUG' ) && isset( $_SERVER[ 'WP_DEBUG' ] ) ) {
-          define( 'WP_DEBUG', $_SERVER[ 'DB_PREFIX' ] );
+          define( 'WP_DEBUG', $_SERVER[ 'WP_DEBUG' ] );
+        }
+
+        if( !defined( 'WP_DEBUG_DISPLAY' ) && isset( $_SERVER[ 'WP_DEBUG_DISPLAY' ] ) ) {
+          define( 'WP_DEBUG_DISPLAY', $_SERVER[ 'WP_DEBUG_DISPLAY' ] );
         }
 
         /** Check for any ENVIRONMENT variables first */
