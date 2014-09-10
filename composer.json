@@ -1,7 +1,7 @@
 {
   "name": "usabilitydynamics/wp-veneer",
   "type": "wordpress-module",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "homepage": "https://github.com/UsabilityDynamics/wp-veneer",
   "keywords": [
     "wordpress",
