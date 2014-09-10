@@ -105,44 +105,36 @@ namespace UsabilityDynamics\Veneer {
           $_SERVER[ 'DOCUMENT_ROOT' ] = $base_dir;
         }
 
-        if( !defined( 'PHP_ENV' ) ) {
-          define( 'PHP_ENV', isset( $_SERVER[ 'PHP_ENV' ] ) && !defined( 'PHP_ENV' ) ? $_SERVER[ 'PHP_ENV' ] : 'production' );
+        if( !defined( 'WP_ENV' ) && isset( $_SERVER[ 'WP_ENV' ] ) ) {
+          define( 'WP_ENV', $_SERVER[ 'WP_ENV' ] );
         }
 
-        if( !defined( 'WP_ENV' ) ) {
-          define( 'WP_ENV', isset( $_SERVER[ 'WP_ENV' ] ) && !defined( 'WP_ENV' ) ? $_SERVER[ 'WP_ENV' ] : 'production' );
+        if( !defined( 'PHP_ENV' ) && isset( $_SERVER[ 'PHP_ENV' ] ) ) {
+          define( 'PHP_ENV', $_SERVER[ 'PHP_ENV' ] );
         }
 
-        if( !defined( 'DB_HOST' ) ) {
-          define( 'DB_HOST', isset( $_SERVER[ 'DB_HOST' ] ) && !defined( 'DB_HOST' ) ? $_SERVER[ 'DB_HOST' ] : 'localhost' );
+        if( !defined( 'DB_HOST' ) && isset( $_SERVER[ 'DB_HOST' ] ) ) {
+          define( 'DB_HOST', $_SERVER[ 'DB_HOST' ] );
         }
 
-        if( !defined( 'DB_NAME' ) ) {
-          define( 'DB_NAME', isset( $_SERVER[ 'DB_NAME' ] ) && !defined( 'DB_NAME' ) ? $_SERVER[ 'DB_NAME' ] : 'wp' );
+        if( !defined( 'DB_USER' ) && isset( $_SERVER[ 'DB_USER' ] ) ) {
+          define( 'DB_USER', $_SERVER[ 'DB_USER' ] );
         }
 
-        if( !defined( 'DB_PASSWORD' ) ) {
-          define( 'DB_PASSWORD', isset( $_SERVER[ 'DB_PASSWORD' ] ) && !defined( 'DB_PASSWORD' ) ? $_SERVER[ 'DB_PASSWORD' ] : null );
+        if( !defined( 'DB_PASSWORD' ) && isset( $_SERVER[ 'DB_PASSWORD' ] ) ) {
+          define( 'DB_PASSWORD', $_SERVER[ 'DB_PASSWORD' ] );
         }
 
-        if( !defined( 'DB_USER' ) ) {
-          define( 'DB_USER', isset( $_SERVER[ 'DB_USER' ] ) && !defined( 'DB_USER' ) ? $_SERVER[ 'DB_USER' ] : null );
+        if( !defined( 'DB_NAME' ) && isset( $_SERVER[ 'DB_NAME' ] ) ) {
+          define( 'DB_NAME', $_SERVER[ 'DB_NAME' ] );
         }
 
-        if( !defined( 'DB_PREFIX' ) ) {
-          define( 'DB_PREFIX', isset( $_SERVER[ 'DB_PREFIX' ] ) && !defined( 'DB_PREFIX' ) ? $_SERVER[ 'DB_PREFIX' ] : 'wp_' );
+        if( !defined( 'DB_PREFIX' ) && isset( $_SERVER[ 'DB_PREFIX' ] ) ) {
+          define( 'DB_PREFIX', $_SERVER[ 'DB_PREFIX' ] );
         }
 
-        if( !defined( 'WP_DEBUG' ) ) {
-          define( 'WP_DEBUG', isset( $_SERVER[ 'WP_DEBUG' ] ) && !defined( 'WP_DEBUG' ) ? $_SERVER[ 'WP_DEBUG' ] : false );
-        }
-
-        if( !defined( 'WP_DEBUG_DISPLAY' ) ) {
-          define( 'WP_DEBUG_DISPLAY', isset( $_SERVER[ 'WP_DEBUG_DISPLAY' ] ) && !defined( 'WP_DEBUG_DISPLAY' ) ? $_SERVER[ 'WP_DEBUG_DISPLAY' ] : false );
-        }
-
-        if( !defined( 'WP_DEBUG_LOG' ) ) {
-          define( 'WP_DEBUG_LOG', isset( $_SERVER[ 'WP_DEBUG_LOG' ] ) && !defined( 'WP_DEBUG_LOG' ) ? $_SERVER[ 'WP_DEBUG_LOG' ] : false );
+        if( !defined( 'WP_DEBUG' ) && isset( $_SERVER[ 'WP_DEBUG' ] ) ) {
+          define( 'WP_DEBUG', $_SERVER[ 'DB_PREFIX' ] );
         }
 
         /** Check for any ENVIRONMENT variables first */
