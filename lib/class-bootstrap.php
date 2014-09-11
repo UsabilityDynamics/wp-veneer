@@ -720,6 +720,17 @@ namespace UsabilityDynamics\Veneer {
        */
       public function toolbar_local(){
         global $wp_admin_bar;
+
+        $_environment = defined( 'ENVIRONMENT' ) ? ENVIRONMENT : null;
+
+        if( defined( 'WP_ENV' ) && !$_environment ) {
+          $_environment = WP_ENV;
+        }
+
+        if( defined( 'PHP_ENV' ) && !$_environment ) {
+          $_environment = PHP_ENV;
+        }
+
         if( current_user_can( 'manage_options' ) ){
           /** Add the style we need */ ?>
           <style>
@@ -738,7 +749,7 @@ namespace UsabilityDynamics\Veneer {
           $wp_admin_bar->add_menu( array(
             'id' => 'environment',
             'parent' => 'server_name',
-            'title' => ENVIRONMENT,
+            'title' => sprintf( __( '[%s]' ), $_environment ),
             'href' => '#'
           ) );
           $wp_admin_bar->add_menu( array(

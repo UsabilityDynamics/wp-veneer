@@ -150,7 +150,7 @@ namespace UsabilityDynamics\Veneer {
         $this->handler = new FingersCrossedHandler( $handler, Logger::ERROR );
 
         /** Now, bring in our file handler, depending on what kind of system we're in */
-        if( ENVIRONMENT == 'production' ){
+        if( defined( 'ENVIRONMENT' ) && ENVIRONMENT == 'production' ){
           $this->logger->pushHandler( $this->handler );
         }else{
           $this->logger->pushHandler( $handler );
