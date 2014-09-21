@@ -18,5 +18,3 @@ npm-debug.log
 *.out
 *.pid
 *.gz
-
-vendor
