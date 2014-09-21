@@ -194,7 +194,7 @@ namespace UsabilityDynamics\Veneer {
       public function __construct() {
         global $wpdb, $current_site, $current_blog, $wp_veneer;
 
-        // Return Singleton Instance
+	      // Return Singleton Instance
         if( self::$instance ) {
           return self::$instance;
         }
@@ -580,10 +580,9 @@ namespace UsabilityDynamics\Veneer {
        * Minify Output.
        */
       public function enqueue_scripts() {
-        global $wp_veneer;
 
         if( is_user_logged_in() ) {
-          wp_enqueue_style( 'wp-veneer', plugins_url( '/static/styles/wp-veneer.css', dirname( __DIR__ ) ) );
+          wp_enqueue_style( 'wp-veneer', plugins_url( '/static/styles/wp-veneer.css', __DIR__ ) );
         };
 
       }

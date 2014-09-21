@@ -21,6 +21,10 @@
  * @module Veneer
  */
 
+if( file_exists( __DIR__ . '/vendor/libraries/autoload.php' ) ) {
+	include_once( __DIR__ . '/vendor/libraries/autoload.php' );
+}
+
 // Include bootstrap.
 if( !class_exists( 'UsabilityDynamics\Veneer\Bootstrap' ) ) {
   include_once( __DIR__ . '/lib/class-bootstrap.php' );
