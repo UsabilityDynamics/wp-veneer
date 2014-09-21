@@ -18,6 +18,7 @@ build:
 # Build for repository commit
 push:
 	echo Pushing $(NAME).
+	rm -rf composer.lock
 	composer install --prefer-dist --no-dev --no-interaction
 	git add . --all
 	git commit -m '[ci skip]'

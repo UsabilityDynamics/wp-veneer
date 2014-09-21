@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6b7125a3affdf2806567521ace05440d",
+    "hash": "fd31010ebf5ee0fabd1c3e4a2ad52458",
     "packages": [
         {
             "name": "composer/installers",
@@ -421,7 +421,7 @@
             "license": [
                 "MIT"
             ],
-            "time": "2014-06-03 15:01:06"
+            "time": "2014-09-13 03:00:23"
         },
         {
             "name": "usabilitydynamics/lib-installer",
@@ -459,7 +459,7 @@
             "license": [
                 "MIT"
             ],
-            "time": "2014-06-03 00:40:50"
+            "time": "2014-09-09 19:59:58"
         },
         {
             "name": "usabilitydynamics/lib-settings",
@@ -535,7 +535,7 @@
                     "lib"
                 ]
             },
-            "time": "2014-07-15 16:52:21"
+            "time": "2014-07-23 11:51:09"
         },
         {
             "name": "usabilitydynamics/lib-utility",
@@ -569,15 +569,11 @@
                     "lib"
                 ]
             },
-            "time": "2014-07-18 17:34:11"
+            "time": "2014-09-18 13:23:04"
         }
     ],
-    "packages-dev": [
-
-    ],
-    "aliases": [
-
-    ],
+    "packages-dev": [],
+    "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
         "mindscape/raygun4php": 20
@@ -586,7 +582,5 @@
     "platform": {
         "php": ">=5.3"
     },
-    "platform-dev": [
-
-    ]
+    "platform-dev": []
 }
