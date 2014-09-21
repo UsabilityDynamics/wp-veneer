@@ -333,7 +333,6 @@ namespace UsabilityDynamics\Veneer {
        *
        */
       public function _admin_menu() {
-        global $menu, $submenu;
 
         // Site Only.
         if( current_filter() === 'admin_menu' ) {
@@ -451,14 +450,18 @@ namespace UsabilityDynamics\Veneer {
 
       }
 
-      /**
-       * Handle Caching and Minification
-       *
-       * @todo Add logging.
-       *
-       * @mehod cache
-       * @author potanin@UD
-       */
+	    /**
+	     * Handle Caching and Minification
+	     *
+	     * @todo Add logging.
+	     *
+	     * @mehod cache
+	     * @author potanin@UD
+	     *
+	     * @param $buffer
+	     *
+	     * @return mixed|void
+	     */
       public function ob_start( &$buffer ) {
         global $post, $wp_query;
 
@@ -567,14 +570,18 @@ namespace UsabilityDynamics\Veneer {
 
       }
 
+	    /**
+	     *
+	     */
       public function init() {
 
         // Only admin can see W3TC notices and errors
         // add_action('admin_notices', array( $this, 'admin_notices' ));
         // add_action('network_admin_notices', array( $this, 'admin_notices' ));
 
-        add_action( 'admin_menu', array( $this, '_admin_menu' ), 8 );
-        add_action( 'network_admin_menu', array( $this, '_admin_menu' ), 8 );
+	      // @note Disabled until actual UIs are ready.
+        // add_action( 'admin_menu', array( $this, '_admin_menu' ), 8 );
+        // add_action( 'network_admin_menu', array( $this, '_admin_menu' ), 8 );
 
       }
 
@@ -596,11 +603,11 @@ namespace UsabilityDynamics\Veneer {
 	     */
 	    public function _install() {
 
-		    if( !function_exists( 'install_network' ) ) {
+		    if( is_admin() ) {
+			    //wp_die('_install');
 			    //define( 'WP_INSTALLING_NETWORK', true );
 			    //require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-			    ///dbDelta( wp_get_db_schema( 'global' ) );
-			    //die('sdf');
+			    //dbDelta( wp_get_db_schema( 'global' ) );
 		    }
 
 		    $_files = array(
@@ -724,7 +731,7 @@ namespace UsabilityDynamics\Veneer {
       private function _components() {
 
         // Init our logging mechanism
-        if( class_exists( 'UsabilityDynamics\Veneer\Log' ) ) {
+        if( class_exists( 'UsabilityDynamics\Veneer\Log' ) && class_exists( 'Raygun4php\RaygunClient' ) ) {
           $this->_log = Log::init()->__construct();
         }
 

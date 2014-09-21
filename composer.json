@@ -43,9 +43,7 @@
     "monolog/monolog": "1.10.0",
     "graze/monolog-extensions": "~1.4.0",
     "matthiasmullie/minify": "1.2.0",
-    "mrclay/minify": "2.2.0"
-  },
-  "require-dev": {
+    "mrclay/minify": "2.2.0",
     "mindscape/raygun4php": "dev-master"
   },
   "autoload": {
@@ -67,7 +65,7 @@
   },
   "dist": {
     "url": "https://github.com/usabilitydynamics/wp-veneer/archive/master.zip",
-     "type": "zip"
+    "type": "zip"
   },
   "source": {
     "url": "git@github.com:UsabilityDynamics/wp-veneer",

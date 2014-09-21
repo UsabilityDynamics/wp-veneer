@@ -31,7 +31,7 @@ namespace UsabilityDynamics\Veneer {
         }
 
 	      // Don't apply anything if MS is not installed at the moment.
-	      if( $current_blog->_default ) {
+	      if( isset( $current_blog ) && isset( $current_blog->_default ) ) {
 		      return;
 	      }
 

@@ -130,9 +130,16 @@ namespace UsabilityDynamics\Veneer {
             break;
           case defined( 'RAYGUN_API_KEY' ) && ( ( defined( 'WP_LOGS_HANDLER' ) && WP_LOGS_HANDLER == 'raygun' ) || ( !defined( 'WP_LOGS_HANDLER' ) && ENVIRONMENT == 'production' ) ):
             /** Create the client for RayGun */
-            $client = new RaygunClient( RAYGUN_API_KEY );
+
+	          if( class_exists( 'RaygunClient' ) ) {
+		          $client = new RaygunClient( RAYGUN_API_KEY );
+	          }
             /** Create the handler */
-            $handler = new RaygunHandler( $client );
+
+	          if( class_exists( 'RaygunHandler' ) ) {
+		          $handler = new RaygunHandler( $client );
+	          }
+
             break;
           case !defined( 'WP_LOGS_HANDLER' ):
           default:

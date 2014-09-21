@@ -82,7 +82,7 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'pre_option_upload_url_path', array( $this, '_media_url_path' ) );
 
         // Extend Arguments with defaults.
-        $args = \UsabilityDynamics\Utility::parse_args( $args, array(
+        $args = Utility::parse_args( $args, array(
           "active"    => true,
           "subdomain" => "media",
           "cdn"       => array(),
@@ -185,7 +185,7 @@ namespace UsabilityDynamics\Veneer {
         }
 
         // Append the apex domain to storage path.
-        if( defined( 'MULTISITE' ) && MULTISITE && ( WP_VENEER_PUBLIC || WP_VENEER_STORAGE ) ) {
+        if( defined( 'MULTISITE' ) && MULTISITE && ( defined( 'WP_VENEER_PUBLIC' ) && WP_VENEER_PUBLIC || defined( 'WP_VENEER_STORAGE' ) && WP_VENEER_STORAGE ) ) {
           $_public_path = $_public_path . trailingslashit( $this->site );
         }
 
