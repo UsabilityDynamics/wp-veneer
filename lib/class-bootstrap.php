@@ -623,7 +623,7 @@ namespace UsabilityDynamics\Veneer {
 					    throw new \Exception( __( 'Destination is not writable, unable to install wp-cluster.', 'wp-veneer' ) );
 				    }
 
-				    if( !function_exists( 'link' ) || !link( $_source, $_destination ) ) {
+				    if( !function_exists( 'symlink' ) || !symlink( $_source, $_destination ) ) {
 
 					    if( !copy( $_source, $_destination ) ) {
 						    // Something went wrong?
