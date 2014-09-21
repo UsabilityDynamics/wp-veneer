@@ -1,7 +1,6 @@
 {
   "name": "usabilitydynamics/wp-veneer",
   "type": "wordpress-module",
-  "version": "0.6.6",
   "homepage": "https://github.com/UsabilityDynamics/wp-veneer",
   "keywords": [
     "wordpress",
@@ -20,6 +19,10 @@
     {
       "type": "composer",
       "url": "http://repository.usabilitydynamics.com"
+    },
+    {
+      "type":"composer",
+      "url":"http://wpackagist.org"
     }
   ],
   "config": {
@@ -34,15 +37,16 @@
     "php": ">=5.3",
     "composer/installers": "~1.0",
     "usabilitydynamics/lib-installer": "master",
-    "monolog/monolog": "master",
-    "graze/monolog-extensions": "~1.4.0",
-    "mindscape/raygun4php": "dev-master",
-    "usabilitydynamics/lib-api": "master",
-    "usabilitydynamics/lib-settings": "master",
+    "usabilitydynamics/lib-api": "0.5.0",
+    "usabilitydynamics/lib-settings": "0.2.2",
     "usabilitydynamics/lib-ui": "master",
-    "usabilitydynamics/lib-utility": "master",
+    "monolog/monolog": "1.10.0",
+    "graze/monolog-extensions": "~1.4.0",
     "matthiasmullie/minify": "1.2.0",
-    "mrclay/minify": "master"
+    "mrclay/minify": "2.2.0"
+  },
+  "require-dev": {
+    "mindscape/raygun4php": "dev-master"
   },
   "autoload": {
     "classmap": [
