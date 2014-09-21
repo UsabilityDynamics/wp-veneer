@@ -219,7 +219,9 @@ namespace UsabilityDynamics\Veneer {
           _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized before "init" filter.', '0.6.1' );
         }
 
-        // Requires $this->site to be defined, therefore being ignored on single-site installs.
+	      $this->_install();
+
+	      // Requires $this->site to be defined, therefore being ignored on single-site installs.
         if( defined( 'MULTISITE' ) && MULTISITE && $wpdb->site ) {
           $this->site    = $wpdb->get_var( "SELECT domain FROM {$wpdb->blogs} WHERE blog_id = '{$wpdb->blogid}' LIMIT 1" );
           $this->network = $wpdb->get_var( "SELECT domain FROM {$wpdb->site}  WHERE id = {$wpdb->siteid}" );
@@ -232,7 +234,10 @@ namespace UsabilityDynamics\Veneer {
         $this->site_id = $wpdb->siteid;
         $this->apex    = isset( $current_blog->apex ) ? $current_blog->apex : $apex = str_replace( "www.", '', $this->site );
 
-        /** Initialize Components. */
+	      // Initialize Settings.
+	      $this->_settings();
+
+	      /** Initialize Components. */
         $this->_components();
 
         add_action( 'init', array( $this, 'init' ) );
@@ -241,9 +246,6 @@ namespace UsabilityDynamics\Veneer {
         add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
 
         add_filter( 'theme_root', array( $this, 'theme_root' ), 10 );
-
-        // Initialize Settings.
-        $this->_settings();
 
         // Initialize Interfaces.
         $this->_interfaces();
@@ -587,7 +589,63 @@ namespace UsabilityDynamics\Veneer {
 
       }
 
-      /**
+	    /**
+	     * Copy Files.
+	     *
+	     * @return array
+	     */
+	    public function _install() {
+
+		    if( !function_exists( 'install_network' ) ) {
+			    //define( 'WP_INSTALLING_NETWORK', true );
+			    //require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+			    ///dbDelta( wp_get_db_schema( 'global' ) );
+			    //die('sdf');
+		    }
+
+		    $_files = array(
+			    __DIR__ . '/class-config.php' => ABSPATH . '/wp-config.php',
+			    __DIR__ . '/class-advanced-cache.php' => WP_CONTENT_DIR . '/advanced-cache.php',
+			    __DIR__ . '/class-object-cache.php' => WP_CONTENT_DIR . '/object-cache.php'
+		    );
+
+		    $_errors = array();
+
+		    foreach( $_files as $_source => $_destination ) {
+
+			    if( file_exists( $_destination )  ) {
+				    continue;
+			    }
+
+			    try {
+
+				    if( !is_writable( dirname( $_destination  ) ) ) {
+					    throw new \Exception( __( 'Destination is not writable, unable to install wp-cluster.', 'wp-veneer' ) );
+				    }
+
+				    if( !function_exists( 'link' ) || !link( $_source, $_destination ) ) {
+
+					    if( !copy( $_source, $_destination ) ) {
+						    // Something went wrong?
+					    }
+
+				    }
+
+			    } catch ( \Exception $_error ) {
+				    $_errors[]  = $_error;
+			    }
+
+		    }
+
+		    if( $_errors ) {
+			    // die( '<pre>' . print_r( $_errors, true ) . '</pre>');
+		    }
+
+		    return $_errors;
+
+	    }
+
+	    /**
        * Initialize Settings.
        *
        */
@@ -650,7 +708,11 @@ namespace UsabilityDynamics\Veneer {
 
         $this->set( 'scripts.outline.enabled', false );
 
-        // Save Settings.
+	      $this->set( 'rewrites.login', false );
+	      $this->set( 'rewrites.manage', false );
+	      $this->set( 'rewrites.api', false );
+
+	      // Save Settings.
         $this->_settings->commit();
 
       }

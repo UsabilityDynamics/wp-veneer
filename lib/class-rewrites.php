@@ -24,13 +24,18 @@ namespace UsabilityDynamics\Veneer {
        * @for Locale
        */
       public function __construct() {
-        global $wp_veneer;
+        global $wp_veneer, $current_blog;
 
         if( !$wp_veneer ) {
           wp_die( '<h1>Veneer Error</h1><p>The $wp_veneer variable is not configured.</p>' );
         }
 
-        if( !defined( 'WP_BASE_DOMAIN' ) ) {
+	      // Don't apply anything if MS is not installed at the moment.
+	      if( $current_blog->_default ) {
+		      return;
+	      }
+
+	      if( !defined( 'WP_BASE_DOMAIN' ) ) {
 
           if( defined( 'WP_HOME' ) ) {
             define( 'WP_BASE_DOMAIN', str_replace( array( 'https://', 'http://' ), '', WP_HOME ) );
@@ -46,7 +51,6 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'wp_redirect', array( $this, 'wp_redirect' ), 10, 2 );
         add_filter( 'pre_option_home', array( $this, '_option_home' ), 10 );
         add_filter( 'content_url', array( $this, 'replace_network_url' ), 10, 2 );
-        add_filter( 'user_admin_url', array( $this, 'replace_network_url' ), 10, 2 );
         add_filter( 'site_url', array( $this, 'replace_network_url' ), 10, 3 );
         add_filter( 'plugins_url', array( $this, 'replace_network_url' ), 10, 2 );
 
@@ -60,15 +64,16 @@ namespace UsabilityDynamics\Veneer {
         add_filter( 'login_redirect', array( $this, 'masked_url_fixes' ), 100, 3 );
 
         add_filter( 'lostpassword_url', array( $this, 'lostpassword_url' ), 100, 3 );
-        add_filter( 'admin_url', array( $this, 'admin_url' ), 100, 3 );
         add_filter( 'includes_url', array( $this, 'includes_url' ), 100, 3 );
         add_filter( 'home_url', array( $this, 'home_url' ), 100, 4 );
         add_filter( 'login_url', array( $this, 'login_url' ), 100, 2 );
         add_filter( 'logout_url', array( $this, 'logout_url' ), 50, 2 );
 
         // Special Cases.
-        add_filter( 'user_admin_url', array( $this, 'user_admin_url' ), 100, 2 );
-        add_filter( 'network_admin_url', array( $this, 'network_admin_url' ), 100, 2 );
+	      add_filter( 'admin_url', array( $this, 'admin_url' ), 100, 3 );
+	      add_filter( 'user_admin_url', array( $this, 'user_admin_url' ), 100, 2 );
+	      add_filter( 'network_admin_url', array( $this, 'network_admin_url' ), 100, 2 );
+	      add_filter( 'user_admin_url', array( $this, 'replace_network_url' ), 10, 2 );
 
         add_filter( 'stylesheet_directory_uri', array( $this, 'stylesheet_directory_uri' ), 100, 3 );
         add_filter( 'template_directory_uri', array( $this, 'template_directory_uri' ), 100, 3 );
@@ -146,21 +151,26 @@ namespace UsabilityDynamics\Veneer {
        *
        * Hooks into get_option( 'home' )
        *
-       * @param $default
+       * @param $_always_false
        * @return string
        */
-      public function _option_home( $default ) {
+      public function _option_home( $_always_false ) {
         global $wp_veneer;
 
-        if( !$default ) {
-          return self::prepend_scheme( $wp_veneer->site );
-        }
+	      //die('$default' . $_always_false );
 
         if( defined( 'WP_HOME' ) ) {
           // $default = str_replace( WP_HOME, $default, $default );
         }
 
-        return ( $wp_veneer->site ? 'http://' . $wp_veneer->site : $default );
+	      //die( '<pre>' . print_r( $wp_veneer, true ) . '</pre>');
+
+	      if( $wp_veneer->site ) {
+		      return ( $wp_veneer->site ? 'http://' . $wp_veneer->site : '' );
+	      }
+
+        return $_always_false;
+
       }
 
       /**
@@ -255,11 +265,15 @@ namespace UsabilityDynamics\Veneer {
        */
       public static function user_admin_url( $url ) {
         global $wp_veneer;
-        $url = str_replace( '/wp-admin', '/manage', $url );
+
+	      if( $wp_veneer->get( 'rewrites.manage' ) ) {
+		      $url = str_replace( '/wp-admin', '/manage', $url );
+	      }
 
         if( strpos( $url, 'http' ) !== 0 ) {
           die($url);
         }
+
         return $url;
       }
 
@@ -276,7 +290,11 @@ namespace UsabilityDynamics\Veneer {
        */
       public static function network_admin_url( $url ) {
         global $wp_veneer;
-        $url = str_replace( '/wp-admin/network/', '/manage/network', $url );
+
+	      if( $wp_veneer->get( 'rewrites.manage' ) ) {
+		      $url = str_replace( '/wp-admin/network/', '/manage/network', $url );
+	      }
+
         return $url;
       }
 
@@ -288,7 +306,12 @@ namespace UsabilityDynamics\Veneer {
        * @return mixed
        */
       public static function logout_url( $url ) {
-        $url = str_replace( '/wp-login.php', '/manage/login', $url );
+	      global $wp_veneer;
+
+	      if( $wp_veneer->get( 'rewrites.manage' ) ) {
+		      $url = str_replace( '/wp-login.php', '/manage/login', $url );
+	      }
+
         return $url;
       }
 
@@ -301,7 +324,12 @@ namespace UsabilityDynamics\Veneer {
        * @return mixed
        */
       public static function login_url( $url, $redirect ) {
-        $url = str_replace( '/wp-login.php', '/manage/login', $url );
+	      global $wp_veneer;
+
+	      if( $wp_veneer->get( 'rewrites.login' ) ) {
+		      $url = str_replace( '/wp-login.php', '/manage/login', $url );
+	      }
+
         return $url;
       }
 
@@ -367,6 +395,7 @@ namespace UsabilityDynamics\Veneer {
        * @return string
        */
       public static function masked_url_fixes( $url ) {
+	      global $wp_veneer;
 
         // Conceal WordPress Location. (new)
         if( strpos( $url, '/vendor/libraries/automattic/wordpress' ) ) {
@@ -378,13 +407,13 @@ namespace UsabilityDynamics\Veneer {
           $url = str_replace( '/vendor/wordpress/core', '', $url );
         }
 
-        if( strpos( $url, '/wp-admin' ) ) {
+        if( strpos( $url, '/wp-admin' ) && $wp_veneer->get( 'rewrites.manage' ) ) {
           $url = str_replace( '/wp-admin', '/manage', $url );
         }
 
-        if( strpos( $url, '/wp-login.php' ) ) {
-          $url = str_replace( '/wp-login.php', '/manage/login', $url );
-        }
+	      if( strpos( $url, '/wp-login.php' ) && $wp_veneer->get( 'rewrites.login' ) ) {
+		      $url = str_replace( '/wp-login.php', '/manage/login', $url );
+	      }
 
         return $url;
 
@@ -404,9 +433,12 @@ namespace UsabilityDynamics\Veneer {
        * @return mixed
        */
       public static function admin_url( $url, $path, $blog_id ) {
+	      global $wp_veneer;
 
-        $url = str_replace( '/vendor/libraries/automattic/wordpress/manage/', '/manage/', $url );
-        $url = str_replace( '/wp-admin/', '/manage/', $url );
+	      if( $wp_veneer->get( 'rewrites.manage' ) ) {
+	        $url = str_replace( '/vendor/libraries/automattic/wordpress/manage/', '/manage/', $url );
+	        $url = str_replace( '/wp-admin/', '/manage/', $url );
+	      }
 
         // $url = str_replace( '/wp-admin/', '/manage/', $url );
 
@@ -427,8 +459,11 @@ namespace UsabilityDynamics\Veneer {
        * @return mixed
        */
       public static function lostpassword_url( $url, $redirect ) {
+	      global $wp_veneer;
 
-        $url = str_replace( 'wp-login.php', 'manage/login', $url );
+	      if( $wp_veneer->get( 'rewrites.login' ) ) {
+		      $url = str_replace( 'wp-login.php', 'manage/login', $url );
+	      }
 
         // @todo replace with api.site.com
         // $url = str_replace( 'wp-ajax.php', '/manage/', $url );
