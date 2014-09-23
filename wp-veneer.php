@@ -3,7 +3,7 @@
  * Plugin Name: WP-Veneer
  * Plugin URI: http://usabilitydynamics.com/
  * Description: Veneer.io Helper.
- * Version: 0.6.6
+ * Version: 0.6.7
  * Author: Usability Dynamics
  * Author URI: http://usabilitydynamics.com/
  * License: GPLv2 or later

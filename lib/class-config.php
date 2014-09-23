@@ -500,7 +500,8 @@ namespace UsabilityDynamics\Veneer {
    */
   if( !defined( 'WP_BASE_DOMAIN' ) && !defined( 'WP_DEBUG' ) && !defined( 'AUTH_KEY' ) ) {
     global $wp_veneer;
-    /** Init our config object */
+
+	  /** Init our config object */
     if( !is_object( $wp_veneer ) ) {
       $wp_veneer = new \stdClass();
     }

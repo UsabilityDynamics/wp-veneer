@@ -18,13 +18,67 @@ namespace UsabilityDynamics\Veneer {
      */
     class Rewrites {
 
+	    /**
+	     * Get Network (Parent of Site) Domain
+	     *
+	     * @since 0.6.7
+	     * @return bool|mixed
+	     */
+	    public static function get_network_domain() {
+		    global $current_site;
+
+		    if( defined( 'WP_BASE_DOMAIN' ) ) {
+			    return defined( 'WP_BASE_DOMAIN' );
+		    }
+
+		    if( isset( $current_site->domain ) ) {
+			    return str_replace( array( 'https://', 'http://' ), '', $current_site->domain );
+		    }
+
+		    if( defined( 'WP_HOME' ) ) {
+			    return str_replace( array( 'https://', 'http://' ), '', WP_HOME );
+		    }
+
+		    if( defined( 'WP_SITEURL' ) ) {
+			    return str_replace( array( 'https://', 'http://' ), '', WP_SITEURL );
+		    }
+
+		    return false;
+
+	    }
+
+	    /**
+	     * Get Site (aka app) Domain
+	     *
+	     * @since 0.6.7
+	     * @return bool|mixed
+	     */
+	    public static function get_site_domain() {
+		    global $current_blog;
+
+		    if( defined( 'WP_HOME' ) ) {
+			    return str_replace( array( 'https://', 'http://' ), '', WP_HOME );
+		    }
+
+		    if( defined( 'WP_SITEURL' ) ) {
+			    return str_replace( array( 'https://', 'http://' ), '', WP_SITEURL );
+		    }
+
+		    if( isset( $current_blog->domain ) ) {
+			    return str_replace( array( 'https://', 'http://' ), '', $current_blog->domain );
+		    }
+
+		    return false;
+
+	    }
+
       /**
        * Initialize Locale
        *
        * @for Locale
        */
       public function __construct() {
-        global $wp_veneer, $current_blog;
+        global $wp_veneer, $current_blog, $current_site;
 
         if( !$wp_veneer ) {
           wp_die( '<h1>Veneer Error</h1><p>The $wp_veneer variable is not configured.</p>' );
@@ -35,17 +89,9 @@ namespace UsabilityDynamics\Veneer {
 		      return;
 	      }
 
-	      if( !defined( 'WP_BASE_DOMAIN' ) ) {
-
-          if( defined( 'WP_HOME' ) ) {
-            define( 'WP_BASE_DOMAIN', str_replace( array( 'https://', 'http://' ), '', WP_HOME ) );
-          }
-
-          if( !defined( 'WP_BASE_DOMAIN' ) ) {
-            wp_die( '<h1>Veneer Error</h1><p>The WP_BASE_DOMAIN constant is not defined.</p>' );
-          }
-
-        }
+	      if( !self::get_network_domain() ) {
+		      wp_die( '<h1>Veneer Error</h1><p>The WP_BASE_DOMAIN constant is not defined.</p>' );
+	      }
 
         // Replace Network URL with Site URL.
         add_filter( 'wp_redirect', array( $this, 'wp_redirect' ), 10, 2 );
@@ -522,7 +568,7 @@ namespace UsabilityDynamics\Veneer {
       public static function replace_network_url( $url, $path = null, $schema = null ) {
         global $wp_veneer;
 
-        $_home_url = defined( 'WP_HOME' ) ? WP_HOME : ( defined( 'WP_SITE_URL' ) ? WP_SITE_URL : '' );
+        $_home_url = self::get_site_domain();
 
         // Relative URLs are opoosite, we actually try to strip our URL.
         if( $schema === 'relative' && ( strpos( $url, $_home_url ) === 0 ) ) {

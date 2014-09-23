@@ -216,7 +216,7 @@ namespace UsabilityDynamics\Veneer {
 
         /** Make sure we're not too late to init this */
         if( did_action( 'init' ) ) {
-          _doing_it_wrong( 'UsabilityDynamics\Veneer\Bootstrap::__construct', 'Veneer should not be initialized before "init" filter.', '0.6.1' );
+	        return add_action( 'init' , array( 'UsabilityDynamics\Veneer\Bootstrap', 'get_instance' ) );
         }
 
 	      $this->_install();
@@ -406,7 +406,7 @@ namespace UsabilityDynamics\Veneer {
           $_output = array();
 
           // @todo Write extracted Scripts to an /asset file to be served.
-          foreach( $scripts as $script ) {
+          foreach( (array) $scripts as $script ) {
             $_output[ ] = $script;
           }
 
