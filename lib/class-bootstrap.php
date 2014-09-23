@@ -15,8 +15,6 @@
  * * scripts.path.public
  * * html.minify.enabled
  * *
- *
- *
  * @verison 0.6.1
  * @author potanin@UD
  * @namespace UsabilityDynamics\Veneer
@@ -789,7 +787,9 @@ namespace UsabilityDynamics\Veneer {
       public function toolbar_local(){
         global $wp_admin_bar;
 
-        $_environment = defined( 'ENVIRONMENT' ) ? ENVIRONMENT : null;
+	      $_branch = Utility::get_deployment_branch();
+
+	      $_environment = defined( 'ENVIRONMENT' ) ? ENVIRONMENT : null;
 
         if( defined( 'WP_ENV' ) && !$_environment ) {
           $_environment = WP_ENV;
@@ -799,33 +799,52 @@ namespace UsabilityDynamics\Veneer {
           $_environment = PHP_ENV;
         }
 
-        if( current_user_can( 'manage_options' ) ){
+	      if( function_exists( 'get_env' ) && get_env( 'WP_ENV' )  ) {
+		      $_environment = get_env( 'WP_ENV' );
+	      }
+
+	      if( function_exists( 'get_env' ) && get_env( 'PHP_ENV' )  ) {
+		      $_environment = get_env( 'PHP_ENV' );
+	      }
+
+        if( current_user_can( 'manage_options' ) ) {
+
           /** Add the style we need */ ?>
-          <style>
-            #wp-admin-bar-server_name > a:before {
-              content: "\f177";
-              top: 2px;
-            }
-          </style> <?php 
-          /** Add the menu items */
+          <style> #wp-admin-bar-server_name > a:before {  content: "\f177"; top: 2px; } </style> <?php
+
+	        /** Add the menu items */
           $wp_admin_bar->add_menu( array(
             'id' => 'server_name',
             'parent' => 'top-secondary',
             'title' => gethostname(),
             'href' => '#'
           ) );
-          $wp_admin_bar->add_menu( array(
-            'id' => 'environment',
-            'parent' => 'server_name',
-            'title' => sprintf( __( '[%s]' ), $_environment ),
-            'href' => '#'
-          ) );
+
+	        if( isset( $_environment  ) & $_environment ) {
+		        $wp_admin_bar->add_menu( array(
+			        'id' => 'environment',
+			        'parent' => 'server_name',
+			        'title' => sprintf( __( '[%s]' ), $_environment ),
+			        'href' => '#'
+		        ) );
+	        }
+
           $wp_admin_bar->add_menu( array(
             'id' => 'ip_address',
             'parent' => 'server_name',
             'title' => $_SERVER[ 'SERVER_ADDR' ],
             'href' => '#'
           ) );
+
+	        if( $_branch ) {
+		        $wp_admin_bar->add_menu( array(
+			        'id'     => 'branch_name',
+			        'parent' => 'server_name',
+			        'title'  => sprintf( __( 'Git Branch: %s' ), $_branch ),
+			        'href'   => '#'
+		        ) );
+	        }
+
         }
       }
 
@@ -945,6 +964,7 @@ namespace UsabilityDynamics\Veneer {
    * Ok, create our shorthand function to get the veneer object
    */
   if( !class_exists( 'Veneeer' ) ) {
+
     class Veneer {
       /**
        * Get the Veneer Singleton
@@ -966,6 +986,7 @@ namespace UsabilityDynamics\Veneer {
         return Bootstrap::$instance;
       }
     }
+
   }
 
 }
