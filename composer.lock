@@ -4,7 +4,7 @@
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1bb5269aa9a385288851072359a0ffb9",
+    "hash": "cfef9375308eeedcaad913da5fee8aba",
     "packages": [
         {
             "name": "justinrainbow/json-schema",
@@ -251,12 +251,10 @@
             }
         }
     ],
-    "packages-dev": null,
+    "packages-dev": [],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "mindscape/raygun4php": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "platform": {
         "php": ">=5.3"

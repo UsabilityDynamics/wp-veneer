@@ -40,12 +40,11 @@
     "usabilitydynamics/lib-settings": "0.2.2",
     "usabilitydynamics/lib-ui": "master"
   },
-  "require-dev": {
+  "require-dev": {},
+  "require-disabled": {
     "monolog/monolog": "1.10.0",
     "graze/monolog-extensions": "~1.4.0",
-    "mindscape/raygun4php": "dev-master"
-  },
-  "require-disabled": {
+    "mindscape/raygun4php": "dev-master",
     "matthiasmullie/minify": "1.2.0",
     "mrclay/minify": "2.2.0",
     "usabilitydynamics/lib-installer": "0.1.0"
