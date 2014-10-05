@@ -16,7 +16,7 @@ build:
 	grunt build
 
 # Build for repository commit
-push:
+release:
 	echo Pushing $(NAME).
 	rm -rf composer.lock
 	composer update --prefer-dist --no-dev --no-interaction

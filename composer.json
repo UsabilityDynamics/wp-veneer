@@ -1,7 +1,8 @@
 {
   "name": "usabilitydynamics/wp-veneer",
-  "type": "wordpress-module",
+  "type": "wordpress-plugin",
   "homepage": "https://github.com/UsabilityDynamics/wp-veneer",
+  "description": "https://github.com/UsabilityDynamics/wp-veneer",
   "keywords": [
     "wordpress",
     "multisite",
@@ -18,7 +19,7 @@
   "repositories": [
     {
       "type": "composer",
-      "url": "http://repository.usabilitydynamics.com"
+      "url": "https://repository.usabilitydynamics.com"
     },
     {
       "type":"composer",
@@ -35,16 +36,19 @@
   },
   "require": {
     "php": ">=5.3",
-    "composer/installers": "~1.0",
-    "usabilitydynamics/lib-installer": "master",
     "usabilitydynamics/lib-api": "0.5.0",
     "usabilitydynamics/lib-settings": "0.2.2",
-    "usabilitydynamics/lib-ui": "master",
+    "usabilitydynamics/lib-ui": "master"
+  },
+  "require-dev": {
     "monolog/monolog": "1.10.0",
     "graze/monolog-extensions": "~1.4.0",
+    "mindscape/raygun4php": "dev-master"
+  },
+  "require-disabled": {
     "matthiasmullie/minify": "1.2.0",
     "mrclay/minify": "2.2.0",
-    "mindscape/raygun4php": "dev-master"
+    "usabilitydynamics/lib-installer": "0.1.0"
   },
   "autoload": {
     "classmap": [
@@ -62,14 +66,5 @@
       "lib/class-varnish.php",
       "lib/class-search.php"
     ]
-  },
-  "dist": {
-    "url": "https://github.com/usabilitydynamics/wp-veneer/archive/master.zip",
-    "type": "zip"
-  },
-  "source": {
-    "url": "git@github.com:UsabilityDynamics/wp-veneer",
-    "type": "git",
-    "reference": "master"
   }
 }
