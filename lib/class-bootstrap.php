@@ -658,11 +658,15 @@ namespace UsabilityDynamics\Veneer {
        */
       private function _settings() {
 
-        // Initialize Settings.
-        $this->_settings = new \UsabilityDynamics\Settings( array(
-          "store" => "options",
-          "key"   => "ud:veneer",
-        ) );
+	      if( class_exists( '\UsabilityDynamics\Settings' ) ) {
+
+		      // Initialize Settings.
+		      $this->_settings = new \UsabilityDynamics\Settings( array(
+			      "store" => "options",
+			      "key"   => "ud:veneer",
+		      ));
+
+	      }
 
         // ElasticSearch Service $instances.
         $this->set( 'documents', array(
