@@ -20,13 +20,11 @@ install:
 	@echo Installing $(NAME).
 	rm -rf composer.lock
 	rm -rf vendor
-	composer install --prefer-dist --no-dev --no-interaction
+	composer update --prefer-dist --no-dev --no-interaction
 
 # Build for repository commit
 release:
-	echo Pushing $(NAME).
-	rm -rf composer.lock
-	composer update --prefer-dist --no-dev --no-interaction
+	make install
 	git add . --all
 	git commit -m '[ci skip]'
 	git push

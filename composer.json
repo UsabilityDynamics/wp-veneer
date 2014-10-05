@@ -36,6 +36,7 @@
   },
   "require": {
     "php": ">=5.3",
+    "composer/installers": "v1.0.18",
     "usabilitydynamics/lib-api": "0.5.0",
     "usabilitydynamics/lib-settings": "0.2.2",
     "usabilitydynamics/lib-ui": "master"
@@ -46,8 +47,7 @@
     "graze/monolog-extensions": "~1.4.0",
     "mindscape/raygun4php": "dev-master",
     "matthiasmullie/minify": "1.2.0",
-    "mrclay/minify": "2.2.0",
-    "usabilitydynamics/lib-installer": "0.1.0"
+    "mrclay/minify": "2.2.0"
   },
   "autoload": {
     "classmap": [
