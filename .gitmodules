@@ -1,3 +1,0 @@
-[submodule "vendor/libraries/usabilitydynamics/lib-api"]
-	path = vendor/libraries/usabilitydynamics/lib-api
-	url = git@github.com:UsabilityDynamics/lib-api.git

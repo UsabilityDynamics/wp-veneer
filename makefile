@@ -25,6 +25,10 @@ install:
 # Build for repository commit
 release:
 	make install
+	git rm --cached vendor/libraries/usabilitydynamics/lib-api
+	git rm --cached vendor/libraries/usabilitydynamics/lib-ui
+	git rm --cached vendor/libraries/usabilitydynamics/lib-utility
+	git rm --cached vendor/libraries/usabilitydynamics/lib-settings
 	git add . --all
 	git commit -m '[ci skip]'
 	git push
