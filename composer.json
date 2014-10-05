@@ -29,7 +29,7 @@
   "config": {
     "preferred-install": "source",
     "github-protocols": [ "ssh" ],
-    "vendor-dir": "vendor/libraries",
+    "vendor-dir": "vendor",
     "bin-dir": "vendor/bin",
     "component-dir": "vendor/components",
     "optimize-autoloader": true

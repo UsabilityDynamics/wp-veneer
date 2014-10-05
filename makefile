@@ -25,9 +25,9 @@ install:
 # Build for repository commit
 release:
 	make install
-	rm -rf vendor/libraries/composer/installers
-	git rm --cached -r --ignore-unmatch vendor/libraries/usabilitydynamics/lib-api
-	git rm --cached -r --ignore-unmatch vendor/libraries/usabilitydynamics/lib-ui
-	git rm --cached -r --ignore-unmatch vendor/libraries/usabilitydynamics/lib-utility
-	git rm --cached -r --ignore-unmatch vendor/libraries/usabilitydynamics/lib-settings
+	rm -rf vendor/composer/installers
+	git rm --cached -r --ignore-unmatch vendor/usabilitydynamics/lib-api
+	git rm --cached -r --ignore-unmatch vendor/usabilitydynamics/lib-ui
+	git rm --cached -r --ignore-unmatch vendor/usabilitydynamics/lib-utility
+	git rm --cached -r --ignore-unmatch vendor/usabilitydynamics/lib-settings
 	git add . --all && git commit -m '[ci skip]' && git push
