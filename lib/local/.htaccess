@@ -4,7 +4,7 @@
 # * http://capitaldealsonline.com/assets/scripts/admin-bar.js
 # * http://capitaldealsonline.com/assets/styles/admin-bar.css
 #
-# @version 3.0.1
+# @version 0.6.8
 # @author potanin@UD
 
 # BEGIN Environment
@@ -58,11 +58,9 @@
 
 # BEGIN Security
 <FilesMatch "(^#.*#|\.(md|lock|yml|json|bak|config|dist|fla|inc|ini|log|psd|sh|sql|sw[op])|~)$">
-
   Order allow,deny
   Deny from all
   Satisfy All
-
 </FilesMatch>
 # END Security
 
@@ -266,11 +264,11 @@
 
 # BEGIN PHP-FPM
 <IfModule mod_proxy_fcgi.c>
-<IfModule mod_rewrite.c>
+  <IfModule mod_rewrite.c>
     RewriteCond %{REQUEST_FILENAME} ^.*\.php$
     RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^(.*\.php(/.*)?)$ fcgi://127.0.0.1:9000/var/www/$1 [P,L]
-</IfModule>
+  </IfModule>
 </IfModule>
 # END PHP-FPM
 

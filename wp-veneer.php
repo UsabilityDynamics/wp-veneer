@@ -3,11 +3,12 @@
  * Plugin Name: WP-Veneer
  * Plugin URI: http://usabilitydynamics.com/
  * Description: Veneer.io Helper.
- * Version: 0.6.7
+ * Version: 0.6.8
  * Author: Usability Dynamics
  * Author URI: http://usabilitydynamics.com/
  * License: GPLv2 or later
  * Network: True
+ * GitHub Plugin URI: https://github.com/UsabilityDynamics/wp-veneer
  *
  * The Loader class is self-initializing.
  *
