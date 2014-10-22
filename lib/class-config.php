@@ -16,7 +16,8 @@
 namespace UsabilityDynamics\Veneer {
 
   if( !class_exists( 'UsabilityDynamics\Veneer\Config' ) ) {
-    class Config {
+
+	  class Config {
 
       /**
        * Holds the arrayed location of our config files/folders
@@ -75,6 +76,7 @@ namespace UsabilityDynamics\Veneer {
        * @throws \Exception Plain exception when there is an issue
        */
       public function __construct( $base_dir = __DIR__, $do_stuff = true ) {
+	      global $table_prefix, $wp_version;
 
         if( !( is_bool( $do_stuff ) && $do_stuff ) ) {
           return;
@@ -167,6 +169,11 @@ namespace UsabilityDynamics\Veneer {
           define( 'WP_DEBUG_DISPLAY', $_SERVER[ 'WP_DEBUG_DISPLAY' ] );
         }
 
+	      // Just in case.
+	      if( !defined( 'WP_VERSION' ) && isset( $wp_version ) ) {
+		      define( 'WP_VERSION', $wp_version );
+	      }
+
         /** Check for any ENVIRONMENT variables first */
         foreach( (array) $_ENV as $key => $value ){
           if( !defined( strtoupper( $key ) ) ){
@@ -180,8 +187,19 @@ namespace UsabilityDynamics\Veneer {
           define( 'ENVIRONMENT', trim( $environment ) );
         }
 
+	      if( !defined( 'ENVIRONMENT' ) && defined( 'WP_ENV' ) && WP_ENV ) {
+		      define( 'ENVIRONMENT', WP_ENV );
+	      }
+
+	      if( !defined( 'ENVIRONMENT' ) && defined( 'PHP_ENV' ) && PHP_ENV ) {
+		      define( 'ENVIRONMENT', PHP_ENV );
+	      }
+
         /** For these variables, make sure they exist */
-        $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/static/etc/wp-config/' . ENVIRONMENT . '/';
+	      if( defined( 'ENVIRONMENT' ) )  {
+		      $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/static/etc/wp-config/' . ENVIRONMENT . '/';
+	      }
+
         $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/static/etc/wp-config/';
 
         foreach( $this->config_folders as $key => $value ) {
@@ -278,7 +296,7 @@ namespace UsabilityDynamics\Veneer {
 
         /** Pull in the settings */
         if( isset( $composer_file ) ) {
-          $_settings = self::get_settings( $composer_file );
+          $_settings = self::_parse_composer( $composer_file );
         } else {
           $_settings = array();
         }
@@ -320,7 +338,12 @@ namespace UsabilityDynamics\Veneer {
           }
         }
 
-        /** Return this own object */
+	      /** Is this needed? */
+	      if( !isset( $table_prefix ) ) {
+		      $table_prefix = defined( 'DB_PREFIX' ) ? DB_PREFIX : 'wp_';
+	      }
+
+	      /** Return this own object */
         return $this;
 
       }
@@ -340,7 +363,7 @@ namespace UsabilityDynamics\Veneer {
        *
        * @return mixed False on failure, config array on success
        */
-      function get_config( $config, $value = false ) {
+      private function get_config( $config, $value = false ) {
         if( isset( $this->loaded[ $config ] ) && is_array( $this->loaded[ $config ] ) && isset( $this->loaded[ $config ][ 'vars' ] ) ) {
           if( is_string( $value ) && !empty( $value ) && isset( $this->loaded[ $config ][ 'vars' ][ $value ] ) ) {
             return $this->loaded[ $config ][ 'vars' ][ $value ];
@@ -362,24 +385,41 @@ namespace UsabilityDynamics\Veneer {
        *
        * @author potanin@UD
        * @param null $composer_file
+       * @method _parse_composer
        *
        * @return array
        */
-      private function get_settings( $composer_file = null ) {
-        $_composer = json_decode( file_get_contents( $composer_file ) );
-        $_settings = array();
-        if( isset( $_composer->settings ) && is_object( $_composer->settings ) ) {
+      private function _parse_composer( $composer_file = null ) {
+
+	      try {
+
+		      $_settings = array();
+
+		      $_composer = file_get_contents( $composer_file );
+
+		      $_composer = json_decode( $_composer, false, 512, JSON_BIGINT_AS_STRING );
+
+	      } catch( \Exception $error ) {
+		      // Most likely can't parse JSON file... Silently fail.
+		      return $_settings;
+	      }
+
+
+	      if( isset( $_composer->settings ) && is_object( $_composer->settings ) ) {
           foreach( (array) $_composer->settings as $key => $value ) {
             $_settings[ $key ] = $value;
           }
         }
+
         if( isset( $_composer->extra ) && isset( $_composer->extra->settings ) && is_object( $_composer->extra->settings ) ) {
           foreach( (array) $_composer->extra->settings as $key => $value ) {
             $_settings[ $key ] = $value;
           }
 
         }
-        return $_settings;
+
+        return (array) $_settings;
+	      
       }
 
       /**
@@ -389,7 +429,7 @@ namespace UsabilityDynamics\Veneer {
        * @param string $file The file we want to include
        * @param string $scope The scope for the variables, globally or locally, defaults to 'local'
        */
-      function load_config( $file, $scope = 'local' ) {
+      private function load_config( $file, $scope = 'local' ) {
         /** Ok, make sure our variables are good */
         if( !( is_string( $scope ) && $scope == 'global' ) ) {
           $scope = 'local';
@@ -455,7 +495,7 @@ namespace UsabilityDynamics\Veneer {
        * @param string $slug File's slug to store
        * @param array  $file File definition array as done in 'load_config'
        */
-      function _try_load_config_file( $slug, $file ) {
+      private function _try_load_config_file( $slug, $file ) {
         if( !in_array( $slug, array_keys( $this->loaded ) ) ) {
           /** Now, require the file, base on the type it is */
           if( substr( $file[ 'file' ], strlen( $file[ 'file' ] ) - 4, 4 ) == '.php' ) {
@@ -500,6 +540,7 @@ namespace UsabilityDynamics\Veneer {
    */
   if( !defined( 'WP_BASE_DOMAIN' ) && !defined( 'WP_DEBUG' ) && !defined( 'AUTH_KEY' ) ) {
     global $wp_veneer;
+
     /** Init our config object */
     if( !is_object( $wp_veneer ) ) {
       $wp_veneer = new \stdClass();
@@ -509,9 +550,6 @@ namespace UsabilityDynamics\Veneer {
     if( !isset( $wp_veneer->config ) ) {
       $wp_veneer->config = new Config();
     }
-
-    /** Is this needed? */
-    $table_prefix = defined( 'DB_PREFIX' ) ? DB_PREFIX : 'wp_';
 
     /** Now that we've done that, lets include our wp settings file, as per normal operations */
     require_once( ABSPATH . '/wp-settings.php' );
