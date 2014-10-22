@@ -238,6 +238,7 @@
 # BEGIN Management
 <IfModule mod_rewrite.c>
 
+
   RewriteRule ^wp-admin/admin-ajax.php?(.*)$  /vendor/libraries/automattic/wordpress/wp-admin/admin-ajax.php$1  [QSA,L]
 
   RewriteRule ^wp-admin/js/?(.*)$             /manage/js/$1           [QSA,L]

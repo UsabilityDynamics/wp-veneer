@@ -611,7 +611,7 @@ namespace UsabilityDynamics\Veneer {
 		    }
 
 		    $_files = array(
-			    __DIR__ . '/class-config.php' => ABSPATH . '/wp-config.php',
+			    //__DIR__ . '/class-config.php' => ABSPATH . '/wp-config.php',
 			    __DIR__ . '/class-advanced-cache.php' => WP_CONTENT_DIR . '/advanced-cache.php',
 			    __DIR__ . '/class-object-cache.php' => WP_CONTENT_DIR . '/object-cache.php'
 		    );
