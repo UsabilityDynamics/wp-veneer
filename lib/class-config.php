@@ -17,7 +17,7 @@ namespace UsabilityDynamics\Veneer {
 
   if( !class_exists( 'UsabilityDynamics\Veneer\Config' ) ) {
 
-	  class Config {
+    class Config {
 
       /**
        * Holds the arrayed location of our config files/folders
@@ -76,7 +76,7 @@ namespace UsabilityDynamics\Veneer {
        * @throws \Exception Plain exception when there is an issue
        */
       public function __construct( $base_dir = __DIR__, $do_stuff = true ) {
-	      global $table_prefix, $wp_version;
+        global $table_prefix, $wp_version;
 
         if( !( is_bool( $do_stuff ) && $do_stuff ) ) {
           return;
@@ -169,10 +169,10 @@ namespace UsabilityDynamics\Veneer {
           define( 'WP_DEBUG_DISPLAY', $_SERVER[ 'WP_DEBUG_DISPLAY' ] );
         }
 
-	      // Just in case.
-	      if( !defined( 'WP_VERSION' ) && isset( $wp_version ) ) {
-		      define( 'WP_VERSION', $wp_version );
-	      }
+        // Just in case.
+        if( !defined( 'WP_VERSION' ) && isset( $wp_version ) ) {
+          define( 'WP_VERSION', $wp_version );
+        }
 
         /** Check for any ENVIRONMENT variables first */
         foreach( (array) $_ENV as $key => $value ){
@@ -187,18 +187,18 @@ namespace UsabilityDynamics\Veneer {
           define( 'ENVIRONMENT', trim( $environment ) );
         }
 
-	      if( !defined( 'ENVIRONMENT' ) && defined( 'WP_ENV' ) && WP_ENV ) {
-		      define( 'ENVIRONMENT', WP_ENV );
-	      }
+        if( !defined( 'ENVIRONMENT' ) && defined( 'WP_ENV' ) && WP_ENV ) {
+          define( 'ENVIRONMENT', WP_ENV );
+        }
 
-	      if( !defined( 'ENVIRONMENT' ) && defined( 'PHP_ENV' ) && PHP_ENV ) {
-		      define( 'ENVIRONMENT', PHP_ENV );
-	      }
+        if( !defined( 'ENVIRONMENT' ) && defined( 'PHP_ENV' ) && PHP_ENV ) {
+          define( 'ENVIRONMENT', PHP_ENV );
+        }
 
         /** For these variables, make sure they exist */
-	      if( defined( 'ENVIRONMENT' ) )  {
-		      $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/static/etc/wp-config/' . ENVIRONMENT . '/';
-	      }
+        if( defined( 'ENVIRONMENT' ) )  {
+          $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/static/etc/wp-config/' . ENVIRONMENT . '/';
+        }
 
         $this->config_folders[ ] = rtrim( $base_dir, '/' ) . '/application/static/etc/wp-config/';
 
@@ -338,12 +338,12 @@ namespace UsabilityDynamics\Veneer {
           }
         }
 
-	      /** Is this needed? */
-	      if( !isset( $table_prefix ) ) {
-		      $table_prefix = defined( 'DB_PREFIX' ) ? DB_PREFIX : 'wp_';
-	      }
+        /** Is this needed? */
+        if( !isset( $table_prefix ) ) {
+          $table_prefix = defined( 'DB_PREFIX' ) ? DB_PREFIX : 'wp_';
+        }
 
-	      /** Return this own object */
+        /** Return this own object */
         return $this;
 
       }
@@ -391,35 +391,34 @@ namespace UsabilityDynamics\Veneer {
        */
       private function _parse_composer( $composer_file = null ) {
 
-	      try {
+        try {
 
-		      $_settings = array();
+          $_settings = array();
 
-		      $_composer = file_get_contents( $composer_file );
+          $_composer = file_get_contents( $composer_file );
+          $_composer = json_decode( $_composer, false, 512 );
 
-		      $_composer = json_decode( $_composer, false, 512, JSON_BIGINT_AS_STRING );
-
-	      } catch( \Exception $error ) {
-		      // Most likely can't parse JSON file... Silently fail.
-		      return $_settings;
-	      }
+        } catch( \Exception $error ) {
+          // Most likely can't parse JSON file... Silently fail.
+          return $_settings;
+        }
 
 
-	      if( isset( $_composer->settings ) && is_object( $_composer->settings ) ) {
+        if( isset( $_composer->settings ) && is_object( $_composer->settings ) ) {
           foreach( (array) $_composer->settings as $key => $value ) {
-            $_settings[ $key ] = $value;
+            $_settings[ $key ] = (array) $value;
           }
         }
 
         if( isset( $_composer->extra ) && isset( $_composer->extra->settings ) && is_object( $_composer->extra->settings ) ) {
           foreach( (array) $_composer->extra->settings as $key => $value ) {
-            $_settings[ $key ] = $value;
+            $_settings[ $key ] = (array) $value;
           }
 
         }
 
         return (array) $_settings;
-	      
+        
       }
 
       /**
