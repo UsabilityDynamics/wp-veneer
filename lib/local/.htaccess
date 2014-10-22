@@ -238,11 +238,13 @@
 # BEGIN Management
 <IfModule mod_rewrite.c>
 
-  RewriteRule ^wp-admin/admin-ajax.php?(.*)$  /vendor/libraries/automattic/wordpress/wp-admin/admin-ajax.php$1 [QSA,L]
+  RewriteRule ^wp-admin/admin-ajax.php?(.*)$  /vendor/libraries/automattic/wordpress/wp-admin/admin-ajax.php$1  [QSA,L]
 
   RewriteRule ^wp-admin/js/?(.*)$             /manage/js/$1           [QSA,L]
   RewriteRule ^wp-admin/css/?(.*)$            /manage/css/$1          [QSA,L]
   RewriteRule ^wp-admin/images/?(.*)$         /manage/images/$1       [QSA,L]
+  RewriteRule ^wp-login.php$                  /manage/login/          [R=301,L]
+  RewriteRule ^wp-admin$                      /manage/                [R=301,L]
   RewriteRule ^wp-admin/install.php?(.*)$     /manage/install.php$1   [R=301,L]
 
   # Must have the following to avoid having a broken admin panel
