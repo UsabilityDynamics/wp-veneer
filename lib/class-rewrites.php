@@ -591,11 +591,14 @@ namespace UsabilityDynamics\Veneer {
         }
 
         /**
-         * HACKY Fix because composer doesn't install directories with underscores
+         * HACKY Fix because composer doesn't install directories with underscores, the second one is just lazy.
          */
         switch( true ){
           case stripos( $url, 'modules/simple_email_subscriber' ) !== false:
             $url = str_ireplace( 'modules/simple_email_subscriber', 'modules/simple-email-subscriber', $url );
+          break;
+          case stripos( $plugin, 'sitepress-multilingual-cms' ) !== false:
+            $url = str_ireplace( 'sitepress-multilingual-cms/inc/installer/includes', 'sitepress-multilingual-cms/inc/installer', $url );
           break;
         }
 
