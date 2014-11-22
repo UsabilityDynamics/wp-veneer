@@ -243,7 +243,10 @@ namespace UsabilityDynamics\Veneer {
 				add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 				add_action( 'wp_head', array( $this, 'wp_head' ), 0, 200 );
 				// add_filter( 'theme_root', array( $this, 'theme_root' ), 10 );
-				add_filter( 'flush_rewrite_rules_hard', array( $this, 'flush_rewrite_rules_hard' ));
+
+				add_action( 'admin_init', function() {
+          add_filter( 'flush_rewrite_rules_hard', array( 'UsabilityDynamics\Veneer\Bootstrap', 'flush_rewrite_rules_hard' ));
+        });
 
 				// Initialize Interfaces.
 				$this->_interfaces();
