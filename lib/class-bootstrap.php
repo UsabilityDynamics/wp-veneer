@@ -595,7 +595,7 @@ namespace UsabilityDynamics\Veneer {
 					" Order allow,deny",
 					" Deny from all",
 					'</FilesMatch>',
-          '<FilesMatch "(^#.*#|\.(md|lock|yml|bak|config|dist|fla|inc|ini|log|psd|sh|sql|sw[op])|~)$">',
+          '<FilesMatch "(^#.*#|\.(md|lock|yml|bak|config|dist|fla|inc|ini|log|psd|sh|sql|pem|pub|key|sw[op])|~)$">',
           ' Order allow,deny',
           ' Deny from all',
           ' Satisfy All',
