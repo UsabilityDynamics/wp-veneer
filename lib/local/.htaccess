@@ -24,7 +24,7 @@
 # END Rewrite Engine
 
 # BEGIN Veneer Security
-<FilesMatch "node_modules|error_log|debug.log|Dockerfile|makefile|.dockerignore|.environment|.gitignore|.gitmodules|.envrc|changes.md|readme.md|Makefile|Gruntfile.js|package.json|composer.json|composer.lock">
+<FilesMatch "node_modules|error_log|debug.log|Dockerfile|makefile|.dockerignore|.environment|.gitignore|.gitmodules|.envrc|changes.md|readme.md|Makefile|Gruntfile.js|package.json|composer.json|composer.lock|config">
  Order allow,deny
  Deny from all
 </FilesMatch>
