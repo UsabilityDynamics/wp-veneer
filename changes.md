@@ -1,31 +1,12 @@
-#### 2.2.1
-* Switched Docker build to use wpcloud/site:latest instead of hipstack/wordpress.
-* Disabled PageSpeed and NewRelic on admin.
-
-#### 2.2.0
-* Moved MU plugins to be loaded from ./application
-* Added autoload.php MU plugin for loading vendor libs
-* Re-installed wp-cluster, wp-veneer and wp-network as valid plugins, removing ./vendor/modules completely.
-* Removed automatic loading of wp-vertical-edm and wp-elastic, should be enabled as a plugin.
-* Reinstalled plugins from GitHub: wp-github-updater, wp-network, wp-veneer, wp-cluster, wp-elastic, wp-event-post-type-v0.5, wp-pagespeed and wp-revisr.
-* Setup automatic plugin activation for required plugins.
-* Fixed commenting with wp-comments-post.php
-* Re-installed wp-splash. [wp theme enable wp-splash --network]
-* Replaced wp-spectacle with wp-spectacle-v1.0 [wp theme enable wp-spectacle-v1.0 --network]
-* Replaced wp-spectacle-2 with wp-spectacle-v2.0 [wp theme enable wp-spectable-v2.0 --network]
-* Replaced wp-disco with wp-disco-v2.0 [wp theme activate wp-disco-v2.0].
-* Copy wp-disco settings [wp option get theme_mods_wp-disco --format=json | wp option update theme_mods_wp-disco-v2.0 --format=json]
-* Replaced flawless with wp-flawless-v1.0 [wp theme enable wp-flawless-v1.0 --network]
-* Replaced wp-festival with wp-festival-v1.0 [wp theme enable wp-festival-v1.0 --network]
-* Replaced wp-festival-2 with wp-festival-v2.0 [wp theme enable wp-festival-v2.0 --network]
-* Added "wp utility" command for seeing useful lists such as cross-network active theme.
-* Fixed "lib-settings" and "lib-utility" deps to have fixed versions.
-* Added "wp utility dns" to see list of sites and the resolved IPs.
-* Created post-deployment script [https://gist.github.com/andypotanin/648f2ba3e6acada05b1d]
-
-#### 2.1.3
-* Added changes.md
-* Added "make snapshotImport" command to download MySQL snapshot from RDS.
-* Installed latest version of wp-github-updater.
-* Added GitHub Sync MU plugin.
-* Updated GravityForms, WPML and GitHub Updater.
+#### 0.7.0
+* Moved .htaccess generation into admin_init only.
+* Improved toolbar Server Name, Git Branch and Server IP display.
+* Site post-creation/post-edit action to modify upload_url_path and upload_path options. (WIP)
+* Removed esoteric constants: SUNRISE_LOADED, DOMAIN_MAPPING, ENVIRONMENT, WP_BASE_URL, WP_BASE_DOMAIN
+* Removed WP_BASE_DIR constant since its illogical - should either use ABSPATH, WP_CONTENT_DIR, MUPLUGINDIR, WP_PLUGIN_DIR, WP_LANG_DIR, etc.
+* Added support for WP_VENEER_VARNISH_IP to set where to send purge requests.
+* Made WP_LOGS_DIR be relative to WP_CONTENT_DIR.
+* Made WP_DEBUG and WP_DEBUG_DISPLAY be configurable via Apache environment even if not defiend in composer.json
+* Bundled in monolog/monolog and removed Raygun4php\RaygunClient dependency.
+* Added new options: varnish.enabled, api.enabled, logs.enabled and rewrites.enabled. Disabled by default.
+* (WIP) Set WP_LANG_DIR properly.
