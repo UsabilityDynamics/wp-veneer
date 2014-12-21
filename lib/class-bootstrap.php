@@ -588,6 +588,8 @@ namespace UsabilityDynamics\Veneer {
 					return $setting;
 				}
 
+				// if( !function_exists( 'insert_with_markers' ) ) {}
+
 				$htaccess_file = wp_normalize_path( get_home_path() . '/.htaccess' );
 
 				insert_with_markers( $htaccess_file, 'Veneer Security', array(
@@ -665,7 +667,8 @@ namespace UsabilityDynamics\Veneer {
 					" # RewriteBase /",
 					" # RewriteRule ^manage$                         /manage/ [R=301,L]",
 					" # RewriteRule ^manage/(login|signup)/?(.*)$    /wp-$1.php [QSA,L]",
-					" # RewriteRule ^manage/?(.*)$                   /wp-admin/$1 [QSA,L]",
+					" RewriteRule ^manage$  wp-admin/  [R=301,L]",
+					" RewriteRule ^manage/$  wp-admin/  [R=301,L]",
 					"</IfModule>"
 				));
 
