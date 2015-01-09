@@ -578,6 +578,8 @@ namespace UsabilityDynamics\Veneer {
 			/**
 			 * Need to add logic to append BEFORE the WordPress markers are added, in the meantime need to manually reposition
 			 *
+			 * Veneer Security - https://www.regex101.com/r/pP7fG1/3
+			 *
 			 * @param $setting
 			 *
 			 * @return mixed
@@ -593,15 +595,10 @@ namespace UsabilityDynamics\Veneer {
 				$htaccess_file = wp_normalize_path( get_home_path() . '/.htaccess' );
 
 				insert_with_markers( $htaccess_file, 'Veneer Security', array(
-					'<FilesMatch "node_modules|error_log|debug.log|Dockerfile|makefile|.dockerignore|.environment|.gitignore|.gitmodules|.envrc|changes.md|readme.md">',
+					'<FilesMatch "(?i)(\/\.(.*)|^#.*#|\.(md|lock|bak|config|dist|fla|inc|ini|log|psd|sh|sql|pem|pub|key|sw[op])|node_modules|error_log|debug.log|dockerfile|makefile|.dockerignore|.environment|.gitignore|.gitmodules|.envrc|changes.md|readme.md|wp-cli.yml|circle.yml)$">',
 					" Order allow,deny",
 					" Deny from all",
 					'</FilesMatch>',
-          '<FilesMatch "(^#.*#|\.(md|lock|yml|bak|config|dist|fla|inc|ini|log|psd|sh|sql|pem|pub|key|sw[op])|~)$">',
-          ' Order allow,deny',
-          ' Deny from all',
-          ' Satisfy All',
-          '</FilesMatch>'
 				));
 
         insert_with_markers( $htaccess_file, 'Veneer Static Media', array(
@@ -667,8 +664,8 @@ namespace UsabilityDynamics\Veneer {
 					" # RewriteBase /",
 					" # RewriteRule ^manage$                         /manage/ [R=301,L]",
 					" # RewriteRule ^manage/(login|signup)/?(.*)$    /wp-$1.php [QSA,L]",
-					" RewriteRule ^manage$  wp-admin/  [R=301,L]",
-					" RewriteRule ^manage/$  wp-admin/  [R=301,L]",
+					" # RewriteRule ^manage$  wp-admin/  [R=301,L]",
+					" # RewriteRule ^manage/$  wp-admin/  [R=301,L]",
 					"</IfModule>"
 				));
 
