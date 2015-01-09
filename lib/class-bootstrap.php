@@ -980,7 +980,7 @@ namespace UsabilityDynamics\Veneer {
 					$wp_admin_bar->add_menu( array(
 						'id' => 'environment',
 						'parent' => 'server_name',
-						'title' => sprintf( __( 'Branch: %s' ), $_environment ),
+						'title' => sprintf( __( 'Environment: %s' ), $_environment ),
 						'href' => '#'
 					));
 
