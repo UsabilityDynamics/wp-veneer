@@ -239,7 +239,7 @@ namespace UsabilityDynamics\Veneer {
 
 				/** If we've got WP_CLI, we need to fix the base dir */
 				// If wp-cli then we should take current working directory
-				if( defined( 'WP_CLI' ) ) {
+				if( defined( 'WP_CLI' ) && isset( $_SERVER[ 'PWD' ] ) ) {
 					$this->baseDir = $_SERVER[ 'PWD' ];
 				}
 
@@ -266,7 +266,6 @@ namespace UsabilityDynamics\Veneer {
 				} else if ( is_file( $this->baseDir . '/composer.json' ) ) {
 					$this->composer_file = $this->baseDir . '/composer.json';
 				}
-
 
 				return $this->baseDir;
 
